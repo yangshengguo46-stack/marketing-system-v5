@@ -5,7 +5,7 @@ All notable changes to DeerFlow are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.0] — 2026-06-15
+## [2.0.0] — 2026-06-25
 
 DeerFlow 2.0 is a ground-up rewrite around a "super agent" harness with
 sub-agents, persistent memory, sandbox execution, and an extensible
@@ -13,7 +13,7 @@ skills/tools system. It shares no code with the 1.x line, which now lives on
 the [`main-1.x` branch](https://github.com/bytedance/deer-flow/tree/main-1.x).
 
 This release closes [milestone 2.0.0](https://github.com/bytedance/deer-flow/milestone/1)
-with **180 merged pull requests** since the first 2.0 milestone tag.
+with **182 merged pull requests** since the first 2.0 milestone tag.
 
 ### ⚠ Breaking changes
 
@@ -39,6 +39,7 @@ with **180 merged pull requests** since the first 2.0 milestone tag.
 - **memory:** Add `memory.token_counting` config to opt out of tiktoken for
   network-restricted deployments. ([#3465])
 - **suggest:** Make AI follow-up question suggestions optional. ([#3591])
+- **persistence:** wire alembic migrations, bootstrap schema on startup ([#3706])
 
 #### Models & integrations
 - **models:** Add StepFun reasoning model adapter. ([#3461])
@@ -518,3 +519,4 @@ with **180 merged pull requests** since the first 2.0 milestone tag.
 [#3654]: https://github.com/bytedance/deer-flow/pull/3654
 [#3657]: https://github.com/bytedance/deer-flow/pull/3657
 [#3658]: https://github.com/bytedance/deer-flow/pull/3658
+[#3706]: https://github.com/bytedance/deer-flow/pull/3706
