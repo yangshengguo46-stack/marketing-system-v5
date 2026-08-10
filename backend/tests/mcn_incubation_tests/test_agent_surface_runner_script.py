@@ -107,6 +107,19 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
     with pytest.raises(SystemExit):
         module._parse_args(["--case", "M01", "--max-paid-trials", "1"])
 
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "12",
+                "--execute",
+            ]
+        )
+
     args = module._parse_args(
         [
             "--case",
@@ -114,13 +127,13 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
             "--max-paid-trials",
             "1",
             "--max-agent-steps",
-            "12",
+            "50",
             "--execute",
         ]
     )
     assert args.case_ids == ["M01"]
     assert args.max_paid_trials == 1
-    assert args.max_agent_steps == 12
+    assert args.max_agent_steps == 50
     module.enforce_paid_trial_cap(trial_count=1, max_paid_trials=1)
     with pytest.raises(ValueError, match="paid trial cap"):
         module.enforce_paid_trial_cap(trial_count=2, max_paid_trials=1)
@@ -170,7 +183,7 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             assert "agent-eval-offline-M01-initial" in prompt
             assert thread_id
             assert kwargs["user_id"].startswith("agent-eval-owner-")
-            assert kwargs["recursion_limit"] == 12
+            assert kwargs["recursion_limit"] == 50
             yield SimpleNamespace(
                 type="messages-tuple",
                 data={
@@ -220,7 +233,7 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             "--max-paid-trials",
             "1",
             "--max-agent-steps",
-            "12",
+            "50",
             "--model",
             "fake-model",
             "--run-id",

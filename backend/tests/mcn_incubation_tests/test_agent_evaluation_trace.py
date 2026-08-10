@@ -110,6 +110,33 @@ def test_agent_event_collector_seals_tool_trajectory_without_credentials() -> No
     assert "should-never-be-recorded" not in repr(observation)
 
 
+def test_agent_event_collector_merges_incremental_tool_call_arguments() -> None:
+    collector = AgentEventCollector()
+    for arguments in ({}, {"project_id": "project-a"}):
+        collector.consume(
+            SimpleNamespace(
+                type="messages-tuple",
+                data={
+                    "type": "ai",
+                    "id": "tool-request",
+                    "content": "",
+                    "tool_calls": [
+                        {
+                            "name": "incubation_project_context",
+                            "id": "call-1",
+                            "args": arguments,
+                        }
+                    ],
+                },
+            )
+        )
+
+    observation = collector.finish()
+
+    assert len(observation.events) == 1
+    assert observation.events[0].arguments == {"project_id": "project-a"}
+
+
 def test_agent_event_collector_marks_provider_fallback_and_hides_unknown_results() -> None:
     collector = AgentEventCollector()
     collector.consume(

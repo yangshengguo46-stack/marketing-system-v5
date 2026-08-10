@@ -6,7 +6,7 @@ import json
 import os
 import re
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from hashlib import sha256
 from pathlib import Path
@@ -235,7 +235,7 @@ class AgentEventCollector:
         self._last_message_id = ""
         self._usage: dict[str, int | float] = {}
         self._events: list[AgentTraceEvent] = []
-        self._seen_calls: set[tuple[str | None, str]] = set()
+        self._call_event_indexes: dict[tuple[str, str], int] = {}
         self._fallback_error_code: str | None = None
 
     def consume(self, event: Any) -> None:
@@ -273,7 +273,7 @@ class AgentEventCollector:
         raw_calls = data.get("tool_calls", [])
         if not isinstance(raw_calls, list):
             return
-        for raw_call in raw_calls:
+        for position, raw_call in enumerate(raw_calls):
             if not isinstance(raw_call, Mapping):
                 continue
             tool_name = str(raw_call.get("name") or "").strip()
@@ -281,12 +281,21 @@ class AgentEventCollector:
                 continue
             raw_call_id = raw_call.get("id")
             call_id = None if raw_call_id is None else str(raw_call_id)
-            identity = (call_id, tool_name)
-            if identity in self._seen_calls:
-                continue
-            self._seen_calls.add(identity)
+            call_key = call_id or f"message:{message_id}:position:{position}"
+            identity = (call_key, tool_name)
             sanitized = _sanitize_json(raw_call.get("args", {}))
             arguments = sanitized if isinstance(sanitized, Mapping) else {"value": sanitized}
+            existing_index = self._call_event_indexes.get(identity)
+            if existing_index is not None:
+                existing = self._events[existing_index]
+                merged_arguments = dict(existing.arguments or {})
+                merged_arguments.update(arguments)
+                self._events[existing_index] = replace(
+                    existing,
+                    arguments=merged_arguments,
+                )
+                continue
+            self._call_event_indexes[identity] = len(self._events)
             self._events.append(
                 AgentTraceEvent(
                     sequence=len(self._events),

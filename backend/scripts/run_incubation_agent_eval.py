@@ -50,6 +50,8 @@ _REQUIRED_INCUBATION_TOOLS = frozenset(
         "incubation_project_evidence",
     }
 )
+_MIN_AGENT_GRAPH_STEPS = 40
+_MAX_AGENT_GRAPH_STEPS = 100
 
 
 @dataclass(frozen=True, slots=True)
@@ -277,7 +279,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--max-agent-steps",
         type=int,
         required=True,
-        help="LangGraph recursion limit per trial; bounds loops but is not a currency cap",
+        help=(f"LangGraph super-step limit per trial; the current Lead Agent graph requires at least {_MIN_AGENT_GRAPH_STEPS} for framework overhead"),
     )
     parser.add_argument(
         "--model",
@@ -304,8 +306,8 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error("--execute is required because Agent evaluation makes paid model calls")
     if args.max_paid_trials < 1:
         parser.error("--max-paid-trials must be positive")
-    if not 4 <= args.max_agent_steps <= 50:
-        parser.error("--max-agent-steps must be between 4 and 50")
+    if not _MIN_AGENT_GRAPH_STEPS <= args.max_agent_steps <= _MAX_AGENT_GRAPH_STEPS:
+        parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
     return args
 
 
