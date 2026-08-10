@@ -112,7 +112,13 @@ def test_agent_event_collector_seals_tool_trajectory_without_credentials() -> No
 
 def test_agent_event_collector_merges_incremental_tool_call_arguments() -> None:
     collector = AgentEventCollector()
-    for arguments in ({}, {"project_id": "project-a"}):
+    for arguments, usage in (
+        ({}, None),
+        (
+            {"project_id": "project-a"},
+            {"input_tokens": 100, "output_tokens": 20, "total_tokens": 120},
+        ),
+    ):
         collector.consume(
             SimpleNamespace(
                 type="messages-tuple",
@@ -120,6 +126,7 @@ def test_agent_event_collector_merges_incremental_tool_call_arguments() -> None:
                     "type": "ai",
                     "id": "tool-request",
                     "content": "",
+                    "usage_metadata": usage,
                     "tool_calls": [
                         {
                             "name": "incubation_project_context",
@@ -135,6 +142,11 @@ def test_agent_event_collector_merges_incremental_tool_call_arguments() -> None:
 
     assert len(observation.events) == 1
     assert observation.events[0].arguments == {"project_id": "project-a"}
+    assert observation.usage == {
+        "input_tokens": 100,
+        "output_tokens": 20,
+        "total_tokens": 120,
+    }
 
 
 def test_agent_event_collector_marks_provider_fallback_and_hides_unknown_results() -> None:

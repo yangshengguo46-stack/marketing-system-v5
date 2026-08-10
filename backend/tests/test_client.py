@@ -581,6 +581,62 @@ class TestStream:
         call_kwargs = agent.stream.call_args.kwargs
         assert "messages" in call_kwargs["stream_mode"]
 
+    def test_messages_mode_emits_completed_tool_call_arguments_from_values(self, client):
+        """A terminal values snapshot repairs partial streamed tool arguments."""
+        agent = MagicMock()
+        agent.stream.return_value = iter(
+            [
+                (
+                    "messages",
+                    (
+                        AIMessageChunk(
+                            content="",
+                            id="ai-tool",
+                            tool_calls=[
+                                {
+                                    "name": "incubation_project_context",
+                                    "args": {},
+                                    "id": "call-1",
+                                }
+                            ],
+                        ),
+                        {},
+                    ),
+                ),
+                (
+                    "values",
+                    {
+                        "messages": [
+                            HumanMessage(content="read project", id="h-1"),
+                            AIMessage(
+                                content="",
+                                id="ai-tool",
+                                tool_calls=[
+                                    {
+                                        "name": "incubation_project_context",
+                                        "args": {"project_id": "project-a"},
+                                        "id": "call-1",
+                                    }
+                                ],
+                            ),
+                        ]
+                    },
+                ),
+            ]
+        )
+
+        with (
+            patch.object(client, "_ensure_agent"),
+            patch.object(client, "_agent", agent),
+        ):
+            events = list(client.stream("read project", thread_id="t-tool-args"))
+
+        tool_events = _tool_call_events(events)
+        assert [event.data["tool_calls"][0]["args"] for event in tool_events] == [
+            {},
+            {"project_id": "project-a"},
+        ]
+
     def test_stream_emits_additional_kwargs_updates_for_streamed_ai_messages(self, client):
         """stream() emits a follow-up AI event when attribution metadata arrives via values."""
         assembled = AIMessage(

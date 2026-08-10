@@ -122,10 +122,11 @@ Use `scripts/run_incubation_agent_eval.py` for the next complete Lead Agent
 evaluation. It seeds versioned cases into an isolated SQLite project/evidence
 ledger, uses an `InMemorySaver`, and seals the configured tool schemas plus a
 redacted actual tool trajectory. Every invocation must explicitly select cases,
-set `--max-paid-trials` and `--max-agent-steps`, and include `--execute` after
-user confirmation. These bounds limit trials and graph recursion, not exact
-currency spend. Do not score a run as successful merely because it called an
-incubation tool.
+set `--max-paid-trials`, `--max-agent-steps`, and `--max-model-calls`, and include
+`--execute` after user confirmation. These bounds limit trials, graph recursion,
+and actual lead-model calls respectively, but not exact currency spend. The
+evaluation request must return its judgment in chat instead of creating a file.
+Do not score a run as successful merely because it called an incubation tool.
 
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**

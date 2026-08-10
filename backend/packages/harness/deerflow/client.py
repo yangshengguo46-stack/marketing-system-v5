@@ -887,6 +887,7 @@ class DeerFlowClient:
         # Cross-mode handoff: ids already streamed via LangGraph ``messages``
         # mode so the ``values`` path skips re-synthesis of the same message.
         streamed_ids: set[str] = set()
+        streamed_tool_calls_by_id: dict[str, list[dict]] = {}
         # The same message id carries identical cumulative ``usage_metadata``
         # in both the final ``messages`` chunk and the values snapshot —
         # count it only on whichever arrives first.
@@ -981,6 +982,7 @@ class DeerFlowClient:
                     if msg_chunk.tool_calls:
                         if msg_id:
                             streamed_ids.add(msg_id)
+                            streamed_tool_calls_by_id[msg_id] = self._serialize_tool_calls(msg_chunk.tool_calls)
                         additional_kwargs_delta = None if sent_additional_kwargs else _unsent_additional_kwargs(msg_id, additional_kwargs)
                         yield self._ai_tool_calls_event(
                             msg_id,
@@ -1011,6 +1013,15 @@ class DeerFlowClient:
                         _account_usage(msg_id, getattr(msg, "usage_metadata", None))
                         additional_kwargs = self._serialize_additional_kwargs(msg)
                         additional_kwargs_delta = _unsent_additional_kwargs(msg_id, additional_kwargs)
+                        final_tool_calls = self._serialize_tool_calls(msg.tool_calls)
+                        if final_tool_calls and final_tool_calls != streamed_tool_calls_by_id.get(msg_id):
+                            yield self._ai_tool_calls_event(
+                                msg_id,
+                                msg.tool_calls,
+                                additional_kwargs_delta,
+                            )
+                            streamed_tool_calls_by_id[msg_id] = final_tool_calls
+                            additional_kwargs_delta = None
                         if additional_kwargs_delta:
                             # Metadata-only follow-up: ``messages-tuple`` has no
                             # dedicated attribution event, so clients should

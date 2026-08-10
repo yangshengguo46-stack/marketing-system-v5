@@ -79,13 +79,16 @@ cd backend
 uv run python scripts/run_incubation_agent_eval.py \
   --case M01 \
   --max-paid-trials 1 \
-  --max-agent-steps 50 \
-  --run-id agent-eval-m01-v2 \
+  --max-agent-steps 100 \
+  --max-model-calls 6 \
+  --run-id agent-eval-m01-v3 \
   --execute
 ```
 
-`--execute` 仍是付费确认。一个 Agent trial 可能包含多次模型调用，`--max-paid-trials` 不是请求次数或货币上限；`--max-agent-steps` 只限制 LangGraph 图超步。当前 Lead Agent 编译图有 25 个节点，运行器拒绝低于 40 的值；50 只是容纳正常中间件和工具往返，不代表 50 次模型调用。证据写入忽略目录 `.deer-flow/incubation-agent-eval/<run-id>/`，包括输入输出、Token、工具面、脱敏轨迹、隔离 SQLite 及哈希。
+`--execute` 仍是付费确认。`--max-paid-trials` 限制案例 trial 数，`--max-model-calls` 是每个 trial 的实际模型调用硬上限；`--max-agent-steps` 只限制 LangGraph 图超步。当前 Lead Agent 编译图有 25 个节点，100 用于容纳通用中间件和三项只读工具往返，不代表 100 次模型调用。证据写入忽略目录 `.deer-flow/incubation-agent-eval/<run-id>/`，包括输入输出、Token、工具面、脱敏轨迹、隔离 SQLite 及哈希。
 
 首次真实运行只允许 `M01:initial`，默认不加 `--thinking` 或 `--include-mutations`。必须先人工复核最终判断和轨迹，不能从工具命中直接推断业务通过。
 
 `agent-eval-m01-v1` 使用 12 个图超步，在首个项目事实工具往返前触发 `graph_recursion_error`，没有最终输出，不能进入业务评审。修正和回归测试见 `../evidence/2026-08-11-m01-agent-evaluation.md`；重跑必须使用新 ID，原密封证据不得覆盖。
+
+`agent-eval-m01-v2` 使用 50 个图超步，成功读取项目事实、证据和方法，但在通用 `write_file` 交付动作前耗尽预算，仍没有最终答案。`v3` 将交付格式限定为聊天文本，并以 6 次模型调用硬上限独立控制费用；两个失败 run 都保留且不进入业务评分。

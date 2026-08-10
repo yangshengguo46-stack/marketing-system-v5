@@ -52,6 +52,7 @@ def test_agent_eval_prepares_isolated_trials_without_embedding_case_answers() ->
     assert "incubation_project_context" not in initial_prompt
     assert "incubation_project_evidence" not in initial_prompt
     assert "信息不足" in initial_prompt
+    assert "不要创建或呈现文件" in initial_prompt
 
 
 @pytest.mark.asyncio
@@ -106,6 +107,18 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
 
     with pytest.raises(SystemExit):
         module._parse_args(["--case", "M01", "--max-paid-trials", "1"])
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "100",
+                "--execute",
+            ]
+        )
 
     with pytest.raises(SystemExit):
         module._parse_args(
@@ -116,6 +129,22 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
                 "1",
                 "--max-agent-steps",
                 "12",
+                "--max-model-calls",
+                "6",
+                "--execute",
+            ]
+        )
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "100",
+                "--max-model-calls",
+                "0",
                 "--execute",
             ]
         )
@@ -127,16 +156,34 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
             "--max-paid-trials",
             "1",
             "--max-agent-steps",
-            "50",
+            "100",
+            "--max-model-calls",
+            "6",
             "--execute",
         ]
     )
     assert args.case_ids == ["M01"]
     assert args.max_paid_trials == 1
-    assert args.max_agent_steps == 50
+    assert args.max_agent_steps == 100
+    assert args.max_model_calls == 6
     module.enforce_paid_trial_cap(trial_count=1, max_paid_trials=1)
     with pytest.raises(ValueError, match="paid trial cap"):
         module.enforce_paid_trial_cap(trial_count=2, max_paid_trials=1)
+
+
+def test_agent_eval_model_call_budget_is_hard_and_per_run() -> None:
+    module = _load_script()
+    budget = module.EvaluationModelCallBudget(max_calls=2)
+
+    assert budget.reserve(("thread-a", "run-a")) is True
+    assert budget.reserve(("thread-a", "run-a")) is True
+    assert budget.reserve(("thread-a", "run-a")) is False
+    assert budget.reserve(("thread-a", "run-b")) is True
+    fallback = budget._fallback()
+    assert fallback.result[0].additional_kwargs == {
+        "deerflow_error_fallback": True,
+        "error_reason": "evaluation_model_call_cap_reached",
+    }
 
 
 def test_agent_eval_uses_existing_deerflow_lead_agent_runtime() -> None:
@@ -157,8 +204,9 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     module = _load_script()
 
     class FakeClient:
-        def __init__(self, **_kwargs):
-            pass
+        def __init__(self, **kwargs):
+            assert len(kwargs["middlewares"]) == 1
+            assert kwargs["middlewares"][0].max_calls == 6
 
         def list_models(self):
             return {"models": [{"name": "fake-model"}]}
@@ -183,7 +231,7 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             assert "agent-eval-offline-M01-initial" in prompt
             assert thread_id
             assert kwargs["user_id"].startswith("agent-eval-owner-")
-            assert kwargs["recursion_limit"] == 50
+            assert kwargs["recursion_limit"] == 100
             yield SimpleNamespace(
                 type="messages-tuple",
                 data={
@@ -233,7 +281,9 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             "--max-paid-trials",
             "1",
             "--max-agent-steps",
-            "50",
+            "100",
+            "--max-model-calls",
+            "6",
             "--model",
             "fake-model",
             "--run-id",

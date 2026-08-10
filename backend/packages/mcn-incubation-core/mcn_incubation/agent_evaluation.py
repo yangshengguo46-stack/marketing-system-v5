@@ -234,6 +234,7 @@ class AgentEventCollector:
         self._chunks: dict[str, list[str]] = {}
         self._last_message_id = ""
         self._usage: dict[str, int | float] = {}
+        self._usage_message_ids: set[str] = set()
         self._events: list[AgentTraceEvent] = []
         self._call_event_indexes: dict[tuple[str, str], int] = {}
         self._fallback_error_code: str | None = None
@@ -259,6 +260,13 @@ class AgentEventCollector:
 
     def _consume_ai(self, data: Mapping[str, Any]) -> None:
         message_id = str(data.get("id") or "")
+        raw_usage = data.get("usage_metadata")
+        if isinstance(raw_usage, Mapping) and (not message_id or message_id not in self._usage_message_ids):
+            normalized_usage = _normalize_usage({str(name): value for name, value in raw_usage.items() if isinstance(name, str) and isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0})
+            for name, value in normalized_usage.items():
+                self._usage[name] = self._usage.get(name, 0) + value
+            if message_id:
+                self._usage_message_ids.add(message_id)
         text = _message_text(data.get("content", ""))
         if text:
             self._chunks.setdefault(message_id, []).append(text)

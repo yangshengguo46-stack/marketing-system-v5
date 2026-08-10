@@ -16,6 +16,6 @@
 - `evidence/2026-08-10-preflight-quality-review.md`：三案例真实输出、thinking 和 B01 四候选微型对照的业务评审。
 - `evidence/method-retrieval-eval.jsonl`：12 条来源化孵化方法检索基线。
 
-完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、Agent 步数上限和 `--execute`；未得到付费确认时只维护离线测试，不发起模型调用。
+完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、模型调用上限和 `--execute`；未得到付费确认时只维护离线测试，不发起模型调用。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

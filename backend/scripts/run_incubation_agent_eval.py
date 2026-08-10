@@ -7,14 +7,18 @@ import asyncio
 import importlib
 import json
 import re
-from collections.abc import Iterator, Sequence
+import threading
+from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 
+from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
+from langchain_core.messages import AIMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.checkpoint.memory import InMemorySaver
 from mcn_incubation.agent_evaluation import (
@@ -52,6 +56,68 @@ _REQUIRED_INCUBATION_TOOLS = frozenset(
 )
 _MIN_AGENT_GRAPH_STEPS = 40
 _MAX_AGENT_GRAPH_STEPS = 100
+_MAX_EVALUATION_MODEL_CALLS = 12
+
+
+class EvaluationModelCallBudget(AgentMiddleware):
+    """Hard per-run model-call cap used only by the paid evaluation CLI."""
+
+    def __init__(self, *, max_calls: int) -> None:
+        super().__init__()
+        self.max_calls = max_calls
+        self._lock = threading.Lock()
+        self._counts: dict[tuple[str, str], int] = {}
+
+    def reserve(self, key: tuple[str, str]) -> bool:
+        with self._lock:
+            count = self._counts.get(key, 0)
+            if count >= self.max_calls:
+                return False
+            self._counts[key] = count + 1
+            return True
+
+    @staticmethod
+    def _key(request: ModelRequest) -> tuple[str, str]:
+        context = getattr(request.runtime, "context", None)
+        if isinstance(context, Mapping):
+            return (
+                str(context.get("thread_id") or "unknown-thread"),
+                str(context.get("run_id") or "unknown-run"),
+            )
+        return "unknown-thread", str(id(request.runtime))
+
+    def _fallback(self) -> ModelResponse:
+        return ModelResponse(
+            result=[
+                AIMessage(
+                    content="Evaluation stopped after reaching its model-call budget.",
+                    additional_kwargs={
+                        "deerflow_error_fallback": True,
+                        "error_reason": "evaluation_model_call_cap_reached",
+                    },
+                )
+            ]
+        )
+
+    @override
+    def wrap_model_call(
+        self,
+        request: ModelRequest,
+        handler: Callable[[ModelRequest], ModelResponse],
+    ) -> ModelCallResult:
+        if not self.reserve(self._key(request)):
+            return self._fallback()
+        return handler(request)
+
+    @override
+    async def awrap_model_call(
+        self,
+        request: ModelRequest,
+        handler: Callable[[ModelRequest], Awaitable[ModelResponse]],
+    ) -> ModelCallResult:
+        if not self.reserve(self._key(request)):
+            return self._fallback()
+        return await handler(request)
 
 
 @dataclass(frozen=True, slots=True)
@@ -104,6 +170,7 @@ def build_agent_eval_prompt(trial: AgentEvalTrialSpec) -> str:
         f"项目 ID：{trial.project_id}",
         "请基于系统保存的项目资料，判断主体适合怎么起号、采用什么表现形式、持续做什么内容、如何形成变现与转化闭环，并给出最小验证实验。",
         "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时可以继续做暂定判断，但不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
+        "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
     ]
     if trial.include_mutation:
         sections.append("这是新增证据后的独立修订轮次；请指出哪些原判断应当改变、保留或继续未知。")
@@ -282,6 +349,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help=(f"LangGraph super-step limit per trial; the current Lead Agent graph requires at least {_MIN_AGENT_GRAPH_STEPS} for framework overhead"),
     )
     parser.add_argument(
+        "--max-model-calls",
+        type=int,
+        required=True,
+        help="Hard model-call cap per trial for evaluation cost control",
+    )
+    parser.add_argument(
         "--model",
         help="Configured DeerFlow model; defaults to the first configured model",
     )
@@ -308,6 +381,8 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error("--max-paid-trials must be positive")
     if not _MIN_AGENT_GRAPH_STEPS <= args.max_agent_steps <= _MAX_AGENT_GRAPH_STEPS:
         parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
+    if not 1 <= args.max_model_calls <= _MAX_EVALUATION_MODEL_CALLS:
+        parser.error(f"--max-model-calls must be between 1 and {_MAX_EVALUATION_MODEL_CALLS}")
     return args
 
 
@@ -348,6 +423,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         subagent_enabled=False,
         plan_mode=False,
         available_skills=set(),
+        middlewares=[EvaluationModelCallBudget(max_calls=args.max_model_calls)],
         environment="incubation-agent-eval",
     )
     configured_models = client.list_models()["models"]
