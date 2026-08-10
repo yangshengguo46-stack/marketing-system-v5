@@ -1,6 +1,6 @@
 # MCN Incubation Core Guide
 
-Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A28 audits before changing this package.
+Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A29 audits before changing this package.
 
 ## Ownership
 

@@ -16,18 +16,20 @@
 | 36 案例评测集 | tested | 八类业务场景、每例包含新证据变体 | 专家标注和评分标定 |
 | 五架构竞赛 | micro-business-rejected | `B01` 四候选真实模型对照 4/4 技术成功、证据完整；固定流程、长手册、按需方法、方法加两条事实均未通过业务评审 | 该运行无工具且宪法与生产存在漂移；180-trial 真实模型竞赛未完成；第五候选缺真实案例 |
 | ADR-006 | proposed | 候选边界和升级条件已记录 | 胜者、成本和人工一致性结果 |
-| 标准 Agent 与知识层 | in-progress | A25-A27 对照公开标准、DeerFlow 现状和微型实验缺陷；来源化方法、项目事实和项目证据读取纵切已接入 | 受控浏览器/MCP 采集、真实案例与完整 Agent 评测 |
-| 完整 Agent 评测入口 | harness-failure-fixed | `v1` 暴露 12 图超步不足；`v2` 已正确读取事实、证据和方法，但在文件交付前耗尽 50 图超步；部分 usage、完整参数和模型调用硬上限已有红绿测试 | 使用聊天交付、100 图超步、6 模型调用上限的新 ID 重跑；未获业务人工评审 |
+| 标准 Agent 与知识层 | business-rejected | A25-A28；来源化方法、项目事实和项目证据已接入，完整 Lead Agent 能读取三类上下文 | `v3` 仍违反已读方法的事实和数字边界；受控浏览器/MCP 与真实闭环未完成 |
+| 完整 Agent 评测入口 | tested-business-rejected | `v1/v2` 校准评测器；`v3` 以聊天交付和硬预算技术成功，工具参数、Token 和结果均已密封 | 修正业务质量前不扩大 36 案例，不宣称 M01 通过 |
 | ADR-007 | proposed | 增强型单 Agent、四类知识和先 BM25 后 embedding 的候选已记录 | 生产验证与三个真实业务闭环 |
+| 账号拆解证据层 | contract-tested | A29、ADR-008 和 10 个跨六平台失败案例；MediaKit 直接能力与缺口已逐项确认 | 浏览器快照、媒体原子任务、聚合合同和一个授权真实账号闭环 |
+| ADR-008 | proposed | 账号拆解只作为下游证据，不成为第二 Agent；MediaKit 路由与授权边界已记录 | 真实账号验收和模式人工复核 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向修订为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。尚未产生架构胜者，外挂知识层也未被证明有效；任何文档、界面或对外表述都不得写成已验证最佳方案。
+首选方向仍为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。`M01 v3` 证明该结构能运行，也证明知识命中不会自动带来正确判断；尚未产生架构胜者，任何文档、界面或对外表述都不得写成已验证最佳方案。
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、完整 Agent 脱敏轨迹与离线端到端运行器、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `352 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `354 passed`。
 - `uv run python -m pytest tests/test_client.py -q`：DeerFlowClient 流式消息、终态工具参数补全和既有嵌入式客户端合同共 `171 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
 - 旧 `packages/marketing-os`、`app/marketing` 和 `tests/marketing_os_tests` 已清除；A01-A19 只作为历史审计档案保留，当前依赖图不含 `marketing-os`。
@@ -52,8 +54,10 @@
 - A28 新增 `run_incubation_agent_eval.py` 和脱敏轨迹账本：案例资料只进入隔离项目库，请求只带项目 ID；实际工具调用、结果哈希、最终文本、Token、工具面和评测数据库均可验真。
 - `agent-eval-m01-v1` 在 3.5 秒后因 12 个 LangGraph 图超步不足而失败，只观察到首个项目事实工具意图，没有工具结果、最终文本或 Token 回执；这不是 M01 业务失败。当前 Lead 图有 25 个节点，运行器已通过失败测试将范围改为 `40..100`，并修复流式工具参数合并。详见 `../evidence/2026-08-11-m01-agent-evaluation.md`。
 - `agent-eval-m01-v2` 在 79.9 秒后耗尽 50 图超步；事实、证据、方法三项只读工具均成功，第四步因通用交付规则转向 `write_file`。修正改为聊天文本、100 图超步和独立 6 次模型调用硬上限，并让失败轨迹保留部分 usage 与终态完整工具参数。
+- `agent-eval-m01-v3` 技术成功：66.841 秒，输入 `43,527`、输出 `2,209`、合计 `45,736` Token；事实、证据、方法和聊天结果均完整密封。人工业务评审拒绝其无依据平台断言、未确认案例资产、表现形式和 500 播放/三评论/五私信等任意阈值，不能记为宝妈孵化通过。
+- A29 证明账号拆解可行但不属于单条 MediaKit 命令：MediaKit 直接承担元信息、ASR、OCR 和场景切分；浏览器负责账号观察；模式聚合必须带样本、反例、覆盖率和时间口径。10 条跨六平台合同用例已先行通过。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-提交第二轮评测器修正并确认工作区干净后，只用新 ID、100 图超步和 6 次模型调用硬上限重跑 `M01:initial`，观察它是否正确区分方法、项目事实、外部证据和未知；复核通过前不扩大案例。随后建设受控浏览器/MCP 证据采集写面，不得再用无工具单轮生成代替 Agent 评测。
+先按 A29 用离线夹具实现账号快照、透明样本框、作品观察、媒体原子和模式/反例的最小合同，再接一个用户授权账号的只读浏览器快照。M01 不再自动付费重跑；必须先离线提出并验证“知识已读仍被违反”的修正假设，且不得增加固定孵化阶段、模型输出改写或营销分数硬门。
