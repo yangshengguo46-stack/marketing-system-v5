@@ -623,6 +623,56 @@ def test_system_prompt_template_preserves_placeholders():
         assert ph in template, f"placeholder {ph} accidentally removed"
 
 
+def test_system_prompt_makes_the_deerflow_lead_agent_the_incubation_root():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "single lead MCN incubation agent" in template
+    assert "Incubation is your root responsibility" in template
+    assert "Content production, audience analysis, browser automation, media processing" in template
+    assert "must not become another decision-maker" in template
+    assert "Subagents may research bounded questions" in template
+    assert "must not own the incubation decision" in template
+
+
+def test_production_and_evaluation_share_one_incubation_contract():
+    from mcn_incubation.agent_contract import INCUBATION_AGENT_CONTRACT
+    from mcn_incubation.context import LEAD_AGENT_CONSTITUTION
+
+    assert f"<incubation_core>\n{INCUBATION_AGENT_CONTRACT}\n</incubation_core>" in prompt_module.SYSTEM_PROMPT_TEMPLATE
+    assert INCUBATION_AGENT_CONTRACT in LEAD_AGENT_CONSTITUTION
+
+
+def test_incubation_prompt_does_not_recreate_a_mandatory_interview_or_stage_gate():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "CLARIFY → PLAN → ACT" not in template
+    assert "ALWAYS ask" not in template
+    assert "Clarification First" not in template
+    assert "**Clarify first**" not in template
+    assert "ALWAYS clarify unclear/missing/ambiguous requirements" not in template
+    assert "fixed incubation stages" in template
+    assert "provisional recommendation" in template
+    assert "Do not restart with a generic intake interview" in template
+
+
+def test_incubation_prompt_keeps_proposed_variables_out_of_project_truth():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "Never invent a biography, persona credential, customer case, or product outcome" in template
+    assert "Proposed prices, budgets, publishing cadence, and metric thresholds are hypotheses" in template
+    assert "must not be described as observed facts, market norms, or proof of demand" in template
+    assert "Labeling an arbitrary number as a test variable does not ground it" in template
+
+
+def test_incubation_prompt_retrieves_methods_only_when_they_change_the_judgment():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "`incubation_context`" in template
+    assert "retrieve only the relevant cards" in template
+    assert "advisory lenses, not a required route or authority" in template
+    assert "must call incubation_context" not in template.casefold()
+
+
 def _make_minimal_app_config():
     return SimpleNamespace(
         sandbox=SimpleNamespace(mounts=[]),

@@ -182,6 +182,7 @@ _FRAMEWORK_STRUCTURED_TAGS = [
     "soul",
     "self_update",
     "thinking_style",
+    "incubation_core",
     "clarification_system",
     "critical_reminders",
     "response_style",

@@ -58,6 +58,7 @@ deer-flow/
 ├── backend/                        # Python backend — see backend/AGENTS.md
 │   ├── Makefile                    # Per-module backend commands (dev, gateway, test, lint, migrate-rev)
 │   ├── packages/extension-api/     # deerflow-extension-api package (import: deerflow_extension_api.*) — public extension contract
+│   ├── packages/mcn-incubation-core/ # fifth-version incubation contracts (import: mcn_incubation.*)
 │   ├── packages/harness/           # deerflow-harness package (import: deerflow.*) — agent framework
 │   └── app/                        # FastAPI Gateway + IM channels (import: app.*)
 ├── frontend/                       # Next.js frontend (pnpm) — see frontend/AGENTS.md
@@ -69,6 +70,8 @@ deer-flow/
 ├── scripts/                        # Root orchestration scripts invoked by the Makefile (check, configure, doctor, support_bundle, serve, nginx, docker, deploy, setup_wizard)
 ├── tests/                          # Root-level tests (currently tests/skills/ — public skill tests)
 └── docs/                           # Cross-cutting docs, plans, and design notes
+    ├── marketing-os/              # legacy/historical Marketing OS work; not the fifth-version product root
+    └── mcn-incubation-v5/         # fifth-version incubation product contract, audits, eval corpus, and decisions
 ```
 
 Third-party extensions are loaded from a top-level `plugins:` list in `config.yaml`
@@ -158,5 +161,14 @@ These apply repo-wide; module guides own the module-specific detail.
 - **Test-driven development** — features and bug fixes ship with tests. Backend tests live
   in `backend/tests/` (TDD is mandatory there; see [backend/AGENTS.md](backend/AGENTS.md));
   frontend tests live in `frontend/tests/`.
+- **Legacy Marketing OS evidence** — `docs/marketing-os/` is an archived audit
+  record, not the current product contract. Its abandoned runtime package and
+  Gateway projection are deliberately absent. Use the audits for provenance and
+  failure lessons; do not restore them as a wrapper around the fifth version.
+- **Fifth-version incubation delivery** — DeerFlow's single Lead Agent is the
+  incubation decision-maker. Read `docs/mcn-incubation-v5/` before changing
+  `packages/mcn-incubation-core` or the Lead Agent prompt. Do not add another
+  agent runtime, semantic middleware, fixed incubation stage, or score gate.
+  New fifth-version work must not depend on the legacy `marketing-os` package.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

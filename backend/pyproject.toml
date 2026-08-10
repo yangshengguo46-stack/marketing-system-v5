@@ -82,8 +82,9 @@ index-url = "https://pypi.org/simple"
 override-dependencies = ["websockets==16.0"]
 
 [tool.uv.workspace]
-members = ["packages/harness", "packages/extension-api"]
+members = ["packages/harness", "packages/extension-api", "packages/mcn-incubation-core"]
 
 [tool.uv.sources]
 deerflow-harness = { workspace = true }
 deerflow-extension-api = { workspace = true }
+mcn-incubation-core = { workspace = true }

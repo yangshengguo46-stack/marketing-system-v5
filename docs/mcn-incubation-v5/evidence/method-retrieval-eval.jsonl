@@ -1,0 +1,12 @@
+{"case_id":"KR01","query":"一个做过十年会计的宝妈怎样从零起号、持续经营并设计变现","expected_capabilities":["incubation_model","content_engine","monetization"],"limit":4}
+{"case_id":"KR02","query":"本人不想出镜，也不展示孩子，应该选择什么拍摄和表现形式","expected_capabilities":["expression_form"],"limit":4}
+{"case_id":"KR03","query":"产品配方公开，能不能直接说安全有效，应该拿什么证据证明","expected_capabilities":["trust_proof"],"limit":4}
+{"case_id":"KR04","query":"怎样拆解对标账号和代表作品，又不照抄爆款台词与镜头","expected_capabilities":["benchmark_adaptation"],"limit":4}
+{"case_id":"KR05","query":"宝妈标签太宽了，应该怎样理解受众问题、需求和购买情境","expected_capabilities":["audience_problem"],"limit":4}
+{"case_id":"KR06","query":"如何把零散选题变成可以长期持续更新的内容系列","expected_capabilities":["content_engine"],"limit":4}
+{"case_id":"KR07","query":"内容有播放但没有私信和线索，主页到成交的承接怎么设计","expected_capabilities":["conversion"],"limit":4}
+{"case_id":"KR08","query":"冷启动第一轮试拍怎样验证假设，又不编造行业阈值","expected_capabilities":["experiment_design"],"limit":4}
+{"case_id":"KR09","query":"品牌和创始人谁应该成为被记住的主体，产品怎么形成差异定位","expected_capabilities":["positioning"],"limit":4}
+{"case_id":"KR10","query":"这款产品由谁付费、怎么赚钱，价格和交付能力怎么判断","expected_capabilities":["monetization"],"limit":4}
+{"case_id":"KR11","query":"TikTok 商业内容中的产品实测怎样形成可信背书","expected_capabilities":["trust_proof"],"limit":4}
+{"case_id":"KR12","query":"量子纠缠公式推导","expected_capabilities":[],"limit":4}

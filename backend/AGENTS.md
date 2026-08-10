@@ -30,6 +30,7 @@ deer-flow/
 │   ├── langgraph.json         # LangGraph Studio graph configuration
 │   ├── packages/
 │   │   ├── extension-api/     # public, host-independent extension contracts (import: deerflow_extension_api.*)
+│   │   ├── mcn-incubation-core/ # fifth-version incubation contracts (import: mcn_incubation.*)
 │   │   └── harness/           # deerflow-harness package (import: deerflow.*)
 │   │       ├── pyproject.toml
 │   │       └── deerflow/
@@ -72,6 +73,59 @@ deer-flow/
 ```
 
 ## Important Development Guidelines
+
+### Legacy Marketing OS Evidence
+
+`docs/marketing-os/` is retained only as historical audit evidence. The abandoned
+`packages/marketing-os` and `app/marketing` runtimes are not part of this checkout's
+product architecture and must not be recreated as a wrapper around the fifth version.
+
+### Fifth-Version Incubation Core
+
+The existing DeerFlow Lead Agent is the sole MCN incubation decision-maker; do
+not create a wrapper agent or second runtime. Its compact incubation contract
+lives once in
+`packages/mcn-incubation-core/mcn_incubation/agent_contract.py` and is imported
+verbatim by production and evaluation prompts. `packages/mcn-incubation-core` owns
+facts, decision versions, experiments, outcomes, reviewed cases, methods, and
+evaluation contracts. The built-in `incubation_context` method reader is
+read-only and advisory; it returns typed, reviewed source metadata and must
+keep platform applicability, supported claims, limitations, and refresh dates
+visible. `incubation_project_context` reads the authenticated
+owner's unsuperseded typed truths from the shared durable database, while
+`incubation_project_evidence` separately returns current source snapshots with
+hashes, applicability, limitations, disputes, and expiry warnings. Neither model
+schema may expose `owner_id`, and evidence must never auto-promote to truth.
+Gateway startup bootstraps the independent
+incubation metadata before these readers are used. Read `docs/mcn-incubation-v5/`
+before changing either side. New
+fifth-version code must not import or depend on the historical `marketing-os` runtime.
+
+Run a deliberately small real-model preflight with
+`uv run python scripts/run_incubation_preflight.py --execute`. The explicit
+flag acknowledges paid calls. Evidence is append-only under the ignored local
+`.deer-flow/incubation-preflight/` root; a DeerFlow provider-error fallback is
+a failed trial, never a successful model answer. Do not start the 180-trial
+bakeoff until model parameters and a cost cap are pinned.
+
+Use `scripts/run_incubation_micro_bakeoff.py` to compare a deliberately small,
+explicit set of architecture candidates through the same configured chat
+model. Every invocation must name its cases and variants, set
+`--max-paid-trials`, and include `--execute`; the runner seals candidate
+contexts, outputs, hashes, usage, and completion under the ignored local
+`.deer-flow/incubation-micro-bakeoff/` root. This is evaluation tooling, not a
+second agent runtime. Do not enable the case-memory candidate until real
+outcomes have been human-reviewed, and do not declare a winner from a single
+case or an uncalibrated human impression.
+
+Use `scripts/run_incubation_agent_eval.py` for the next complete Lead Agent
+evaluation. It seeds versioned cases into an isolated SQLite project/evidence
+ledger, uses an `InMemorySaver`, and seals the configured tool schemas plus a
+redacted actual tool trajectory. Every invocation must explicitly select cases,
+set `--max-paid-trials` and `--max-agent-steps`, and include `--execute` after
+user confirmation. These bounds limit trials and graph recursion, not exact
+currency spend. Do not score a run as successful merely because it called an
+incubation tool.
 
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**

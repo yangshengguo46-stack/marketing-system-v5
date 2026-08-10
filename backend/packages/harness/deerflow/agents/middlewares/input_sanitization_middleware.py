@@ -75,6 +75,7 @@ _BLOCKED_TAG_NAMES: frozenset[str] = frozenset(
         "soul",
         "self_update",
         "thinking_style",
+        "incubation_core",
         "clarification_system",
         "critical_reminders",
         "response_style",

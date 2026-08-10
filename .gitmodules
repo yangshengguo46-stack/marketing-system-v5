@@ -1,0 +1,3 @@
+[submodule "third_party/volcengine/mediakit-cli"]
+	path = third_party/volcengine/mediakit-cli
+	url = https://github.com/volcengine/mediakit-cli.git

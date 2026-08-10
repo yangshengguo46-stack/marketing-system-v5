@@ -344,6 +344,21 @@ def get_config() -> AppConfig:
         raise HTTPException(status_code=503, detail="Configuration not available") from exc
 
 
+async def _initialize_incubation_runtime(app: FastAPI, *, engine, session_factory) -> None:
+    """Bootstrap the fifth-version ledger on the shared durable database."""
+    if session_factory is None:
+        app.state.incubation_repository = None
+        return
+    if engine is None:
+        raise RuntimeError("incubation runtime requires the initialized persistence engine")
+
+    from mcn_incubation.persistence import IncubationRepository
+    from mcn_incubation.persistence_schema import bootstrap_incubation_schema
+
+    await bootstrap_incubation_schema(engine)
+    app.state.incubation_repository = IncubationRepository(session_factory)
+
+
 @asynccontextmanager
 async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGenerator[None, None]:
     """Bootstrap and tear down all LangGraph runtime singletons.
@@ -369,7 +384,7 @@ async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGen
         async with langgraph_runtime(app, startup_config):
             yield
     """
-    from deerflow.persistence.engine import close_engine, get_session_factory, init_engine_from_config
+    from deerflow.persistence.engine import close_engine, get_engine, get_session_factory, init_engine_from_config
     from deerflow.runtime import make_store, make_stream_bridge
     from deerflow.runtime.checkpoint_mode import freeze_checkpoint_channel_mode, freeze_checkpoint_snapshot_frequency
     from deerflow.runtime.checkpointer.async_provider import make_checkpointer
@@ -400,6 +415,11 @@ async def langgraph_runtime(app: FastAPI, startup_config: AppConfig) -> AsyncGen
 
         # Initialize repositories — one get_session_factory() call for all.
         sf = get_session_factory()
+        await _initialize_incubation_runtime(
+            app,
+            engine=get_engine() if sf is not None else None,
+            session_factory=sf,
+        )
         if sf is not None:
             from deerflow.persistence.feedback import FeedbackRepository
             from deerflow.persistence.run import RunRepository
