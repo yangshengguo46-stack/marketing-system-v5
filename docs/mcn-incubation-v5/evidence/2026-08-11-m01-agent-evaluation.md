@@ -95,3 +95,11 @@
 - 旧评测仍未显式关闭宿主记忆开关，因此实现已改为使用独立 `AppConfig` 副本，同时关闭注入和写入。真实产品配置及项目事实账本不受影响。
 - 薄合同只增加“最少反转信息”和“表现形式须有主体适配证据”两项认识边界；表现形式方法卡升级为 v4。4000 字上下文预算回归仍保留受控案例，没有用放宽预算掩盖提示词膨胀。
 - 本轮只有离线测试，没有付费模型调用。M01 继续是 `business-rejected / offline-repair-tested`，详见 `../audits/A34-subject-fit-and-memory-isolation.md`。
+
+## `agent-eval-m01-v5`
+
+- 用户再次授权后执行初始与 mutation 两个受限 trial；两轮均技术成功并调用项目事实、项目证据和方法上下文。
+- 初始轮为 32.292 秒、`42,839` Token；mutation 轮为 43.045 秒、`43,214` Token。两份输出及完整轨迹均已密封在 `.deer-flow/incubation-agent-eval/agent-eval-m01-v5/`。
+- 初始轮把默认形式换成语音图文，仍补造定位、题目、免费/低价服务、三周九条和三咨询阈值；mutation 轮又补造小红书、规划师身份、桌面道具、60–90 秒、批量产能、99/9.9 元及播放/评论/咨询阈值。人工业务评审均拒绝。
+- 旧 `--include-mutations` 使用独立项目与线程，却要求 mutation 说明“原判断”；模型虚构了“原先可真人口播”的假设。因此该输出不能用于评价真实连续修订能力。
+- 评测器已离线改为同项目、同线程、先初始后追加 mutation，并通过 fake-stream 回归；没有再次付费调用。完整证据与边界见 `../audits/A35-m01-paid-v5-and-sequential-revision.md`。

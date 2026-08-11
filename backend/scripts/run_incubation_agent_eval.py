@@ -161,7 +161,7 @@ def prepare_trial_specs(
     trials = tuple(
         AgentEvalTrialSpec(
             trial_id=f"{case.case_id}:{'mutation' if mutation else 'initial'}",
-            project_id=(f"agent-eval-{run_component}-{_safe_component(case.case_id)}-{'mutation' if mutation else 'initial'}"),
+            project_id=f"agent-eval-{run_component}-{_safe_component(case.case_id)}",
             case=case,
             include_mutation=mutation,
         )
@@ -170,8 +170,6 @@ def prepare_trial_specs(
     )
     if len({trial.trial_id for trial in trials}) != len(trials):
         raise ValueError("agent evaluation trial ids must be unique")
-    if len({trial.project_id for trial in trials}) != len(trials):
-        raise ValueError("agent evaluation project ids must be unique")
     if any(len(trial.project_id) > 255 for trial in trials):
         raise ValueError("agent evaluation project id exceeds storage limit")
     return trials
@@ -179,14 +177,14 @@ def prepare_trial_specs(
 
 def build_agent_eval_prompt(trial: AgentEvalTrialSpec) -> str:
     sections = [
-        "请为系统中已经存在的 MCN 孵化项目做一次首轮业务判断。",
+        "请处理系统中已经存在的 MCN 孵化项目。",
         f"项目 ID：{trial.project_id}",
-        "请基于系统保存的项目资料，判断主体适合怎么起号、采用什么表现形式、持续做什么内容、如何形成变现与转化闭环，并给出最小验证实验。",
-        "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时指出会改变结论的最少主体信息，在获得它们前只比较条件化备选或最小试验，不要无依据宣布一种表现形式最适合。仍可给出有用的暂定方向，但不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
+        "请从系统保存的项目资料开始处理起号、表现形式、持续内容、变现与转化问题，不要为了本轮看起来完整而假定主体信息。",
+        "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时先说明目前能确定什么，指出会改变结论的最少主体信息，并只给条件化备选或最小试验，不要无依据宣布一种表现形式最适合。资料足够时才给完整路线，且不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
         "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
     ]
     if trial.include_mutation:
-        sections.append("这是新增证据后的独立修订轮次；请指出哪些原判断应当改变、保留或继续未知。")
+        sections.append("这是同一项目的新增证据轮次；请结合上一轮实际回答与当前项目账本，指出哪些判断应当改变、保留或继续未知，不得虚构上一轮观点。")
     return "\n".join(sections)
 
 
@@ -203,14 +201,6 @@ def _trial_truth_statements(trial: AgentEvalTrialSpec) -> tuple[tuple[str, Truth
     statements.extend((f"constraint-{index}", TruthKind.USER_FACT, f"现实限制：{value}") for index, value in enumerate(case.constraints, start=1))
     statements.extend((f"goal-{index}", TruthKind.USER_FACT, f"经营目标：{value}") for index, value in enumerate(case.goals, start=1))
     statements.extend((f"offer-{index}", TruthKind.USER_FACT, f"当前产品或服务：{value}") for index, value in enumerate(case.offers, start=1))
-    if trial.include_mutation:
-        statements.append(
-            (
-                "mutation",
-                TruthKind.SOURCE_FACT,
-                f"新补充证据：{case.mutation}",
-            )
-        )
     return tuple(statements)
 
 
@@ -222,6 +212,8 @@ async def seed_trial_state(
     corpus_sha256: str,
     created_at: datetime,
 ) -> None:
+    if trial.include_mutation:
+        raise ValueError("seed_trial_state requires the initial trial")
     if len(trial.case.facts) != len(trial.case.truth_ids):
         raise ValueError(f"case facts and truth ids must align: {trial.case.case_id}")
     statements = _trial_truth_statements(trial)
@@ -282,6 +274,66 @@ async def seed_trial_state(
             ),
             operation_key=f"{trial.project_id}-append-{suffix}",
         )
+
+
+async def append_trial_mutation(
+    *,
+    repository: IncubationRepository,
+    trial: AgentEvalTrialSpec,
+    owner_id: str,
+    corpus_sha256: str,
+    created_at: datetime,
+) -> None:
+    """Append new evidence to the existing project before its next turn."""
+
+    if not trial.include_mutation:
+        raise ValueError("append_trial_mutation requires the mutation trial")
+    statement = f"新补充证据：{trial.case.mutation}"
+    evidence_id = f"{trial.project_id}-mutation-evidence"
+    source_payload = {
+        "case_id": trial.case.case_id,
+        "phase": "mutation",
+        "statement": statement,
+        "corpus_sha256": corpus_sha256,
+    }
+    content_hash = sha256(
+        json.dumps(
+            source_payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    await repository.append_evidence(
+        EvidenceItem(
+            evidence_id=evidence_id,
+            owner_id=owner_id,
+            project_id=trial.project_id,
+            kind=EvidenceKind.USER_ARTIFACT,
+            status=EvidenceStatus.ACTIVE,
+            source_locator=(f"eval-corpus://incubation-eval-cases/{trial.case.case_id}#mutation"),
+            captured_at=created_at,
+            content_hash=content_hash,
+            observed_facts=(statement,),
+            limitations=("这是版本化评测新增输入，不是账号实际经营结果，也不能证明某条孵化路线有效。",),
+            artifact_refs=(f"corpus-sha256:{corpus_sha256}",),
+            source_updated_label=f"corpus-sha256:{corpus_sha256}",
+        ),
+        operation_key=f"{trial.project_id}-append-mutation-evidence",
+    )
+    await repository.append_truth(
+        ProjectTruth(
+            truth_id=f"{trial.project_id}-mutation",
+            owner_id=owner_id,
+            project_id=trial.project_id,
+            kind=TruthKind.SOURCE_FACT,
+            statement=statement,
+            created_at=created_at,
+            source_ref=evidence_id,
+            evidence_refs=(evidence_id,),
+        ),
+        operation_key=f"{trial.project_id}-append-mutation-truth",
+    )
 
 
 def enforce_paid_trial_cap(*, trial_count: int, max_paid_trials: int) -> None:
@@ -477,6 +529,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         await bootstrap_incubation_schema(engine)
         repository = IncubationRepository(session_factory)
         for trial in trials:
+            if trial.include_mutation:
+                continue
             await seed_trial_state(
                 repository=repository,
                 trial=trial,
@@ -489,8 +543,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         with _bind_evaluation_session_factory(session_factory):
             for trial in trials:
+                if trial.include_mutation:
+                    asyncio.run(
+                        append_trial_mutation(
+                            repository=IncubationRepository(session_factory),
+                            trial=trial,
+                            owner_id=actor_id,
+                            corpus_sha256=corpus_sha256,
+                            created_at=datetime.now(UTC),
+                        )
+                    )
                 prompt = build_agent_eval_prompt(trial)
-                thread_id = f"incubation-{_safe_component(run_id)}-{_safe_component(trial.trial_id)}"
+                thread_id = f"incubation-{_safe_component(run_id)}-{_safe_component(trial.case.case_id)}"
                 collector = AgentEventCollector()
                 started_at = datetime.now(UTC)
                 terminal_error_code: str | None = None

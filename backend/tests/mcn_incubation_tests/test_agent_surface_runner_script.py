@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from datetime import UTC, datetime
 from hashlib import sha256
@@ -47,8 +48,9 @@ def test_agent_eval_prepares_isolated_trials_without_embedding_case_answers() ->
     )
 
     assert [trial.trial_id for trial in trials] == ["M01:initial", "M01:mutation"]
-    assert len({trial.project_id for trial in trials}) == 2
+    assert len({trial.project_id for trial in trials}) == 1
     initial_prompt = module.build_agent_eval_prompt(trials[0])
+    mutation_prompt = module.build_agent_eval_prompt(trials[1])
     assert trials[0].project_id in initial_prompt
     assert _case("M01").facts[0] not in initial_prompt
     assert "incubation_project_context" not in initial_prompt
@@ -57,6 +59,8 @@ def test_agent_eval_prepares_isolated_trials_without_embedding_case_answers() ->
     assert "会改变结论的最少主体信息" in initial_prompt
     assert "不要无依据宣布一种表现形式最适合" in initial_prompt
     assert "不要创建或呈现文件" in initial_prompt
+    assert "独立修订轮次" not in mutation_prompt
+    assert "结合上一轮实际回答" in mutation_prompt
 
 
 def test_agent_eval_disables_general_memory_without_mutating_host_config() -> None:
@@ -92,15 +96,35 @@ async def test_agent_eval_seeds_versioned_project_truth_and_evidence(tmp_path) -
     await bootstrap_incubation_schema(engine)
     session_factory = async_sessionmaker(engine, expire_on_commit=False)
     repository = IncubationRepository(session_factory)
-    trial = module.prepare_trial_specs(
+    initial_trial, mutation_trial = module.prepare_trial_specs(
         cases=(_case("M01"),),
         include_mutations=True,
         run_id="agent-run-001",
-    )[1]
+    )
     try:
         await module.seed_trial_state(
             repository=repository,
-            trial=trial,
+            trial=initial_trial,
+            owner_id="agent-eval-owner",
+            corpus_sha256=sha256(CASE_PATH.read_bytes()).hexdigest(),
+            created_at=NOW,
+        )
+
+        initial_truths = await repository.list_current_truths(
+            owner_id="agent-eval-owner",
+            project_id=initial_trial.project_id,
+        )
+        initial_evidence = await repository.list_current_evidence(
+            owner_id="agent-eval-owner",
+            project_id=initial_trial.project_id,
+        )
+
+        assert f"新补充证据：{_case('M01').mutation}" not in {truth.statement for truth in initial_truths}
+        assert len(initial_evidence) == 1
+
+        await module.append_trial_mutation(
+            repository=repository,
+            trial=mutation_trial,
             owner_id="agent-eval-owner",
             corpus_sha256=sha256(CASE_PATH.read_bytes()).hexdigest(),
             created_at=NOW,
@@ -108,11 +132,11 @@ async def test_agent_eval_seeds_versioned_project_truth_and_evidence(tmp_path) -
 
         truths = await repository.list_current_truths(
             owner_id="agent-eval-owner",
-            project_id=trial.project_id,
+            project_id=mutation_trial.project_id,
         )
         evidence = await repository.list_current_evidence(
             owner_id="agent-eval-owner",
-            project_id=trial.project_id,
+            project_id=mutation_trial.project_id,
         )
 
         statements = {truth.statement for truth in truths}
@@ -122,9 +146,12 @@ async def test_agent_eval_seeds_versioned_project_truth_and_evidence(tmp_path) -
         assert all(f"经营目标：{value}" in statements for value in _case("M01").goals)
         assert all(f"当前产品或服务：{value}" in statements for value in _case("M01").offers)
         assert f"新补充证据：{_case('M01').mutation}" in statements
-        assert len(evidence) == 1
-        assert evidence[0].source_locator == "eval-corpus://incubation-eval-cases/M01"
-        assert "不是账号实际经营结果" in evidence[0].limitations[0]
+        assert len(evidence) == 2
+        evidence_by_locator = {item.source_locator: item for item in evidence}
+        initial_item = evidence_by_locator["eval-corpus://incubation-eval-cases/M01"]
+        mutation_item = evidence_by_locator["eval-corpus://incubation-eval-cases/M01#mutation"]
+        assert "不是账号实际经营结果" in initial_item.limitations[0]
+        assert "不是账号实际经营结果" in mutation_item.limitations[0]
     finally:
         await engine.dispose()
 
@@ -231,6 +258,8 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     module = _load_script()
 
     class FakeClient:
+        calls = []
+
         def __init__(self, **kwargs):
             assert len(kwargs["middlewares"]) == 1
             assert kwargs["middlewares"][0].max_calls == 6
@@ -257,7 +286,8 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             ]
 
         def stream(self, prompt, *, thread_id, **kwargs):
-            assert "agent-eval-offline-M01-initial" in prompt
+            self.calls.append((prompt, thread_id))
+            assert "agent-eval-offline-M01" in prompt
             assert thread_id
             assert kwargs["user_id"].startswith("agent-eval-owner-")
             assert kwargs["recursion_limit"] == 100
@@ -271,7 +301,7 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
                         {
                             "name": "incubation_project_context",
                             "id": "call-1",
-                            "args": {"project_id": "agent-eval-offline-M01-initial"},
+                            "args": {"project_id": "agent-eval-offline-M01"},
                         }
                     ],
                 },
@@ -307,8 +337,9 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
         [
             "--case",
             "M01",
+            "--include-mutations",
             "--max-paid-trials",
-            "1",
+            "2",
             "--max-agent-steps",
             "100",
             "--max-model-calls",
@@ -324,6 +355,9 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     )
 
     assert result == 0
+    assert len(FakeClient.calls) == 2
+    assert FakeClient.calls[0][1] == FakeClient.calls[1][1]
+    assert "结合上一轮实际回答" in FakeClient.calls[1][0]
     assert PreflightLedger(output_root).verify_run("offline").completed is True
     assert AgentTraceLedger(output_root).verify_run("offline").complete is True
     run_dir = output_root / "offline"
@@ -331,5 +365,8 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     assert (run_dir / "agent-state.db.sha256").is_file()
     prompt = (run_dir / "inputs" / "M01_initial.txt").read_text(encoding="utf-8")
     assert _case("M01").facts[0] not in prompt
-    trace = (run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8")
-    assert "incubation_project_context" in trace
+    initial_trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
+    mutation_trace = json.loads((run_dir / "traces" / "M01_mutation.json").read_text(encoding="utf-8"))
+    assert "incubation_project_context" in json.dumps(initial_trace)
+    assert initial_trace["project_id"] == mutation_trace["project_id"]
+    assert initial_trace["thread_id"] == mutation_trace["thread_id"]

@@ -87,10 +87,12 @@ uv run python scripts/run_incubation_agent_eval.py \
 
 `--execute` 仍是付费确认。`--max-paid-trials` 限制案例 trial 数，`--max-model-calls` 是每个 trial 的实际模型调用硬上限；`--max-agent-steps` 只限制 LangGraph 图超步。当前 Lead Agent 编译图有 25 个节点，100 用于容纳通用中间件和三项只读工具往返，不代表 100 次模型调用。证据写入忽略目录 `.deer-flow/incubation-agent-eval/<run-id>/`，包括输入输出、Token、工具面、脱敏轨迹、隔离 SQLite 及哈希。
 
-任何下一次真实运行都必须使用新 ID，并先明确待验证的修正假设；默认不加 `--thinking` 或 `--include-mutations`。必须人工复核最终判断和轨迹，不能从工具命中直接推断业务通过。
+任何下一次真实运行都必须使用新 ID，并先明确待验证的修正假设；默认不加 `--thinking`。启用 `--include-mutations` 时，同一案例严格按 initial → 追加 mutation 证据 → 同线程 revision 的顺序执行，两个阶段仍分别计入付费 trial 上限。必须人工复核最终判断和轨迹，不能从工具命中直接推断业务通过。
 
 `agent-eval-m01-v1` 使用 12 个图超步，在首个项目事实工具往返前触发 `graph_recursion_error`，没有最终输出，不能进入业务评审。修正和回归测试见 `../evidence/2026-08-11-m01-agent-evaluation.md`；重跑必须使用新 ID，原密封证据不得覆盖。
 
 `agent-eval-m01-v2` 使用 50 个图超步，成功读取项目事实、证据和方法，但在通用 `write_file` 交付动作前耗尽预算，仍没有最终答案。两个失败 run 都保留且不进入业务评分。
 
 `agent-eval-m01-v3` 以聊天交付、100 图超步和 6 次模型调用硬上限技术成功，但人工业务评审拒绝其无依据平台判断、素材资产、表现形式和数字阈值。它是失败证据，不是成功案例；修正方案完成离线测试前，不继续付费扩大案例。
+
+`agent-eval-m01-v4` 与带 initial/mutation 的 `agent-eval-m01-v5` 均技术成功、业务不通过。v5 还证明旧 mutation 编排使用独立项目和线程时不能评价真实修订能力；当前运行器已改为同项目同线程并在第二轮前追加证据。该修复只有离线回归，新的真实连续修订仍需单独确认付费调用。

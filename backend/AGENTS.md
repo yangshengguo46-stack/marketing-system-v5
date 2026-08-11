@@ -123,6 +123,13 @@ fixed intake questionnaire or completeness gate. Full-agent evaluations copy
 the host `AppConfig` and disable both general-memory injection and writes. The
 real host configuration remains unchanged, and typed project truth—not generic
 DeerMem—is authoritative for incubation.
+Audit A35 records that paid M01 v5 initial and mutation outputs both failed
+business review despite reading project facts, evidence, and methods. The old
+mutation trial used a separate project and thread, so it could not observe the
+initial answer and is invalid evidence of revision ability. `--include-mutations`
+must now append the mutation immediately before the second turn on the same
+project and checkpointed thread. Do not spend another paid trial until this
+sequential harness and subject-discovery expectations pass offline.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,
@@ -158,6 +165,10 @@ set `--max-paid-trials`, `--max-agent-steps`, and `--max-model-calls`, and inclu
 and actual lead-model calls respectively, but not exact currency spend. The
 evaluation request must return its judgment in chat instead of creating a file.
 Do not score a run as successful merely because it called an incubation tool.
+Different cases remain isolated. With `--include-mutations`, each case's initial
+and mutation phases share one project and thread; the mutation evidence is
+appended only after the initial turn completes, and each phase still has its own
+sealed trace and consumes one paid-trial slot.
 
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**

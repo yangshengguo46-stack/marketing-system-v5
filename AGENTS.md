@@ -189,6 +189,12 @@ These apply repo-wide; module guides own the module-specific detail.
   sustainable-supply evidence. Full-agent evaluations must disable general
   DeerMem reads and writes in an isolated config copy; project truth still lives
   in the typed ledger. Do not turn this into a fixed intake form or stage gate.
+  Audit A35 records that the paid v5 initial and mutation answers both failed
+  business review even after reading methods. It also invalidates the old
+  isolated mutation design: revisions must append evidence to the same project
+  and resume the same thread. Do not claim revision ability from v5 or run
+  another paid trial before the sequential harness and subject-discovery
+  expectations pass offline.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts
