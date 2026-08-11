@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a40_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a41_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 41)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 42)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -212,3 +212,44 @@ def test_marketing_brain_audit_preserves_category_action_and_commercial_return_p
     assert any("具体商品" in item for item in gold["observable_success"])
     assert any("送礼" in item and "消失" in item for item in gold["observable_failures"])
     assert any("归因" in item for item in gold["observable_success"])
+
+
+def test_cross_domain_marketing_brain_uses_composable_lenses_not_industry_templates() -> None:
+    audit = (AUDIT_ROOT / "A41-cross-domain-marketing-brain-architecture.md").read_text(encoding="utf-8")
+    decision = (DOC_ROOT / "decisions" / "ADR-010-cross-domain-marketing-brain.md").read_text(encoding="utf-8")
+    corpus_path = DOC_ROOT / "evidence" / "marketing-territory-contrast-cases.jsonl"
+    cases = [json.loads(line) for line in corpus_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+    for discipline in ("营销科学", "消费者行为", "认知语义学", "人类学", "设计方法", "Agent 工程"):
+        assert discipline in audit
+    for contract_term in (
+        "TerritoryCandidate",
+        "IncubationDecisionVersion",
+        "semantic_bridge",
+        "recurring_situations",
+        "attribution_path",
+    ):
+        assert contract_term in audit
+    assert "if industry ==" in audit
+    assert "不新增运行时" in decision
+    assert "status: proposed" in decision
+    assert "唯一 Lead Agent" in decision
+
+    assert len(cases) == 6
+    assert len({case["case_id"] for case in cases}) == len(cases)
+    groups: dict[str, list[dict]] = {}
+    for case in cases:
+        groups.setdefault(case["contrast_group"], []).append(case)
+        assert case["review_status"] == "needs_expert_review"
+        assert case["subject_lenses"]
+        assert case["known_facts"]
+        assert case["business_goal"]
+        assert case["must_change"]
+        assert case["mutation"]
+
+    assert set(groups) == {"fruit-business", "fruit-grower", "mother-role"}
+    assert all(len(group_cases) == 2 for group_cases in groups.values())
+    for group_cases in groups.values():
+        assert len({case["surface_label"] for case in group_cases}) == 1
+        assert len({tuple(case["known_facts"]) for case in group_cases}) == 2
+        assert len({tuple(case["subject_lenses"]) for case in group_cases}) == 2
