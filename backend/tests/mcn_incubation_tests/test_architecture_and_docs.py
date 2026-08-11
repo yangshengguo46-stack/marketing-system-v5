@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a38_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a39_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 39)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 40)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -155,3 +155,21 @@ def test_subject_answers_are_versioned_facts_without_becoming_an_intake_gate() -
     assert "用户原文" in product_contract
     assert "版本链" in product_contract
     assert "审批" in product_contract
+
+
+def test_sparse_query_audit_rejects_both_no_question_and_forced_interview_extremes() -> None:
+    audit = (AUDIT_ROOT / "A39-v4-interview-overcorrection-and-sparse-query.md").read_text(encoding="utf-8")
+
+    for evidence_ref in (
+        "019fade9-756b-7371-a697-a275ac9d02d3",
+        "5fbabe36",
+        "fc61bde6",
+        "1aa2242b",
+        "84ccb4dd",
+    ):
+        assert evidence_ref in audit
+    assert "不新增独立访谈 Agent" in audit
+    assert "不使用关键词拦截" in audit
+    assert "不强制 `tool_choice`" in audit
+    assert "不把字段完整度作为继续条件" in audit
+    assert "先冻结失败评测" in audit

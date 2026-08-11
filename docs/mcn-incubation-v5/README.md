@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A38`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作，以及主体问答来源与版本链审计。
+- `audits/A20-A39`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链，以及第四版访谈过度修正与第五版稀疏首问审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -21,6 +21,7 @@
 - `evidence/2026-08-11-m01-memory-isolation-check.json`：v3/v4 评测 actor、thread、project 隔离及空 DeerMem 上下文的脱敏复核。
 - `evidence/2026-08-11-m01-multiagent-trial.md`：只读证据研究员首试的密封参数、未触发轨迹和 M01 业务拒绝结论。
 - `evidence/2026-08-11-subject-answer-provenance-offline.md`：当前运行用户回答、Owner 隔离、幂等、版本链和审批排除的离线合同证据。
+- `evidence/2026-08-11-sparse-gold-gift-query-review.md`：真实右侧会话中黄金礼品加工稀疏首问的回答、思考误读、人工业务拒绝和回归边界。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
