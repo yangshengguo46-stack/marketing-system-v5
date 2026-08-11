@@ -669,6 +669,14 @@ def test_incubation_core_keeps_unconfirmed_resources_conditional():
     assert "不得写成主体已经拥有的优势" in template
 
 
+def test_incubation_core_separates_content_theme_from_evidence_and_available_material():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "区分内容母题与能力证明、可拍素材" in template
+    assert "有视觉冲击不等于应当成为账号主语" in template
+    assert "先由长期需求和关系命题决定讲什么" in template
+
+
 def _make_minimal_app_config():
     return SimpleNamespace(
         sandbox=SimpleNamespace(mounts=[]),
