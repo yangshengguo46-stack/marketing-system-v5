@@ -39,6 +39,9 @@ from mcn_incubation.domain import (
     TruthKind,
 )
 from mcn_incubation.evaluation import EvalCase, load_eval_cases
+from mcn_incubation.marketing_reasoning_evaluation import (
+    SHARED_MARKETING_REASONING_CONTRACT,
+)
 from mcn_incubation.persistence import IncubationRepository
 from mcn_incubation.persistence_schema import bootstrap_incubation_schema
 from mcn_incubation.preflight import PreflightLedger
@@ -76,7 +79,13 @@ _MIN_SUBAGENT_GRAPH_STEPS = 40
 _MAX_SUBAGENT_GRAPH_STEPS = 80
 _MIN_SUBAGENT_TOKENS = 1_000
 _MAX_SUBAGENT_TOKENS = 100_000
-_SUBAGENT_MODES = ("disabled", "evidence-review", "incubation-team")
+_SUBAGENT_MODES = (
+    "disabled",
+    "evidence-review",
+    "incubation-team",
+    "marketing-reasoning-team",
+)
+_TEAM_SUBAGENT_MODES = frozenset({"incubation-team", "marketing-reasoning-team"})
 INCUBATION_EVIDENCE_RESEARCHER_NAME = "incubation-evidence-researcher"
 _EVIDENCE_RESEARCHER_TIMEOUT_SECONDS = 120
 _EVIDENCE_RESEARCHER_DESCRIPTION = "Use only when an incubation judgment needs a bounded, read-only reconciliation of project truths, source evidence, and reviewed methods; returns an evidence brief, never a final strategy."
@@ -136,6 +145,44 @@ _INCUBATION_TEAM_ROLE_CONTRACTS: dict[str, tuple[str, str]] = {
     ),
 }
 
+MARKETING_REASONING_TEAM_SPECIALIST_NAMES = (
+    "semantic-center-specialist",
+    "human-demand-specialist",
+    "content-world-specialist",
+    "expression-form-specialist",
+    "commercial-attribution-specialist",
+)
+_MARKETING_REASONING_TEAM_ROLE_CONTRACTS: dict[str, tuple[str, str]] = {
+    "semantic-center-specialist": (
+        "负责辨认商业对象的语义中心，不让材质、修饰词或表面商品名自动吞掉真正的品类中心、用途与账号主语。",
+        "语义中心板块：比较至少两个合理主语候选，拆清品类中心、材质或修饰、功能、用途与动作，并说明选择哪个候选会怎样改变后续完整因果链。",
+    ),
+    "human-demand-specialist": (
+        "负责从用途与动作推演社会行为、人类需求和关系张力，同时审查跨越是否过度、刻板或已经失去商业联系。",
+        "人类需求板块：提出动作到社会行为、人类需求的候选连接，逐条解释中间因果、最强反例和应退回的跨越；标签不能代替动机。",
+    ),
+    "content-world-specialist": (
+        "负责把候选长期母题展开为可持续内容世界，检查容量、差异和回到商业对象的语义桥，不选择镜头前的表现形式。",
+        "内容世界板块：围绕候选母题展开人物、事件、关系、冲突、时间与空间中的内容世界；内容来源不是表现形式，并指出哪些分支虽有流量想象却没有自然归因。",
+    ),
+    "expression-form-specialist": (
+        "负责比较内容如何呈现，只能依据已知主体条件，或明确写成待验证的条件化形式候选。",
+        "表现形式板块：把候选内容分别映射到口播、对话、情景、纪录、演示、纯素材或图文等表达；未知主体条件不得被补造，常见形式和低成本不等于适合。",
+    ),
+    "commercial-attribution-specialist": (
+        "负责检验内容、信任、需求心智、行动与真实产品或服务之间是否形成自然商业归因，而不是在内容末尾硬贴商品。",
+        "商业归因板块：审查不卖而卖的回路，说明用户为何会把该母题的理解归因给经营主体、何种真实需求会触发行动，以及哪里可能只有泛流量没有转化。",
+    ),
+}
+
+
+def _team_specialist_names(subagent_mode: str) -> tuple[str, ...]:
+    if subagent_mode == "incubation-team":
+        return INCUBATION_TEAM_SPECIALIST_NAMES
+    if subagent_mode == "marketing-reasoning-team":
+        return MARKETING_REASONING_TEAM_SPECIALIST_NAMES
+    raise ValueError(f"subagent mode is not a team: {subagent_mode}")
+
 
 def _incubation_team_system_prompt(name: str) -> str:
     role_summary, board_contract = _INCUBATION_TEAM_ROLE_CONTRACTS[name]
@@ -155,6 +202,25 @@ def _incubation_team_system_prompt(name: str) -> str:
 只返回一份有界板块简报，包含：板块判断、依据与事实边界、备选方案、最强反证、关键未知、跨板块依赖或冲突。不要写面向用户的最终整合答案。"""
 
 
+def _marketing_reasoning_team_system_prompt(name: str) -> str:
+    role_summary, board_contract = _MARKETING_REASONING_TEAM_ROLE_CONTRACTS[name]
+    return f"""你是总控 Lead Agent 的营销推理专业子 Agent，{role_summary}
+
+你不直接面向用户，也不是第二个总控。所有专家共享下面同一套完整因果链；你必须理解全链后再深化自己的板块，不得只看自己负责的一个节点。
+
+{SHARED_MARKETING_REASONING_CONTRACT}
+
+共同边界：
+- 先读取委派项目的事实账本和证据，再区分已知事实、外部观察、专业推断、创意假设与未知事项。
+- 信息不完整也要给条件化判断，不得把缺失信息变成固定问卷、阶段或继续工作的硬门。
+- 不得修改项目状态，不得向用户提问，不得再次委派，不得投票、打分或替 Lead 输出完整方案。
+- 不能用角色共识冒充市场证据；必须主动寻找最强反证，并说明本板块如何改变完整因果链的其他节点。
+
+{board_contract}
+
+只返回一份有界专业简报，包含：核心候选、因果依据、最强反证、替代解释、关键未知、对完整链条的影响。不要复写共同骨架，不要写面向用户的最终答案。"""
+
+
 class AgentEvalTaskMode(StrEnum):
     FULL_INCUBATION = "full_incubation"
     CONTENT_WORLD = "content_world"
@@ -164,6 +230,11 @@ class MethodContextMode(StrEnum):
     AVAILABLE = "available"
     DISABLED = "disabled"
     DISTILLED_USER_REASONING = "distilled_user_reasoning"
+
+
+class ReasoningContractMode(StrEnum):
+    BASELINE = "baseline"
+    SHARED_MARKETING_CHAIN = "shared_marketing_chain"
 
 
 @tool("incubation_context", parse_docstring=True)
@@ -269,7 +340,7 @@ def build_agent_eval_app_config(
                 timeout_seconds=_EVIDENCE_RESEARCHER_TIMEOUT_SECONDS,
             )
         }
-    else:
+    elif subagent_mode == "incubation-team":
         custom_agents = {
             name: CustomSubagentConfig(
                 description=_INCUBATION_TEAM_ROLE_CONTRACTS[name][0],
@@ -282,6 +353,20 @@ def build_agent_eval_app_config(
                 timeout_seconds=_INCUBATION_TEAM_TIMEOUT_SECONDS,
             )
             for name in INCUBATION_TEAM_SPECIALIST_NAMES
+        }
+    else:
+        custom_agents = {
+            name: CustomSubagentConfig(
+                description=_MARKETING_REASONING_TEAM_ROLE_CONTRACTS[name][0],
+                system_prompt=_marketing_reasoning_team_system_prompt(name),
+                tools=list(_INCUBATION_TEAM_READ_TOOLS),
+                disallowed_tools=denied_tools,
+                skills=[],
+                model="inherit",
+                max_turns=max_subagent_steps,
+                timeout_seconds=_INCUBATION_TEAM_TIMEOUT_SECONDS,
+            )
+            for name in MARKETING_REASONING_TEAM_SPECIALIST_NAMES
         }
     allowed_agents = list(custom_agents)
     evaluation_subagents = host_config.subagents.model_copy(
@@ -418,11 +503,14 @@ def build_agent_eval_prompt(
     *,
     task_mode: AgentEvalTaskMode = AgentEvalTaskMode.FULL_INCUBATION,
     subagent_mode: str = "disabled",
+    reasoning_contract_mode: ReasoningContractMode = ReasoningContractMode.BASELINE,
 ) -> str:
     if subagent_mode not in _SUBAGENT_MODES:
         raise ValueError(f"unknown subagent mode: {subagent_mode}")
-    if subagent_mode == "incubation-team" and task_mode is not AgentEvalTaskMode.FULL_INCUBATION:
-        raise ValueError("incubation-team evaluation requires full_incubation task mode")
+    if subagent_mode in {"incubation-team", "marketing-reasoning-team"} and task_mode is not AgentEvalTaskMode.FULL_INCUBATION:
+        raise ValueError(f"{subagent_mode} evaluation requires full_incubation task mode")
+    if subagent_mode == "marketing-reasoning-team" and reasoning_contract_mode is not ReasoningContractMode.SHARED_MARKETING_CHAIN:
+        raise ValueError("marketing-reasoning-team requires the shared marketing chain")
     sections = [
         "请处理系统中已经存在的 MCN 孵化项目。",
         f"项目 ID：{trial.project_id}",
@@ -443,6 +531,14 @@ def build_agent_eval_prompt(
                 "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
             )
         )
+    if reasoning_contract_mode is ReasoningContractMode.SHARED_MARKETING_CHAIN:
+        sections.append(
+            f"""本轮使用以下共同营销推理骨架。它只约束内部推演，不是给用户看的回答目录：
+
+{SHARED_MARKETING_REASONING_CONTRACT}
+
+请在内部维护一条可修订的完整因果链：商业对象、语义中心、动作与用途、社会行为与长期需求、长期母题、内容世界、表现形式、商业归因、反证与未知。节点可以为空或被推翻，不得为了填满而补造；最终回答不要把内部链条复写成栏目式答案。"""
+        )
     if subagent_mode == "incubation-team":
         team_lines = "\n".join(f"- {name}" for name in INCUBATION_TEAM_SPECIALIST_NAMES)
         sections.append(
@@ -455,6 +551,17 @@ def build_agent_eval_prompt(
 
 内容与表现形式是两个不同板块：历史故事、真实案例、现实事件属于内容候选；口播、情景剧、微短剧、纯素材视频和图文属于表现形式。
 收到全部简报后，只有 Lead 可以处理板块冲突并给用户一个统一判断；不得投票、不得打分、不得直接拼接五份简报，也不得把内部一致意见冒充市场证据。"""
+        )
+    if subagent_mode == "marketing-reasoning-team":
+        team_lines = "\n".join(f"- {name}" for name in MARKETING_REASONING_TEAM_SPECIALIST_NAMES)
+        sections.append(
+            f"""本轮是隔离的共享营销推理团队评测。请把以下每个专业子 Agent 恰好委派一次：
+{team_lines}
+
+五个专家都已获得同一套完整因果链，只从不同角度把它推深；这不是线性阶段，也不存在某一节点完成后才能继续的硬门。请让独立问题尽量并行，每批最多三个，分批只表示技术并发限制。
+给每个子 Agent 传入同一项目 ID 和它自己的板块问题，让它读取项目事实与证据后返回候选、因果依据、反证、替代解释、未知及对完整链条的影响。
+
+收到全部简报后，由 Lead 总脑收敛为一个统一营销命题和一条自然的内容到生意回路。Lead 必须处理冲突并作出取舍，不得投票、不得打分、不得直接拼接，也不要按五个专家分五节复述内部报告。最终答案仍须保留事实边界、重要备选和会反转判断的未知。"""
         )
     if trial.include_mutation:
         sections.append("这是同一项目的新增证据轮次；请结合上一轮实际回答与当前项目账本，指出哪些判断应当改变、保留或继续未知，不得虚构上一轮观点。")
@@ -658,13 +765,16 @@ def _evaluation_system_contract_sha256(
     *,
     app_config: AppConfig,
     subagent_mode: str,
+    reasoning_contract_mode: ReasoningContractMode = ReasoningContractMode.BASELINE,
 ) -> str:
-    if subagent_mode == "disabled":
+    if subagent_mode == "disabled" and reasoning_contract_mode is ReasoningContractMode.BASELINE:
         return sha256(SYSTEM_PROMPT_TEMPLATE.encode("utf-8")).hexdigest()
     allowed_agents = list(app_config.subagents.allowed_agents or [])
-    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode == "incubation-team" else 1
+    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode in _TEAM_SUBAGENT_MODES else (1 if allowed_agents else 0)
     contract = {
         "lead_system_prompt_template": SYSTEM_PROMPT_TEMPLATE,
+        "reasoning_contract_mode": reasoning_contract_mode.value,
+        "shared_marketing_reasoning_contract": (SHARED_MARKETING_REASONING_CONTRACT if reasoning_contract_mode is ReasoningContractMode.SHARED_MARKETING_CHAIN else None),
         "subagent_mode": subagent_mode,
         "allowed_agents": allowed_agents,
         "max_concurrent_subagents": max_concurrent_subagents,
@@ -692,10 +802,11 @@ def _write_experiment_manifest(
     max_subagent_tokens: int | None,
     task_mode: AgentEvalTaskMode,
     method_context_mode: MethodContextMode,
+    reasoning_contract_mode: ReasoningContractMode,
     created_at: datetime,
 ) -> None:
     subagent_enabled = subagent_mode != "disabled"
-    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode == "incubation-team" else (1 if subagent_enabled else 0)
+    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode in _TEAM_SUBAGENT_MODES else (1 if subagent_enabled else 0)
     payload = {
         "schema_version": "mcn-incubation-agent-eval-experiment-v1",
         "subagent_mode": subagent_mode,
@@ -709,9 +820,12 @@ def _write_experiment_manifest(
         "max_subagent_tokens": max_subagent_tokens,
         "task_mode": task_mode.value,
         "method_context_mode": method_context_mode.value,
+        "reasoning_contract_mode": reasoning_contract_mode.value,
+        "reasoning_contract_sha256": (sha256(SHARED_MARKETING_REASONING_CONTRACT.encode("utf-8")).hexdigest() if reasoning_contract_mode is ReasoningContractMode.SHARED_MARKETING_CHAIN else None),
         "system_contract_sha256": _evaluation_system_contract_sha256(
             app_config=app_config,
             subagent_mode=subagent_mode,
+            reasoning_contract_mode=reasoning_contract_mode,
         ),
         "created_at": created_at.isoformat(),
     }
@@ -802,6 +916,7 @@ def _incubation_team_protocol_error(
     *,
     task_statuses: Mapping[str, str],
     project_id: str,
+    expected_names: Sequence[str] = INCUBATION_TEAM_SPECIALIST_NAMES,
 ) -> str | None:
     task_calls = [event for event in events if getattr(event, "event_type", None) == "tool_call" and getattr(event, "tool_name", None) == "task"]
     called_names = []
@@ -810,7 +925,7 @@ def _incubation_team_protocol_error(
         name = arguments.get("subagent_type") if isinstance(arguments, Mapping) else None
         called_names.append(str(name or ""))
 
-    expected = set(INCUBATION_TEAM_SPECIALIST_NAMES)
+    expected = set(expected_names)
     if any(name not in expected for name in called_names):
         return "incubation_team_unknown_specialist"
     counts = Counter(called_names)
@@ -874,7 +989,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--subagent-mode",
         choices=_SUBAGENT_MODES,
         default="disabled",
-        help="Evaluation architecture variant; enables either one evidence reviewer or the five-board incubation team",
+        help="Evaluation architecture variant; enables one evidence reviewer or one of the sealed five-specialist teams",
     )
     parser.add_argument(
         "--task-mode",
@@ -887,6 +1002,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         choices=tuple(mode.value for mode in MethodContextMode),
         default=MethodContextMode.AVAILABLE.value,
         help=("Evaluation-only incubation_context variant; disabled removes it and distilled_user_reasoning substitutes one compact candidate card"),
+    )
+    parser.add_argument(
+        "--reasoning-contract-mode",
+        choices=tuple(mode.value for mode in ReasoningContractMode),
+        default=ReasoningContractMode.BASELINE.value,
+        help="Evaluation-only Lead reasoning contract; shared_marketing_chain is case-free and may be matched across single-Lead and team trials",
     )
     parser.add_argument(
         "--max-subagent-steps",
@@ -927,12 +1048,22 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
     if not 1 <= args.max_model_calls <= _MAX_EVALUATION_MODEL_CALLS:
         parser.error(f"--max-model-calls must be between 1 and {_MAX_EVALUATION_MODEL_CALLS}")
-    if args.method_context_mode != MethodContextMode.AVAILABLE.value and args.task_mode != AgentEvalTaskMode.CONTENT_WORLD.value:
-        parser.error("evaluation method-context variants are only valid with --task-mode content_world")
-    if args.method_context_mode != MethodContextMode.AVAILABLE.value and args.subagent_mode != "disabled":
-        parser.error("evaluation method-context variants cannot be combined with a method-capable subagent")
-    if args.subagent_mode == "incubation-team" and args.task_mode != AgentEvalTaskMode.FULL_INCUBATION.value:
-        parser.error("incubation-team is only valid with --task-mode full_incubation")
+    reasoning_mode = ReasoningContractMode(args.reasoning_contract_mode)
+    method_mode = MethodContextMode(args.method_context_mode)
+    if method_mode is MethodContextMode.DISTILLED_USER_REASONING:
+        if args.task_mode != AgentEvalTaskMode.CONTENT_WORLD.value or args.subagent_mode != "disabled":
+            parser.error("distilled_user_reasoning is only valid for a single-Lead content_world trial")
+    if method_mode is MethodContextMode.DISABLED:
+        legacy_ablation = args.task_mode == AgentEvalTaskMode.CONTENT_WORLD.value and args.subagent_mode == "disabled"
+        shared_chain_trial = reasoning_mode is ReasoningContractMode.SHARED_MARKETING_CHAIN and args.task_mode == AgentEvalTaskMode.FULL_INCUBATION.value and args.subagent_mode in {"disabled", "marketing-reasoning-team"}
+        if not (legacy_ablation or shared_chain_trial):
+            parser.error("disabled method context is only valid for the sealed content-world ablation or shared-chain comparison")
+    if args.subagent_mode in _TEAM_SUBAGENT_MODES and args.task_mode != AgentEvalTaskMode.FULL_INCUBATION.value:
+        parser.error(f"{args.subagent_mode} is only valid with --task-mode full_incubation")
+    if args.subagent_mode == "marketing-reasoning-team" and reasoning_mode is not ReasoningContractMode.SHARED_MARKETING_CHAIN:
+        parser.error("marketing-reasoning-team requires --reasoning-contract-mode shared_marketing_chain")
+    if args.subagent_mode == "incubation-team" and reasoning_mode is not ReasoningContractMode.BASELINE:
+        parser.error("incubation-team is the immutable A50 baseline and cannot carry the new reasoning contract")
     if args.subagent_mode == "disabled":
         if args.max_subagent_steps is not None or args.max_subagent_tokens is not None:
             parser.error("subagent caps can only be used with an enabled --subagent-mode")
@@ -979,6 +1110,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     subagent_enabled = args.subagent_mode != "disabled"
     task_mode = AgentEvalTaskMode(args.task_mode)
     method_context_mode = MethodContextMode(args.method_context_mode)
+    reasoning_contract_mode = ReasoningContractMode(args.reasoning_contract_mode)
     evaluation_app_config = build_agent_eval_app_config(
         get_app_config(),
         subagent_mode=args.subagent_mode,
@@ -988,7 +1120,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     subagent_runtime_limits: dict[str, int] = {}
     if subagent_enabled:
         subagent_runtime_limits = {
-            "max_concurrent_subagents": (_INCUBATION_TEAM_MAX_CONCURRENT if args.subagent_mode == "incubation-team" else 1),
+            "max_concurrent_subagents": (_INCUBATION_TEAM_MAX_CONCURRENT if args.subagent_mode in _TEAM_SUBAGENT_MODES else 1),
             "max_total_subagents": evaluation_app_config.subagents.max_total_per_run,
         }
     client = build_agent_eval_client(
@@ -1023,6 +1155,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         system_prompt_sha256=_evaluation_system_contract_sha256(
             app_config=evaluation_app_config,
             subagent_mode=args.subagent_mode,
+            reasoning_contract_mode=reasoning_contract_mode,
         ),
         corpus_sha256=corpus_sha256,
         created_at=created_at,
@@ -1046,6 +1179,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_subagent_tokens=args.max_subagent_tokens,
         task_mode=task_mode,
         method_context_mode=method_context_mode,
+        reasoning_contract_mode=reasoning_contract_mode,
         created_at=created_at,
     )
     database_path = run_dir / "agent-state.db"
@@ -1087,6 +1221,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     trial,
                     task_mode=task_mode,
                     subagent_mode=args.subagent_mode,
+                    reasoning_contract_mode=reasoning_contract_mode,
                 )
                 thread_id = build_trial_thread_id(
                     run_id=run_id,
@@ -1109,11 +1244,12 @@ def main(argv: Sequence[str] | None = None) -> int:
                 except Exception as error:
                     terminal_error_code = _error_code(error)
                 observation = collector.finish()
-                if terminal_error_code is None and args.subagent_mode == "incubation-team":
+                if terminal_error_code is None and args.subagent_mode in _TEAM_SUBAGENT_MODES:
                     terminal_error_code = _incubation_team_protocol_error(
                         observation.events,
                         task_statuses=task_statuses,
                         project_id=trial.project_id,
+                        expected_names=_team_specialist_names(args.subagent_mode),
                     )
                 if terminal_error_code is None:
                     terminal_error_code = observation.fallback_error_code

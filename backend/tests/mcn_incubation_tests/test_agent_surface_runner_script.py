@@ -329,6 +329,113 @@ def test_agent_eval_team_prompt_requires_parallel_board_work_and_lead_synthesis(
     assert _case("M01").facts[0] not in prompt
 
 
+def test_shared_marketing_reasoning_contract_is_case_free_and_not_an_answer_template() -> None:
+    module = _load_script()
+
+    contract = module.SHARED_MARKETING_REASONING_CONTRACT
+
+    assert len(contract) < 1_600
+    for phrase in (
+        "从名词看动词",
+        "从产品看用途",
+        "从用途看人性",
+        "品类中心",
+        "材质或修饰",
+        "社会行为",
+        "长期母题",
+        "内容世界",
+        "表现形式",
+        "商业归因",
+        "不是答题模板",
+        "不是固定阶段",
+    ):
+        assert phrase in contract
+    for leaked_answer in ("黄金", "礼品", "送礼", "水果", "宝妈"):
+        assert leaked_answer not in contract
+
+
+def test_reasoning_team_shares_one_complete_chain_and_keeps_role_specific_depth() -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+        }
+    )
+
+    evaluation_config = module.build_agent_eval_app_config(
+        host_config,
+        subagent_mode="marketing-reasoning-team",
+        max_subagent_steps=40,
+        max_subagent_tokens=12_000,
+    )
+
+    expected_names = (
+        "semantic-center-specialist",
+        "human-demand-specialist",
+        "content-world-specialist",
+        "expression-form-specialist",
+        "commercial-attribution-specialist",
+    )
+    assert module.MARKETING_REASONING_TEAM_SPECIALIST_NAMES == expected_names
+    assert evaluation_config.subagents.allowed_agents == list(expected_names)
+    assert evaluation_config.subagents.max_total_per_run == len(expected_names)
+
+    role_terms = {
+        "semantic-center-specialist": ("语义中心", "品类中心", "材质"),
+        "human-demand-specialist": ("社会行为", "人类需求", "跨越"),
+        "content-world-specialist": ("内容世界", "母题", "表现形式"),
+        "expression-form-specialist": ("表现形式", "口播", "主体条件"),
+        "commercial-attribution-specialist": ("商业归因", "需求心智", "不卖而卖"),
+    }
+    for name in expected_names:
+        specialist = evaluation_config.subagents.custom_agents[name]
+        assert module.SHARED_MARKETING_REASONING_CONTRACT in specialist.system_prompt
+        assert specialist.system_prompt.count(module.SHARED_MARKETING_REASONING_CONTRACT) == 1
+        assert specialist.tools == [
+            "incubation_project_context",
+            "incubation_project_evidence",
+        ]
+        assert specialist.skills == []
+        assert "完整因果链" in specialist.system_prompt
+        assert "不得只看自己负责的一个节点" in specialist.system_prompt
+        for term in role_terms[name]:
+            assert term in specialist.system_prompt
+
+
+def test_shared_reasoning_prompt_gives_identical_contract_to_single_lead_and_team() -> None:
+    module = _load_script()
+    trial = module.prepare_trial_specs(
+        cases=(_case("M01"),),
+        include_mutations=False,
+        run_id="shared-marketing-reasoning",
+    )[0]
+
+    single_lead = module.build_agent_eval_prompt(
+        trial,
+        subagent_mode="disabled",
+        reasoning_contract_mode=module.ReasoningContractMode.SHARED_MARKETING_CHAIN,
+    )
+    team = module.build_agent_eval_prompt(
+        trial,
+        subagent_mode="marketing-reasoning-team",
+        reasoning_contract_mode=module.ReasoningContractMode.SHARED_MARKETING_CHAIN,
+    )
+
+    assert single_lead.count(module.SHARED_MARKETING_REASONING_CONTRACT) == 1
+    assert team.count(module.SHARED_MARKETING_REASONING_CONTRACT) == 1
+    assert "内部维护一条可修订的完整因果链" in single_lead
+    assert "不要把内部链条复写成栏目式答案" in single_lead
+    assert "每个专业子 Agent 恰好委派一次" not in single_lead
+    for name in module.MARKETING_REASONING_TEAM_SPECIALIST_NAMES:
+        assert name in team
+    assert "总脑收敛" in team
+    assert "一个统一营销命题" in team
+    assert "不得直接拼接" in team
+    assert "不要按五个专家分五节" in team
+
+
 def test_agent_eval_team_system_hash_covers_every_specialist_and_concurrency(monkeypatch) -> None:
     module = _load_script()
     host_config = AppConfig.model_validate(
@@ -372,6 +479,47 @@ def test_agent_eval_team_system_hash_covers_every_specialist_and_concurrency(mon
     )
 
 
+def test_shared_reasoning_contract_changes_hash_and_is_sealed_in_manifest(tmp_path) -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+        }
+    )
+    baseline_hash = module._evaluation_system_contract_sha256(
+        app_config=host_config,
+        subagent_mode="disabled",
+    )
+    shared_hash = module._evaluation_system_contract_sha256(
+        app_config=host_config,
+        subagent_mode="disabled",
+        reasoning_contract_mode=module.ReasoningContractMode.SHARED_MARKETING_CHAIN,
+    )
+    assert shared_hash != baseline_hash
+
+    run_dir = tmp_path / "shared-chain"
+    run_dir.mkdir()
+    module._write_experiment_manifest(
+        run_dir=run_dir,
+        subagent_mode="disabled",
+        app_config=host_config,
+        max_agent_steps=100,
+        max_model_calls=8,
+        max_subagent_steps=None,
+        max_subagent_tokens=None,
+        task_mode=module.AgentEvalTaskMode.FULL_INCUBATION,
+        method_context_mode=module.MethodContextMode.DISABLED,
+        reasoning_contract_mode=module.ReasoningContractMode.SHARED_MARKETING_CHAIN,
+        created_at=NOW,
+    )
+    manifest = json.loads((run_dir / "experiment.json").read_text(encoding="utf-8"))
+    assert manifest["reasoning_contract_mode"] == "shared_marketing_chain"
+    assert manifest["reasoning_contract_sha256"] == sha256(module.SHARED_MARKETING_REASONING_CONTRACT.encode("utf-8")).hexdigest()
+    assert manifest["system_contract_sha256"] == shared_hash
+
+
 def test_agent_eval_team_protocol_accepts_each_role_once_in_any_order() -> None:
     module = _load_script()
     shuffled_names = (
@@ -409,6 +557,44 @@ def test_agent_eval_team_protocol_accepts_each_role_once_in_any_order() -> None:
             events,
             task_statuses=task_statuses,
             project_id="project-001",
+        )
+        is None
+    )
+
+
+def test_marketing_reasoning_team_protocol_uses_its_own_five_roles() -> None:
+    module = _load_script()
+    events = []
+    task_statuses = {}
+    for index, name in enumerate(reversed(module.MARKETING_REASONING_TEAM_SPECIALIST_NAMES), start=1):
+        task_id = f"reasoning-task-{index}"
+        events.extend(
+            (
+                SimpleNamespace(
+                    event_type="tool_call",
+                    tool_name="task",
+                    tool_call_id=task_id,
+                    arguments={
+                        "subagent_type": name,
+                        "prompt": "Read project project-reasoning-42 and inspect the complete causal chain.",
+                    },
+                ),
+                SimpleNamespace(
+                    event_type="tool_result",
+                    tool_name="task",
+                    tool_call_id=task_id,
+                    arguments=None,
+                ),
+            )
+        )
+        task_statuses[task_id] = "completed"
+
+    assert (
+        module._incubation_team_protocol_error(
+            events,
+            task_statuses=task_statuses,
+            project_id="project-reasoning-42",
+            expected_names=module.MARKETING_REASONING_TEAM_SPECIALIST_NAMES,
         )
         is None
     )
@@ -826,6 +1012,66 @@ def test_agent_eval_accepts_only_capped_full_incubation_team_trials() -> None:
                 *common,
                 "--method-context-mode",
                 "distilled_user_reasoning",
+            ]
+        )
+
+
+def test_agent_eval_accepts_matched_shared_chain_single_lead_and_reasoning_team() -> None:
+    module = _load_script()
+    common = [
+        "--case",
+        "M01",
+        "--max-paid-trials",
+        "1",
+        "--max-agent-steps",
+        "100",
+        "--max-model-calls",
+        "8",
+        "--task-mode",
+        "full_incubation",
+        "--method-context-mode",
+        "disabled",
+        "--reasoning-contract-mode",
+        "shared_marketing_chain",
+        "--execute",
+    ]
+
+    single = module._parse_args(common)
+    assert single.subagent_mode == "disabled"
+    assert single.reasoning_contract_mode == "shared_marketing_chain"
+    assert single.method_context_mode == "disabled"
+
+    team = module._parse_args(
+        [
+            *common,
+            "--subagent-mode",
+            "marketing-reasoning-team",
+            "--max-subagent-steps",
+            "40",
+            "--max-subagent-tokens",
+            "12000",
+        ]
+    )
+    assert team.subagent_mode == "marketing-reasoning-team"
+
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "100",
+                "--max-model-calls",
+                "8",
+                "--subagent-mode",
+                "marketing-reasoning-team",
+                "--max-subagent-steps",
+                "40",
+                "--max-subagent-tokens",
+                "12000",
+                "--execute",
             ]
         )
 

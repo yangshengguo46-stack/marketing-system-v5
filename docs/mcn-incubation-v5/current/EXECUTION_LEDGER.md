@@ -32,16 +32,16 @@
 | 跨行业营销脑架构 | domain-tested / paid-bakeoff-business-rejected / ADR-proposed | A41/A42、ADR-010；轻量 `TerritoryCandidate` 已在现有决策 JSON 内向后兼容落地且无生产入口；24 个密封试验、26 次调用比较结构化/自然回答、方法、来源机制和两遍法，技术 24/24 成功 | 没有候选通过业务验收；两遍法仅在黄金锚点部分命中且仍补造事实，六个对照均待 MCN 人工复核，方法/机制/两遍上下文不接生产 |
 | 内容世界扩展算子 | paid-candidate-business-rejected / method-interference-confirmed / partial-method-signal / ADR-proposed | A43-A49、ADR-011；A49 用户蒸馏组 61,246 Token，水果扩成“水果生存史”等七个候选，但黄金仍未抓住礼品/送礼主语，两个回答把方法复写成答题表格并补造主张；两例都是方法来源案例，不能证明泛化 | 先离线增加无案例语义替换检查与具体主张核验边界；候选不接生产；品牌、产品、个人和服务留出锚点待复核 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
-| 单一决策权多 Agent 候选 | candidate-b-paid-business-rejected / candidate-a-paid-untriggered / ADR-proposed | A37/A50、ADR-009；候选 A 单证据员真实运行 `task=0`；候选 B 的五个专家真实 `5/5` 完成，171.606 秒、43,667 Token，不再默认露脸口播并分开内容与形式 | Lead 仍补造 19.9/99 元、每周 16 单、周更 2 条和制作耗时，业务拒绝；没有匹配单 Lead 对照，不能归因局部改善；生产配置与生产 Lead 未改 |
+| 单一决策权多 Agent 候选 | candidate-c-matched-business-rejected / candidate-b-paid-business-rejected / candidate-a-paid-untriggered / ADR-proposed | A37/A50/A51、ADR-009；候选 C 在相同无案例营销链和关闭方法上下文下完成黄金礼品团队与单 Lead 匹配运行，团队 5/5 完成；单 Lead 找到“礼品决策参谋”，团队退回“黄金礼品场景解决方案提供者” | 两边都未建立完整人情内容世界且补造案例或数字，均业务拒绝；团队多用 17,941 Token 和 109.133 秒；生产配置与生产 Lead 未改 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-A50 已完成用户提出的五板块团队可用性试验。DeerFlow 的多 Agent 执行链路真实可用，分工也改善了默认口播和内容/形式混淆；但五个同源模型上下文没有自动产生市场证据，Lead 仍用任意价格、单量、频率和制作耗时填满方案。因此当前五角色合同加 Lead 综合方式为 `business-rejected`，不能接生产。A49 的用户思维蒸馏也停止继续实现。下一步不能靠继续加角色、投票器或长提示词修补；若用户决定继续研究，先设计同业务提示的单 Lead 匹配对照和可追责的板块依据传递，再决定是否值得付费。
+A51 已完成用户提出的“同一完整营销脑骨架、五个板块深化、最后总脑收敛”及必要的单 Lead 匹配对照。DeerFlow 多 Agent 技术链路成立，但业务假设没有成立：团队比单 Lead 更行业化、更慢、更贵；单 Lead 虽更接近礼品主语，仍没有打开送与收、人情、礼仪、身份和互惠的长期世界。两边都是 `business-rejected`，没有获胜者，生产保持不变。下一步不能继续加角色或把因果链拆成更多板块；若继续，只离线设计“Lead 先形成一个完整暂定命题、少量专家围绕同一命题找反证、Lead 再修订”的最小候选，并在再次付费前先通过提示与轨迹测试。
 
 ## 本轮验证
 
-- `uv run pytest tests/mcn_incubation_tests -q`：A20-A50、五板块角色/权限/轨迹协议和孵化领域回归共 `121 passed`。
+- `uv run pytest tests/mcn_incubation_tests -q`：A20-A51、共享营销链、两个团队模式、角色权限/轨迹协议和孵化领域回归共 `128 passed`。
 - `uv run pytest tests/test_client.py tests/test_task_tool_core_logic.py tests/test_lead_agent_prompt.py tests/test_subagent_checkpointer_isolation.py -q`：显式并发配置、委派权限、Lead 角色面和子图隔离共 `254 passed`。
 - `uv run python -m pytest tests/mcn_incubation_tests/test_agent_surface_runner_script.py tests/mcn_incubation_tests/test_user_reasoning_evaluation.py tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：评测工具替换、蒸馏卡防答案泄漏、A47-A49 证据与架构边界聚焦回归通过。
 - `uv run python -m pytest tests/mcn_incubation_tests -q`：孵化包领域、持久化、评测、A20-A49 文档连号、蒸馏候选隔离和架构边界共 `109 passed`。
@@ -120,8 +120,9 @@ A50 已完成用户提出的五板块团队可用性试验。DeerFlow 的多 Age
 - A48 按用户确认增加评测专用 `method_context_mode=disabled`，只允许纯内容世界、无子 Agent 的消融。相同模型、系统合同和语料下技术 `2/2` 完成、合计 59,967 Token，比基线少 4,038；黄金首次明确“黄金只是载体”，水果首次进入历史、流行文化和未来世界。两例仍因三模板、虚构供给、任意数字和未经核验的健康/价格主张被拒绝，因此方法上下文是重要干扰源但不是唯一病根，生产方法系统未改。
 - A49 按用户确认增加评测专用 `distilled_user_reasoning`：1,056 字符的无案例方法卡在同模型、合同和语料下技术 `2/2` 完成、合计 61,246 Token。水果扩成七个内容世界，黄金仍未命中礼品/送礼主语；两例都复写方法答题表格并补造事实，人工业务拒绝，候选没有进入生产。
 - A50 按用户新方向停止继续实现思维蒸馏，测试先行新增评测专用 `incubation-team`。五个角色只读项目事实与证据、无 Skill、无写入、无提问和无递归；Lead 只看到这五个角色。轨迹协议要求五个唯一调用、结果配对、`task_completed` 终态和当前项目绑定，并显式传入并密封并发 `3`、总委派 `5` 与每人预算。真实 M01 `5/5` 角色完成，43,667 Token、171.606 秒；局部改善非默认口播与内容/形式分离，但任意价格、单量、频率和工时导致人工业务拒绝。独立安全审阅否决了对自由文本子简报的有限正则快照，继续只存哈希和长度，没有重复付费运行。
+- A51 按用户给出的完整推理骨架新增评测专用 `shared_marketing_chain` 与 `marketing-reasoning-team`；合同无黄金礼品等案例答案，Lead 与五个专家都看见同一完整链。黄金团队 5/5 完成，49,764 Token、135.287 秒；同合同单 Lead 31,823 Token、26.154 秒。单 Lead 更接近“礼品决策参谋”，团队退回“黄金礼品场景解决方案提供者”；两边均补造案例或数字并业务拒绝，当前平行分块候选不接生产。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-下一孵化纵切不自动发起新模型调用。先让用户复核 A50 的真实答案与业务拒绝原因；若继续，多 Agent 因果问题要用同业务提示的单 Lead 匹配对照，协作问题要让每个板块依据可读、可追责并明确哪些是事实、假设和反证。当前不改生产配置，不引入更多角色、固定阶段、投票、评分门、共享向量记忆或第二运行时。
+下一孵化纵切不自动发起新模型调用。先让用户复核 A51 团队与单 Lead 的真实差异。若继续，多 Agent 只考虑“Lead 完整暂定命题 -> 少量只读专家找反证 -> Lead 修订”的最小候选，不再让专家平行填充一条因果链，也不引入更多角色、固定阶段、投票、评分门、共享向量记忆或第二运行时。当前不改生产配置。

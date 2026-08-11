@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A50`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测、模板答案提示词溯源、最小生产思路接入、生产 Lead 真实试验、方法上下文消融、用户思维蒸馏候选和五板块孵化团队试验。
+- `audits/A20-A51`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测、模板答案提示词溯源、最小生产思路接入、生产 Lead 真实试验、方法上下文消融、用户思维蒸馏候选、五板块孵化团队和共享营销推理链匹配试验。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -36,11 +36,12 @@
 - `evidence/2026-08-11-method-context-ablation.md`：同模型、同合同、同语料下移除方法工具的 2/2 匹配消融；内容世界明显改善但仍业务拒绝。
 - `evidence/2026-08-11-distilled-user-reasoning-trial.md`：不含案例答案的用户思维蒸馏卡完成 2/2 真实对照；水果扩展明显，黄金主语与事实边界仍失败。
 - `evidence/2026-08-12-m01-five-board-team-trial.md`：定位、受众、内容世界、表现形式和商业化五个只读专家真实完成 M01；非默认口播有所改善，但任意价格、产能和频率导致业务拒绝。
+- `evidence/2026-08-12-shared-marketing-reasoning-team.md`：同一无案例营销因果链下，黄金礼品五专家团队与单 Lead 的匹配试验；两者均业务拒绝，单 Lead 在该样本更接近礼品主语，团队更慢、更贵且更行业化。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
 
-完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、Lead 模型调用上限和 `--execute`；不同案例使用独立项目与线程，同一案例的 mutation 在第二轮前追加到原项目并复用原线程，泛记忆在配置副本中关闭。`--subagent-mode evidence-review` 只开放一个只读证据研究员；`--subagent-mode incubation-team` 只开放定位、受众、内容世界、表现形式和商业化五个只读专家。两种模式都强制显式给出每个子 Agent 的图步数和 Token 上限；团队模式还密封有效并发数、五个唯一角色、项目绑定、工具结果和内部完成终态。它们均不进入生产配置。
+完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、Lead 模型调用上限和 `--execute`；不同案例使用独立项目与线程，同一案例的 mutation 在第二轮前追加到原项目并复用原线程，泛记忆在配置副本中关闭。`--subagent-mode evidence-review` 只开放一个只读证据研究员；`--subagent-mode incubation-team` 保留 A50 五板块基线；`--subagent-mode marketing-reasoning-team` 配合 `--reasoning-contract-mode shared_marketing_chain` 才能启用 A51 五个共享全链专家。启用子 Agent 时必须显式给出每人图步数和 Token 上限；团队模式还密封有效并发数、五个唯一角色、项目绑定、工具结果和内部完成终态。所有候选均不进入生产配置。
 
 营销领地隔离对照入口为 `backend/scripts/run_marketing_territory_bakeoff.py`。完整对照组使用 `--group`，专家锚点使用 `--anchor-case`；所有运行必须列出候选、给出按实际模型调用计数的 `--max-paid-trials` 并显式 `--execute`。两遍候选的一次架构试验会计为两次调用。评测上下文、机制卡和两遍编排没有接入生产 `incubation_context`。
 
@@ -49,5 +50,7 @@
 A46 按用户最新纠偏，将一段不含黄金礼品、水果等答案示例的极薄营销内容世界思路直接加入现有 Lead。A47 的首次生产试验技术完成但业务拒绝；A48 移除方法上下文后，黄金与水果均朝专家锚点明显改善，但仍有三模板、事实补造和越界交付。A49 用不含案例答案的用户思维蒸馏卡替换评测方法：水果扩成七个内容世界，黄金仍未抓住礼品/送礼主语，且模型把方法栏目复写成答题表格。宽泛方法是重要干扰源，用户蒸馏有局部方法信号；来源案例结果不能证明跨行业泛化，两者都不是生产胜者。
 
 A50 按用户最新方向停止继续实现思维蒸馏，新增评测专用五板块孵化团队。每个专家只读同一项目并在自己的板块提出判断、备选和反证，Lead 保留唯一最终决策权；不投票、不评分、不写状态、不形成线性阶段。M01 真实运行五个角色全部完成，共 43,667 Token；答案不再默认露脸口播并分开内容与形式，但又补造价格、单量、频率和制作耗时，人工业务拒绝，生产未改。没有同业务提示的单 Lead 匹配对照前也不能声称局部改善由多 Agent 造成。
+
+A51 将用户给出的完整营销因果链同时交给五个精确专家和 Lead，并关闭宽泛方法上下文；黄金礼品团队与同合同单 Lead 匹配运行分别消耗 49,764 和 31,823 Token。单 Lead 至少识别“礼品决策参谋”和关系维护，团队则退回“黄金礼品场景解决方案提供者”；两者都没有建立完整人情内容世界，也都补造案例或数字，人工业务拒绝。当前平行分块再收敛候选不接生产；生产保持不变。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

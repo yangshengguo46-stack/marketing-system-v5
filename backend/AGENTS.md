@@ -214,10 +214,10 @@ system-contract hash, corpus, and task mode, removing `incubation_context` only
 from the evaluation tool surface improved both gold and fruit anchors while the
 answers still failed business review. Broad method context is therefore a
 supported material interferer, not the sole cause. Keep
-`method_context_mode=disabled` evaluation-only, content-world-only, and
-subagent-incompatible; do not globally remove production methods or implement a
-keyword route. The next design target is compact task-relevant projection plus
-the remaining mother-contract boundary conflict.
+`method_context_mode=disabled` is evaluation-only. A48's historical mode stays
+a single-Lead content-world ablation; A51 additionally permits it only in the
+sealed shared-chain single-Lead/team comparison. Do not globally remove
+production methods or implement a keyword route.
 Audit A49 records the first compact user-reasoning substitution. The case-free
 `user-distilled-incubation-v1` card improved fruit-world breadth but still
 missed gift-giving as the gold-gift semantic head, was mirrored as an answer
@@ -242,6 +242,15 @@ same business guidance. The first M01 team run completed all five roles with
 43,667 tokens and improved talking-head/content-form concerns, but invented
 prices, volume, cadence, and production time; it is business-rejected and must
 not enter production.
+Audit A51 gives the same case-free marketing chain to a five-specialist
+`marketing-reasoning-team` and a matched single Lead while disabling broad
+method context. Both gold-gift outputs were business-rejected; the single Lead
+was closer to the gift/relationship anchor, while the team was slower, more
+expensive, and more industry-generic. Keep
+`SHARED_MARKETING_REASONING_CONTRACT` evaluation-only and absent from the
+canonical production contract, method library, production config, and default
+subagents. Do not repair this rejected parallel decomposition with more roles,
+candidate quotas, rankings, a vector database, or another runtime.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a50_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a51_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 51)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 52)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -162,6 +162,67 @@ def test_five_board_incubation_team_is_an_isolated_collaboration_trial() -> None
     assert "incubation-commercial-specialist" in runner
     assert "incubation-positioning-specialist" not in production_config
     assert "incubation-commercial-specialist" not in production_config
+
+
+def test_shared_marketing_reasoning_team_is_a_case_free_isolated_successor_trial() -> None:
+    audit = (AUDIT_ROOT / "A51-shared-marketing-reasoning-team.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-12-shared-marketing-reasoning-team.md").read_text(encoding="utf-8")
+    runner = (REPO_ROOT / "backend" / "scripts" / "run_incubation_agent_eval.py").read_text(encoding="utf-8")
+    reasoning_contract = (PACKAGE_ROOT / "marketing_reasoning_evaluation.py").read_text(encoding="utf-8")
+    production_contract = (PACKAGE_ROOT / "agent_contract.py").read_text(encoding="utf-8")
+    production_config = (REPO_ROOT / "config.example.yaml").read_text(encoding="utf-8")
+
+    for marker in (
+        "从名词看动词",
+        "从产品看用途",
+        "从用途看人性",
+        "语义中心",
+        "社会行为",
+        "内容世界",
+        "表现形式",
+        "商业归因",
+        "同一套完整因果链",
+        "Lead",
+        "一个统一营销命题",
+        "不是固定阶段",
+        "不需要向量数据库",
+        "评测专用",
+        "不接入生产",
+    ):
+        assert marker in audit
+        assert marker in evidence
+
+    for specialist in (
+        "semantic-center-specialist",
+        "human-demand-specialist",
+        "content-world-specialist",
+        "expression-form-specialist",
+        "commercial-attribution-specialist",
+    ):
+        assert specialist in runner
+        assert specialist not in production_config
+
+    assert "SHARED_MARKETING_REASONING_CONTRACT" in reasoning_contract
+    for leaked_answer in ("黄金", "礼品", "送礼", "水果", "宝妈"):
+        assert leaked_answer not in reasoning_contract
+    assert "SHARED_MARKETING_REASONING_CONTRACT" not in production_contract
+    assert "同业务合同的单 Lead" in audit
+    for result_marker in (
+        "agent-eval-gold-shared-reasoning-team-v1-20260812",
+        "agent-eval-gold-shared-reasoning-single-v1-20260812",
+        "49,764",
+        "31,823",
+        "黄金礼品场景解决方案提供者",
+        "礼品决策参谋",
+        "70%",
+        "3 类各做 2 条",
+        "business-rejected",
+        "单 Lead 更接近专家锚点",
+        "没有获胜者",
+        "生产保持不变",
+    ):
+        assert result_marker in audit
+        assert result_marker in evidence
 
 
 def test_subject_answers_are_versioned_facts_without_becoming_an_intake_gate() -> None:

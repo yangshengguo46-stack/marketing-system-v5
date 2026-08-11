@@ -262,10 +262,10 @@ These apply repo-wide; module guides own the module-specific detail.
   Audit A48 confirms broad method context as a material but non-exclusive
   interferer: a matched no-method evaluation improved both expert anchors but
   still produced templates, invented facts, and out-of-scope delivery. Its
-  `method_context_mode=disabled` switch belongs only to the content-world
-  evaluator and cannot run with subagents. Do not turn it into a production
-  keyword route or globally delete methods; redesign compact task-relevant
-  projection and the remaining mother-contract boundary offline first.
+  `method_context_mode=disabled` switch is evaluator-only. A48's historical
+  mode remains a single-Lead content-world ablation; A51 additionally permits
+  it only for the sealed shared-chain single-Lead/team comparison. Do not turn
+  it into a production keyword route or globally delete methods.
   Audit A49 evaluates a compact, case-free distillation of the user's visible
   marketing corrections. It improved fruit-world breadth but still missed the
   gift-giving semantic head for gold gifts, copied the method fields into an
@@ -289,6 +289,15 @@ These apply repo-wide; module guides own the module-specific detail.
   M01 team run completed all five roles with 43,667 tokens and improved
   talking-head/content-form concerns, but invented prices, volume, cadence, and
   production time; it is business-rejected and must not enter production.
+  Audit A51 tests the user's complete, case-free marketing chain through both a
+  five-specialist `marketing-reasoning-team` and a matched single Lead, with
+  broad method context disabled. Both gold-gift outputs were business-rejected;
+  the single Lead was closer to the gift/relationship anchor, while the team
+  was slower, more expensive, and more industry-generic. Keep
+  `SHARED_MARKETING_REASONING_CONTRACT` evaluation-only and out of
+  `agent_contract.py`, methods, production config, and production subagents.
+  Do not repair the rejected parallel decomposition by adding roles, quotas,
+  rankings, a vector database, or another runtime.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

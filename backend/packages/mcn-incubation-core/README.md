@@ -14,6 +14,8 @@ The DeerFlow harness exposes three read-only tools backed by this package. `incu
 
 `backend/scripts/run_incubation_agent_eval.py` is the next full-Agent evaluation path. It seeds each selected case into an isolated project/evidence database, runs the existing `DeerFlowClient` with an in-memory checkpoint, and seals the configured tool schemas, redacted tool trajectory, output, usage, and database digest. It requires explicit trial and recursion limits plus `--execute`; neither limit is represented as an exact currency cap.
 
+`mcn_incubation.marketing_reasoning_evaluation.SHARED_MARKETING_REASONING_CONTRACT` is an evaluation-only, case-free contract used by the A51 matched trial. The same contract can be given to one Lead or to the sealed `marketing-reasoning-team`; it is not a production method card, knowledge base, or second runtime. The gold-gift team and matched single-Lead outputs were both business-rejected, so this module must remain outside the canonical production contract.
+
 `backend/scripts/run_marketing_territory_bakeoff.py` also contains evaluation-only content-territory candidates. The failed conversation-v1 operator card is retained for provenance. `ResponseMode.CONTENT_WORLD_EXPLORATION` isolates a read-only world-mapping task from the canonical production Lead and final customer-delivery contracts; its baseline and conversation-v2 variants differ only by the operator card. This mode is not registered in production and has no paid-model result.
 
 Run the focused tests from `backend/`:
