@@ -51,6 +51,7 @@ async def incubation_project_context(runtime: Runtime, project_id: str) -> dict:
                 "created_at": truth.created_at.isoformat(),
                 "source_ref": truth.source_ref,
                 "evidence_refs": list(truth.evidence_refs),
+                "supersedes_truth_id": truth.supersedes_truth_id,
             }
             for truth in truths
         ],

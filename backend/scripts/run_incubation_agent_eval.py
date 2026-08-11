@@ -51,11 +51,17 @@ from deerflow.config.token_budget_config import TokenBudgetConfig
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CORPUS = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
 DEFAULT_OUTPUT_ROOT = REPO_ROOT / ".deer-flow" / "incubation-agent-eval"
-_REQUIRED_INCUBATION_TOOLS = frozenset(
+_REQUIRED_INCUBATION_READ_TOOLS = frozenset(
     {
         "incubation_context",
         "incubation_project_context",
         "incubation_project_evidence",
+    }
+)
+_REQUIRED_INCUBATION_LEAD_TOOLS = frozenset(
+    {
+        *_REQUIRED_INCUBATION_READ_TOOLS,
+        "incubation_record_subject_answer",
     }
 )
 _MIN_AGENT_GRAPH_STEPS = 40
@@ -121,8 +127,13 @@ def build_agent_eval_app_config(
     specialist = CustomSubagentConfig(
         description=_EVIDENCE_RESEARCHER_DESCRIPTION,
         system_prompt=_EVIDENCE_RESEARCHER_SYSTEM_PROMPT,
-        tools=sorted(_REQUIRED_INCUBATION_TOOLS),
-        disallowed_tools=["task", "ask_clarification", "present_files"],
+        tools=sorted(_REQUIRED_INCUBATION_READ_TOOLS),
+        disallowed_tools=[
+            "task",
+            "ask_clarification",
+            "present_files",
+            "incubation_record_subject_answer",
+        ],
         skills=[],
         model="inherit",
         max_turns=max_subagent_steps,
@@ -447,7 +458,7 @@ def _tool_surface(
         subagent_enabled=subagent_enabled,
     )
     schemas_by_name = {tool.name: convert_to_openai_tool(tool) for tool in tools}
-    required_tools = set(_REQUIRED_INCUBATION_TOOLS)
+    required_tools = set(_REQUIRED_INCUBATION_LEAD_TOOLS)
     if subagent_enabled:
         required_tools.add("task")
     missing = required_tools - schemas_by_name.keys()

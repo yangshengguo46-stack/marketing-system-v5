@@ -71,7 +71,7 @@ from deerflow.tracing import build_tracing_callbacks
 logger = logging.getLogger(__name__)
 
 _BOOTSTRAP_SKILL_NAMES = {"bootstrap"}
-_NON_INTERACTIVE_DISABLED_TOOL_NAMES = frozenset({"ask_clarification"})
+_NON_INTERACTIVE_DISABLED_TOOL_NAMES = frozenset({"ask_clarification", "incubation_record_subject_answer"})
 
 # Channels whose inbound messages originate from untrusted external
 # commenters (anyone on a GitHub repo, etc.) and whose run context is

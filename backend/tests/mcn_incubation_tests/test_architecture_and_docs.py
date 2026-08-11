@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a37_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a38_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 38)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 39)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -141,3 +141,17 @@ def test_multiagent_decision_keeps_one_incubation_authority() -> None:
     assert "只读" in decision
     assert "唯一孵化决策权" in product_contract
     assert "子 Agent" in product_contract
+
+
+def test_subject_answers_are_versioned_facts_without_becoming_an_intake_gate() -> None:
+    audit = (AUDIT_ROOT / "A38-subject-question-answer-provenance.md").read_text(encoding="utf-8")
+    product_contract = (DOC_ROOT / "current" / "PRODUCT_CONTRACT.md").read_text(encoding="utf-8")
+
+    assert "status: reviewed" in audit
+    assert "incubation_record_subject_answer" in audit
+    assert "ProjectTruth" in audit
+    assert "当前 run" in audit
+    assert "固定问卷" in audit
+    assert "用户原文" in product_contract
+    assert "版本链" in product_contract
+    assert "审批" in product_contract

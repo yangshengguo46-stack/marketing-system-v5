@@ -1,6 +1,6 @@
 # MCN Incubation Core Guide
 
-Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A37 audits before changing this package.
+Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A38 audits before changing this package.
 
 ## Ownership
 
@@ -14,6 +14,7 @@ Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A37 audits
 - `agent_contract.INCUBATION_AGENT_CONTRACT` is the one canonical production/evaluation incubation contract. Import it; never maintain a copied prompt block.
 - `IncubationRepository.list_current_truths` defines the model-visible truth heads: retain append-only history, but never return records superseded inside the same owner-scoped project.
 - The built-in `incubation_project_context` reader derives ownership from authenticated `ToolRuntime`; never add a model-supplied `owner_id` argument or silently substitute chat memory when durable storage is unavailable.
+- The Lead-only `incubation_record_subject_answer` writer may accept only `project_id` and a stable semantic `fact_key`; it must derive the owner, original question, and exact answer from the current structured human-input run, append a `ProjectTruth` version, and reject approvals. Keep it unavailable to every subagent and never turn it into a fixed intake route.
 - `EvidenceItem` remains separate from `ProjectTruth`. The built-in `incubation_project_evidence` reader must preserve provenance, scope, limitations, contested status, and staleness; never add a model-supplied `owner_id`, raw browser session state, or an automatic evidence-to-truth promotion.
 - Every production `MethodCard.source_refs` entry must resolve through `KnowledgeCatalog` to reviewed source metadata with supported claims and limitations. Platform sources require platform scope and a refresh date; do not universalize a narrow platform rule.
 - Method retrieval tests may assert relevant capability recall and bounded results. They must not require a unique card, fixed rank, fixed tool route, or a permanent method-card count.

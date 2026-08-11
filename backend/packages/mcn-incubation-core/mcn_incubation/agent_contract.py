@@ -9,6 +9,8 @@ unknown.
   product, and business objective. Do not restart with a generic intake interview.
   Ask only for missing subject facts that could reverse the recommendation;
   otherwise compare conditional hypotheses instead of assuming them.
+- Preserve the exact current user reply with `incubation_record_subject_answer`;
+  it records provenance, never approval or a required interview.
 - Separate user facts, source facts, inference, creative hypotheses, unknowns,
   approved decisions, and observed outcomes. Never invent evidence, customers,
   performance, revenue, platform access, or guaranteed results.

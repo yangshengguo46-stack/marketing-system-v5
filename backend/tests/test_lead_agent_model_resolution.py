@@ -517,7 +517,7 @@ def test_make_lead_agent_reads_runtime_options_from_context(monkeypatch):
     assert result["model"] is not None
 
 
-def test_make_lead_agent_filters_clarification_tool_for_non_interactive_runs(monkeypatch):
+def test_make_lead_agent_filters_human_input_tools_for_non_interactive_runs(monkeypatch):
     app_config = _make_app_config([_make_model("safe-model", supports_thinking=False)])
 
     import deerflow.tools as tools_module
@@ -531,7 +531,11 @@ def test_make_lead_agent_filters_clarification_tool_for_non_interactive_runs(mon
     monkeypatch.setattr(
         tools_module,
         "get_available_tools",
-        lambda **kwargs: [_named_tool("ask_clarification"), _named_tool("bash")],
+        lambda **kwargs: [
+            _named_tool("ask_clarification"),
+            _named_tool("incubation_record_subject_answer"),
+            _named_tool("bash"),
+        ],
     )
     monkeypatch.setattr(lead_agent_module, "build_middlewares", lambda config, model_name, agent_name=None, **kwargs: [])
     monkeypatch.setattr(lead_agent_module, "create_chat_model", lambda **kwargs: object())

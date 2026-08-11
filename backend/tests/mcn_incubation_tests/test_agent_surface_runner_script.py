@@ -122,8 +122,15 @@ def test_agent_eval_evidence_research_mode_is_read_only_and_run_scoped() -> None
     assert evaluation_config.subagents.allowed_agents == [specialist_name]
     assert evaluation_config.subagents.max_total_per_run == 1
     assert set(evaluation_config.subagents.custom_agents) == {specialist_name}
-    assert specialist.tools == sorted(module._REQUIRED_INCUBATION_TOOLS)
-    assert specialist.disallowed_tools == ["task", "ask_clarification", "present_files"]
+    assert specialist.tools == sorted(module._REQUIRED_INCUBATION_READ_TOOLS)
+    assert "incubation_record_subject_answer" in module._REQUIRED_INCUBATION_LEAD_TOOLS
+    assert "incubation_record_subject_answer" not in specialist.tools
+    assert specialist.disallowed_tools == [
+        "task",
+        "ask_clarification",
+        "present_files",
+        "incubation_record_subject_answer",
+    ]
     assert specialist.skills == []
     assert specialist.max_turns == 50
     assert specialist.timeout_seconds == 120
@@ -386,12 +393,14 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
                 incubation_context_tool,
                 incubation_project_context_tool,
                 incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
             )
 
             return [
                 incubation_context_tool,
                 incubation_project_context_tool,
                 incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
             ]
 
         def stream(self, prompt, *, thread_id, **kwargs):
@@ -505,6 +514,7 @@ def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
                 incubation_context_tool,
                 incubation_project_context_tool,
                 incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
                 task_tool,
             )
 
@@ -512,6 +522,7 @@ def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
                 incubation_context_tool,
                 incubation_project_context_tool,
                 incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
                 task_tool,
             ]
 

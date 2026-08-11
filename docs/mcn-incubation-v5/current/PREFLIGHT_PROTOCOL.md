@@ -85,7 +85,7 @@ uv run python scripts/run_incubation_agent_eval.py \
   --execute
 ```
 
-`--execute` 仍是付费确认。`--max-paid-trials` 限制案例 trial 数，`--max-model-calls` 是每个 trial 的实际模型调用硬上限；`--max-agent-steps` 只限制 LangGraph 图超步。当前 Lead Agent 编译图有 25 个节点，100 用于容纳通用中间件和三项只读工具往返，不代表 100 次模型调用。证据写入忽略目录 `.deer-flow/incubation-agent-eval/<run-id>/`，包括输入输出、Token、工具面、脱敏轨迹、隔离 SQLite 及哈希。
+`--execute` 仍是付费确认。`--max-paid-trials` 限制案例 trial 数，`--max-model-calls` 是每个 trial 的实际模型调用硬上限；`--max-agent-steps` 只限制 LangGraph 图超步。当前 Lead Agent 编译图有 25 个节点，100 用于容纳通用中间件和孵化工具往返，不代表 100 次模型调用。证据写入忽略目录 `.deer-flow/incubation-agent-eval/<run-id>/`，包括输入输出、Token、工具面、脱敏轨迹、隔离 SQLite 及哈希。
 
 任何下一次真实运行都必须使用新 ID，并先明确待验证的修正假设；默认不加 `--thinking`。启用 `--include-mutations` 时，同一案例严格按 initial → 追加 mutation 证据 → 同线程 revision 的顺序执行，两个阶段仍分别计入付费 trial 上限。必须人工复核最终判断和轨迹，不能从工具命中直接推断业务通过。
 
@@ -96,6 +96,22 @@ uv run python scripts/run_incubation_agent_eval.py \
 `agent-eval-m01-v3` 以聊天交付、100 图超步和 6 次模型调用硬上限技术成功，但人工业务评审拒绝其无依据平台判断、素材资产、表现形式和数字阈值。它是失败证据，不是成功案例；修正方案完成离线测试前，不继续付费扩大案例。
 
 `agent-eval-m01-v4` 与带 initial/mutation 的 `agent-eval-m01-v5` 均技术成功、业务不通过。v5 还证明旧 mutation 编排使用独立项目和线程时不能评价真实修订能力；当前运行器已改为同项目同线程并在第二轮前追加证据。该修复只有离线回归，新的真实连续修订仍需单独确认付费调用。
+
+### 主体问答连续会话
+
+A38 已离线验证 `incubation_record_subject_answer` 的来源、Owner、幂等、版本链和审批排除合同，但没有发起新模型调用。现有 `--include-mutations` 只负责在两轮之间追加评测证据，不会伪造右侧界面的结构化用户回答，所以不能用它冒充主体问答验收。
+
+下一次 M01 必须使用新 run ID，并保持同一项目、同一线程。评测观察以下行为，不把固定工具轨迹当成评分项：
+
+1. Lead 根据已有项目事实给条件化判断，或只提出一个确实会反转路线的主体问题。
+2. 用户通过真实 Human Input Card 回答；Gateway 将回执绑定当前 run。
+3. 若 Lead 记录回答，`incubation_record_subject_answer` 必须从真实回执读取用户原文并追加项目事实；模型不能在参数中转述答案。
+4. 独立验真项目事实版本链，并检查 Lead 是否明确哪些旧假设被新回答推翻、保留或仍未知；不要求它为了轨迹再调用一次固定读取工具。
+5. 人工业务评审同时检查问题的信息增益、表现形式适配、变现依据和修订理由；仅命中工具不算通过。
+
+若 Lead 没有提问，但能在未知边界内给出合格的条件化方案，该运行不能因“未调用工具”被自动判失败；记录器状态应记为 `untriggered`，也不能作为其能力通过证据。若用户回答没有改变项目判断，则 Lead 应说明原因，不得为满足版本链测试而制造修订。
+
+该真实会话涉及付费模型调用，仍需用户再次明确确认。确认前只运行离线测试；A38 不改变 M01 的 `business-rejected` 状态。
 
 ### 单一决策权多 Agent 候选
 

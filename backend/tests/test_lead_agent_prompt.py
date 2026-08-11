@@ -682,6 +682,15 @@ def test_incubation_prompt_retrieves_methods_only_when_they_change_the_judgment(
     assert "must call incubation_context" not in template.casefold()
 
 
+def test_incubation_prompt_records_real_subject_answers_without_forcing_an_interview():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "`incubation_record_subject_answer`" in template
+    assert "exact current user reply" in template
+    assert "approval" in template
+    assert "must call incubation_record_subject_answer" not in template.casefold()
+
+
 def _make_minimal_app_config():
     return SimpleNamespace(
         sandbox=SimpleNamespace(mounts=[]),

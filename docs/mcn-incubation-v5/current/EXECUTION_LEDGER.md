@@ -7,10 +7,10 @@
 | 纵切 | 状态 | 已有证据 | 未完成 |
 | --- | --- | --- | --- |
 | 独立产品边界 | tested | 新包、新文档和架构测试不依赖旧 `marketing-os` | 用户可见产品名称 |
-| DeerFlow 总控 | tested | 唯一 Lead Agent 已直接负责孵化；生产与评测逐字共用单一孵化合同；方法、项目事实和项目证据工具均只读；旧“必须先澄清”硬门已移除 | 同一工具面的真实会话验收 |
+| DeerFlow 总控 | tested | 唯一 Lead Agent 已直接负责孵化；生产与评测逐字共用单一孵化合同；方法、项目事实和项目证据读取保持只读，只有主体回答记录器可按当前真实人类回执追加事实；旧“必须先澄清”硬门已移除 | 同一工具面的真实会话验收 |
 | 真实模型预检 | business-rejected | 自动 DNS 恢复；真实模型 1.44 秒返回 `OK`；三轮 M01/B01/G01 均 3/3 技术成功且完整性通过；B01 thinking 技术成功 | 方法卡 v2 与原生 thinking 均未解决无依据事实、资产、效果和指标 |
 | 孵化领域合同 | tested | 简报、事实、外部证据快照、决策、实验、结果、学习和案例对象 | 真实 Agent 输出 |
-| 项目事实与证据账本 | tested | 独立 V2 metadata、Owner 隔离、不可变追加、幂等、替代链、来源/哈希/范围/局限/过期合同，以及事实与证据两个只读工具 | 受控采集写入和当前决策投影 |
+| 项目事实与证据账本 | tested | 独立 V2 metadata、Owner 隔离、不可变追加、幂等、替代链、来源/哈希/范围/局限/过期合同，事实与证据两个只读工具，以及当前人类回答的受控事实写入 | 受控外部证据采集和当前决策投影 |
 | 方法上下文 | tested | 十类来源化方法卡、九条已复核来源和 13 条有界检索基线；真实 M01 宽查询可召回六项任务能力且不再混入小红书来源 | 修正后的真实模型遵循效果与重复调用成本 |
 | 受控案例记忆 | tested | 项目内隔离、状态过滤、支持与反例分离 | 长期真实案例 |
 | 36 案例评测集 | tested | 八类业务场景、每例包含新证据变体 | 专家标注和评分标定 |
@@ -25,20 +25,24 @@
 | M01 事实边界修正 | paid-retest-business-rejected | A31/A33；离线检索合同通过，但 v4 未调用方法工具并再次补造路线、资产、价格和阈值 | 离线比较逐主张依据等轻量认识结构；通过前不再付费重跑 |
 | M01 主体适配与记忆隔离 | paid-retest-business-rejected | A34/A35；泛记忆已隔离，但 v5 初始与 mutation 均继续补造形式、平台、供给、价格和阈值 | 用有效连续对话评测主体信息获取与修订 |
 | 连续修订评测 | offline-harness-tested | A35；同案例现共享项目/线程，mutation 只在第二轮前追加，两个 trace 分别密封 | 修正后的真实连续对话尚未付费验证 |
+| 主体问答来源与版本链 | offline-tested | A38；Lead 从当前 run 的结构化用户回执记录原文，Owner 隔离、同请求幂等、同语义键替代链、项目投影、审批排除和子 Agent 禁写均已测试 | 真实 UI 连续会话、问题信息增益和据回答修订的业务评审 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
 | 单一决策权多 Agent 候选 | offline-repaired / paid-untriggered / business-rejected | A37、ADR-009；运行级角色白名单、只读证据研究员、独立步数/Token/超时/总委派上限和密封实验 manifest 已离线通过；试后发现并测试先行修复嵌入式配置传播缺口 | Lead 实际未调用 `task`，因此真实运行既未证明专业子 Agent 可执行，也未测其质量；最终答案仍补造路线与数字，ADR 保持 proposed |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A37 将“唯一决策权”与“只能有一次 Agent 调用”分开：专业子 Agent 可以作为只读工具，但不能是并列大脑。M01 首试中 Lead 没有委派，说明小型项目对账不会自然产生多 Agent 净收益；它随后仍违反已读方法并补造产能、资产、价格和阈值。试后发现的嵌入式配置传播缺口已离线修复，但没有倒推为真实通过。当前继续优先解决 Lead 如何获取主体信息并尊重未知；专业子 Agent 只在真正证据密集的账号拆解或多来源研究中继续验证。尚未产生架构胜者。
+首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A37 将“唯一决策权”与“只能有一次 Agent 调用”分开：专业子 Agent 可以作为只读工具，但不能是并列大脑。A38 又补上了连续孵化的来源断点：关键主体回答现在能从当前真实人类回执进入项目事实版本链，不再只存在于聊天或模型摘要中；它没有引入固定问卷。M01 首试中 Lead 没有委派，且随后仍违反已读方法并补造产能、资产、价格和阈值。当前只证明回答持久化合同离线通过，尚未证明 Lead 会问对问题或据答案作出合格修订。专业子 Agent 只在真正证据密集的账号拆解或多来源研究中继续验证。尚未产生架构胜者。
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests ... -q`：A20-A37、ADR-009、孵化合同、完整 Agent 评测器、运行级子 Agent 白名单、只读证据研究员、Lead 渲染可见性、配置隔离与密封轨迹共 `330 passed`。
-- `uv run python -m pytest tests/test_subagent_* ... tests/test_client.py -q`：DeerFlow 子 Agent 执行器、Token 回流、超时/循环/总次数背压、延迟工具、检查点隔离、委派账本、Lead 模型解析和嵌入式客户端共 `413 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests ... tests/test_app_config_reload.py -q`：A20-A38、孵化合同、主体回答工具、方法/事实/证据、评测器、子 Agent 配置和 4000 字上下文预算共 `338 passed`。
+- `uv run python -m pytest tests/test_subagent_*.py tests/test_task_tool*.py tests/test_client.py tests/test_client_explicit_app_config.py -q`：子 Agent 权限、委派、Token/超时背压、检查点与客户端共 `511 passed`。
+- `uv run python -m pytest tests/test_create_deerflow_agent.py tests/test_tool_deduplication.py tests/test_input_sanitization_middleware.py tests/test_human_input.py tests/test_thread_data_middleware.py tests/test_gateway_services.py -q`：全局工具注册、人类回执清洗、当前 run 盖章和 Gateway 输入合同共 `343 passed`。
+- `uv run python -m pytest tests/test_lead_agent_model_resolution.py -q`：交互与非交互 Lead 工具面共 `43 passed`；定时任务不暴露提问或主体回答记录工具。
+- 新增能力的七文件聚焦回归为 `147 passed`；A38 连号、来源、产品合同与架构边界单测为 `8 passed`。
 - 本轮变更的 Ruff 检查与格式检查通过，`uv lock --check` 通过，`git diff --check` 无空白错误。
-- 本轮变更和 A37/实验证据的凭证特征扫描未发现 API Key、Token 或私钥值；完整本地输出仍只位于被忽略的 `.deer-flow/`。
+- 本轮 tracked 新增行与 untracked 文件的凭证特征扫描未发现 API Key、Token 或私钥值；README 全文件扫描只命中既有示例占位符，完整本地输出仍只位于被忽略的 `.deer-flow/`。
 - `uv run python -m pytest tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：A20-A36 连续编号、`reviewed` 状态、来源、结论和第五版决定合同共 `6 passed`；对应 Ruff 检查和格式检查通过。
 - `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py tests/test_client_explicit_app_config.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 主体适配与记忆隔离、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `374 passed`。
 - `uv run python -m pytest tests/test_client.py tests/test_client_explicit_app_config.py -q`：DeerFlowClient 流式消息、终态工具参数补全、显式配置隔离和既有嵌入式客户端合同共 `174 passed`。
@@ -85,8 +89,11 @@
 - 专业子 Agent 离线权限、参数和密封轨迹回归通过；`agent-eval-m01-multiagent-v1` 完成 Lead 运行、耗时 31.875 秒、合计 49,106 Token，但实际 `task=0`，因此候选未触发。
 - 试后复核发现 `DeerFlowClient` 未把显式评测配置传入工具运行时；新增失败测试后已离线修复并通过客户端回归。由于本次没有 `task` 调用，历史输出不受影响，但这次付费运行不能证明子 Agent 执行链路。
 - 同一 M01 输出仍无依据给出口播信任度、每周产能、30 条内容、免费清单、99 元、两周 10 条和 500 阅读阈值，业务评审不通过。不强制 `task`，ADR-009 保持 `proposed`。
+- A38 用失败测试先行增加 `incubation_record_subject_answer`：模型只提交项目 ID 与稳定语义键，Owner、原问题和用户原文来自当前结构化 human-input 回执；同一回答幂等，新回答追加为 `ProjectTruth` 替代链。
+- 记录工具只对 Lead 开放，子 Agent 在默认配置、专业评测配置和运行时三层禁写；审批、风险确认和不可逆授权不能伪装成主体事实。持久库不可用时明确失败，不回退聊天记忆。
+- A38 当前只有离线合同证据，没有新的付费模型运行。它不能证明 Lead 会提出高信息问题，也不能把 M01 或宝妈案例改记为通过。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-M01 多 Agent 首试仍业务不通过，专业子 Agent 未触发，真实委派执行也尚未验证；连续修订评测器仅完成离线修复。下一孵化纵切仍先定义可观察的主体信息获取行为和版本化用户回答，再用同一项目、同一线程检查 Agent 是否先问高信息问题、保持条件化假设并据新证据修订。专业子 Agent 后续只选证据密集的授权账号拆解或多来源研究验证，不强迫 M01 走部门流程。未经用户再次确认不执行新的付费 run。
+主体信息回答的来源与版本链已完成离线实现，M01 多 Agent 首试仍业务不通过，专业子 Agent 也未触发。下一孵化纵切是在右侧界面用同一项目、同一线程完成真实“提问 -> 用户回答 -> 记录 -> 再读取 -> 修订”闭环，人工检查问题是否真能反转路线、Agent 是否保持条件化假设并尊重新证据。专业子 Agent 后续只选证据密集的授权账号拆解或多来源研究验证，不强迫 M01 走部门流程。未经用户再次确认不执行新的付费 run。

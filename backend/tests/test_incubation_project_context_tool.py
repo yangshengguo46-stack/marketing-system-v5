@@ -78,6 +78,7 @@ async def test_project_context_reads_typed_current_truth_without_exposing_owner(
                     "created_at": NOW.isoformat(),
                     "source_ref": "user-interview-2026-08-11",
                     "evidence_refs": ["resume-redacted.pdf"],
+                    "supersedes_truth_id": None,
                 }
             ],
             "note": "Keep each truth's kind and source boundary; unknowns and hypotheses are not verified facts.",

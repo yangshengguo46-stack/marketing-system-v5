@@ -148,6 +148,15 @@ config, allows the three incubation readers, disables skills, and requires
 explicit Lead-call, child-step, child-token, timeout, and total-delegation
 backstops. Do not register it in production until outcome evaluation supports
 ADR acceptance.
+Audit A38 governs subject-answer provenance. The Lead-only
+`incubation_record_subject_answer` tool reads the exact answer and original
+question from the current run's structured `ask_clarification` exchange; its
+model schema may expose only `project_id` and a stable semantic `fact_key`.
+Ownership comes from `ToolRuntime`, revisions append linked `ProjectTruth`
+records, durable-storage failure has no chat-memory fallback, and approvals are
+rejected. Keep the tool hidden from subagents and also enforce that boundary at
+runtime. It records an answer after one exists; it must not become a fixed
+intake form, mandatory interview, or forced tool route.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,
@@ -931,7 +940,7 @@ that cannot tell sibling branches apart.
    - `task` - Delegate to subagent (description, prompt, subagent_type)
 
 Scheduled-task runtime note:
-- Scheduled background runs set `context.non_interactive=true` and therefore exclude `ask_clarification` from the lead-agent tool list. This keeps scheduler-triggered runs from stalling on human confirmation mid-execution. `non_interactive` is an internal-only context key: it is merged from `body.context` only when the request authenticated as the process-internal user (the scheduler path), never from arbitrary HTTP/IM clients.
+- Scheduled background runs set `context.non_interactive=true` and therefore exclude `ask_clarification` and `incubation_record_subject_answer` from the lead-agent tool list. This keeps scheduler-triggered runs from stalling on human confirmation or attempting to consume a reply that cannot exist mid-execution. `non_interactive` is an internal-only context key: it is merged from `body.context` only when the request authenticated as the process-internal user (the scheduler path), never from arbitrary HTTP/IM clients.
 
 **Community tools** (`packages/harness/deerflow/community/`): optional integrations, each in its own subpackage and wired through `config.yaml`. Documented examples:
 - `tavily/` - Web search (5 results default) and web fetch (4KB limit)

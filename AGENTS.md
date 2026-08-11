@@ -95,7 +95,7 @@ Skill quality review note:
 
 Scheduled-task note:
 - The scheduled-task MVP adds a workspace page at `/workspace/scheduled-tasks` plus a background scheduler service gated by `config.yaml -> scheduler.enabled`.
-- Scheduled background runs are intentionally non-interactive: they execute through the normal run lifecycle, but the lead-agent toolset excludes `ask_clarification` when `context.non_interactive=true`. The key is honored only for internally-authenticated callers (the scheduler launch path); client-supplied `context.non_interactive` is dropped.
+- Scheduled background runs are intentionally non-interactive: they execute through the normal run lifecycle, but the lead-agent toolset excludes `ask_clarification` and `incubation_record_subject_answer` when `context.non_interactive=true`. The key is honored only for internally-authenticated callers (the scheduler launch path); client-supplied `context.non_interactive` is dropped.
 
 ## Commands: Root vs. Module
 
@@ -207,6 +207,13 @@ These apply repo-wide; module guides own the module-specific detail.
   force delegation, give a subagent project writes, or register a department
   of strategy personas. The first evidence specialist exists only in an
   isolated capped evaluator until business outcomes justify adoption.
+  Audit A38 owns subject-answer provenance. The Lead-only
+  `incubation_record_subject_answer` tool reads the original question and exact
+  user reply from the current structured human-input run, derives ownership
+  from runtime identity, and appends a versioned `ProjectTruth`. Models must not
+  supply answer text or owner identity; subagents cannot write; approvals are
+  never subject facts. This is provenance capture, not a fixed questionnaire or
+  required tool route.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

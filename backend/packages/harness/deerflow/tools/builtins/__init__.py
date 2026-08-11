@@ -2,6 +2,7 @@ from .clarification_tool import ask_clarification_tool
 from .incubation_context_tool import incubation_context_tool
 from .incubation_project_context_tool import incubation_project_context_tool
 from .incubation_project_evidence_tool import incubation_project_evidence_tool
+from .incubation_subject_answer_tool import incubation_record_subject_answer_tool
 from .list_uploaded_files_tool import list_uploaded_files
 from .present_file_tool import present_file_tool
 from .review_skill_package_tool import review_skill_package
@@ -19,6 +20,7 @@ __all__ = [
     "incubation_context_tool",
     "incubation_project_context_tool",
     "incubation_project_evidence_tool",
+    "incubation_record_subject_answer_tool",
     "view_image_tool",
     "task_tool",
     "list_uploaded_files",
