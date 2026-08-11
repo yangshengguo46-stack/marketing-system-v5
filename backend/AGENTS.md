@@ -218,6 +218,15 @@ supported material interferer, not the sole cause. Keep
 subagent-incompatible; do not globally remove production methods or implement a
 keyword route. The next design target is compact task-relevant projection plus
 the remaining mother-contract boundary conflict.
+Audit A49 records the first compact user-reasoning substitution. The case-free
+`user-distilled-incubation-v1` card improved fruit-world breadth but still
+missed gift-giving as the gold-gift semantic head, was mirrored as an answer
+template, and did not prevent factual invention. Keep
+`method_context_mode=distilled_user_reasoning` evaluation-only,
+content-world-only, and subagent-incompatible. It is not a production winner
+and does not justify deleting downstream MCN capabilities. The next repair is
+offline semantic-head counterfactual testing, claim-level verification marking,
+and held-out personal/brand/product/service cases before any new paid run.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

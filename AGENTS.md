@@ -266,6 +266,14 @@ These apply repo-wide; module guides own the module-specific detail.
   evaluator and cannot run with subagents. Do not turn it into a production
   keyword route or globally delete methods; redesign compact task-relevant
   projection and the remaining mother-contract boundary offline first.
+  Audit A49 evaluates a compact, case-free distillation of the user's visible
+  marketing corrections. It improved fruit-world breadth but still missed the
+  gift-giving semantic head for gold gifts, copied the method fields into an
+  answer template, and invented claims. Keep `distilled_user_reasoning`
+  evaluation-only and content-world-only. Do not register its card in the
+  production method library, claim a business pass, or delete downstream MCN
+  capabilities; refine semantic-head counterfactual checks and held-out cases
+  offline before another paid run.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

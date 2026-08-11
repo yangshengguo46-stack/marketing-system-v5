@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a48_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a49_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 49)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 50)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -467,3 +467,33 @@ def test_a48_records_method_context_as_a_material_but_not_sole_failure_contribut
 
     assert "8261b541b737422f147d90f68515a6ed8bcffb0bc90606c2c49dfc88c974a9c8" in evidence
     assert "9db90f6541045b97714451afdcbc32513380484b32e22b364a058e5460ea82a8" in evidence
+
+
+def test_a49_records_distilled_user_reasoning_as_partial_signal_not_production_winner() -> None:
+    audit = (AUDIT_ROOT / "A49-distilled-user-reasoning-trial.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-distilled-user-reasoning-trial.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "agent-eval-content-world-distilled-user-v1-20260811",
+        "distilled_user_reasoning",
+        "user-distilled-incubation-v1",
+        "2/2",
+        "61,246",
+        "9b196817998485c410762bde7ac070b595c7b78e7a9221d9439118ba796c724c",
+        "e052743b1dbc6aba875cef2ac29d9437a411c7128ddc699d1183d4a902321c61",
+        "0d9fba0dd104c624d10de655ec1439061833feca1b98e0c9774d499a162d6841",
+        "水果生存史",
+        "七个候选",
+        "礼品/送礼",
+        "答题表格",
+        "business-rejected",
+        "不接入生产",
+        "不删除 MCN 下游能力",
+        "不能证明跨行业泛化",
+    ):
+        assert marker in audit
+        assert marker in evidence
+
+    assert "8261b541b737422f147d90f68515a6ed8bcffb0bc90606c2c49dfc88c974a9c8" in evidence
+    assert "9db90f6541045b97714451afdcbc32513380484b32e22b364a058e5460ea82a8" in evidence
+    assert "未追加第二轮付费调用" in audit

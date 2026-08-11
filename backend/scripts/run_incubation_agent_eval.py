@@ -21,6 +21,7 @@ from typing import Any, override
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ModelCallResult, ModelRequest, ModelResponse
 from langchain_core.messages import AIMessage
+from langchain_core.tools import tool
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.checkpoint.memory import InMemorySaver
 from mcn_incubation.agent_evaluation import (
@@ -40,6 +41,7 @@ from mcn_incubation.evaluation import EvalCase, load_eval_cases
 from mcn_incubation.persistence import IncubationRepository
 from mcn_incubation.persistence_schema import bootstrap_incubation_schema
 from mcn_incubation.preflight import PreflightLedger
+from mcn_incubation.user_reasoning_evaluation import distilled_user_reasoning_context
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -106,6 +108,26 @@ class AgentEvalTaskMode(StrEnum):
 class MethodContextMode(StrEnum):
     AVAILABLE = "available"
     DISABLED = "disabled"
+    DISTILLED_USER_REASONING = "distilled_user_reasoning"
+
+
+@tool("incubation_context", parse_docstring=True)
+def distilled_user_incubation_context(query: str, limit: int = 1) -> dict[str, object]:
+    """Retrieve the evaluation-only distilled content-world reasoning card.
+
+    This candidate is advisory and supplies optional reasoning lenses, not case
+    answers, a fixed workflow, project facts, or a final incubation judgment.
+
+    Args:
+        query: Current content-world question for an unfamiliar business object.
+        limit: Compatibility bound from 1 through 10; this candidate returns one card.
+    """
+
+    if not query.strip():
+        raise ValueError("query cannot be blank")
+    if not 1 <= limit <= 10:
+        raise ValueError("limit must be between 1 and 10")
+    return distilled_user_reasoning_context()
 
 
 def build_agent_eval_client(
@@ -126,7 +148,10 @@ def build_agent_eval_client(
                 model_name=model_name,
                 subagent_enabled=subagent_enabled,
             )
-            return [tool for tool in tools if tool.name != "incubation_context"]
+            filtered_tools = [tool for tool in tools if tool.name != "incubation_context"]
+            if method_context_mode is MethodContextMode.DISTILLED_USER_REASONING:
+                filtered_tools.append(distilled_user_incubation_context)
+            return filtered_tools
 
     return MethodContextFilteredClient(**client_kwargs)
 
@@ -700,7 +725,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--method-context-mode",
         choices=tuple(mode.value for mode in MethodContextMode),
         default=MethodContextMode.AVAILABLE.value,
-        help="Evaluation-only incubation_context availability; disabled is a content-world ablation",
+        help=("Evaluation-only incubation_context variant; disabled removes it and distilled_user_reasoning substitutes one compact candidate card"),
     )
     parser.add_argument(
         "--max-subagent-steps",
@@ -741,10 +766,10 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
     if not 1 <= args.max_model_calls <= _MAX_EVALUATION_MODEL_CALLS:
         parser.error(f"--max-model-calls must be between 1 and {_MAX_EVALUATION_MODEL_CALLS}")
-    if args.method_context_mode == MethodContextMode.DISABLED.value and args.task_mode != AgentEvalTaskMode.CONTENT_WORLD.value:
-        parser.error("--method-context-mode disabled is only valid with --task-mode content_world")
-    if args.method_context_mode == MethodContextMode.DISABLED.value and args.subagent_mode != "disabled":
-        parser.error("--method-context-mode disabled cannot be combined with a method-capable subagent")
+    if args.method_context_mode != MethodContextMode.AVAILABLE.value and args.task_mode != AgentEvalTaskMode.CONTENT_WORLD.value:
+        parser.error("evaluation method-context variants are only valid with --task-mode content_world")
+    if args.method_context_mode != MethodContextMode.AVAILABLE.value and args.subagent_mode != "disabled":
+        parser.error("evaluation method-context variants cannot be combined with a method-capable subagent")
     if args.subagent_mode == "disabled":
         if args.max_subagent_steps is not None or args.max_subagent_tokens is not None:
             parser.error("subagent caps can only be used with an enabled --subagent-mode")

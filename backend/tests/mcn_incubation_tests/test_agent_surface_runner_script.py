@@ -497,12 +497,61 @@ def test_agent_eval_can_remove_method_context_from_only_the_evaluation_tool_surf
     disabled = module.build_agent_eval_client(
         method_context_mode=module.MethodContextMode.DISABLED,
     )
+    distilled = module.build_agent_eval_client(
+        method_context_mode=module.MethodContextMode.DISTILLED_USER_REASONING,
+    )
 
     assert [tool.name for tool in available._get_tools(model_name="fake-model", subagent_enabled=False)] == [
         "incubation_context",
         "incubation_project_context",
     ]
     assert [tool.name for tool in disabled._get_tools(model_name="fake-model", subagent_enabled=False)] == ["incubation_project_context"]
+    distilled_tools = distilled._get_tools(model_name="fake-model", subagent_enabled=False)
+    assert [tool.name for tool in distilled_tools] == [
+        "incubation_project_context",
+        "incubation_context",
+    ]
+    distilled_payload = distilled_tools[-1].invoke({"query": "打开一个陌生商业对象的内容世界", "limit": 4})
+    assert distilled_payload["authority"] == "evaluation_hypothesis_only"
+    assert distilled_payload["method_card"]["method_card_id"] == "user-distilled-incubation-v1"
+    assert "content-engine-v1" not in json.dumps(distilled_payload, ensure_ascii=False)
+
+
+def test_agent_eval_limits_distilled_user_reasoning_to_isolated_content_world_trials() -> None:
+    module = _load_script()
+    common = [
+        "--case",
+        "CW01-gold-gift",
+        "--max-paid-trials",
+        "1",
+        "--max-agent-steps",
+        "100",
+        "--max-model-calls",
+        "4",
+        "--method-context-mode",
+        "distilled_user_reasoning",
+        "--execute",
+    ]
+
+    args = module._parse_args([*common, "--task-mode", "content_world"])
+    assert args.method_context_mode == "distilled_user_reasoning"
+
+    with pytest.raises(SystemExit):
+        module._parse_args(common)
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                *common,
+                "--task-mode",
+                "content_world",
+                "--subagent-mode",
+                "evidence-review",
+                "--max-subagent-steps",
+                "50",
+                "--max-subagent-tokens",
+                "30000",
+            ]
+        )
 
 
 def test_agent_eval_main_seals_content_world_ablation_with_fake_stream(
