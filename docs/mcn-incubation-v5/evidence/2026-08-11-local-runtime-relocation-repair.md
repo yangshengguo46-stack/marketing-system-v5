@@ -4,7 +4,7 @@
 
 ## 结论
 
-第五版代码仓库从 `/Users/yangyucheng/Documents/第五版营销系统` 迁移到 `/Users/yangyucheng/Documents/ChatGPT/第五版营销系统` 后，源码与锁文件完整，但被复制的 Python 虚拟环境入口仍指向旧绝对路径，前端 Tailwind 解析又回落到没有 `node_modules` 的 Git 根。两项本地运行故障均已修复，统一入口 `http://127.0.0.1:2026/` 返回 `HTTP 200`。
+第五版代码仓库从 `/Users/yangyucheng/Documents/第五版营销系统` 迁移到 `/Users/yangyucheng/Documents/ChatGPT/第五版营销系统` 后，源码与锁文件完整，但复制过来的 Python 虚拟环境和 Turbopack `.next` 缓存仍嵌有旧绝对路径；此外，`127.0.0.1:2026` 在 Next 开发模式下没有被允许加载跨源开发资源。三项本地运行故障均已修复。统一入口和实际工作区必须通过浏览器水合验收，不能再以首页一次 `HTTP 200` 代替工作区验收。
 
 这不是模型、API Key、孵化内核或 A38 数据合同故障，也没有发起模型调用。
 
@@ -26,18 +26,24 @@ ModuleNotFoundError: No module named 'mcn_incubation'
 
 ## Frontend 故障
 
-Gateway 恢复后，Next 与 Nginx 虽已监听，首次页面请求仍超时。`logs/frontend.log` 显示 Tailwind 4 从 Git 根解析 `@import "tailwindcss"`，而本仓库的 pnpm workspace 和依赖位于 `frontend/`。
+Gateway 恢复后，Next 与 Nginx 虽已监听，`/` 可以返回 200，但 `/workspace` 编译超时。`logs/frontend.log` 显示 Tailwind 4 从 Git 根解析 `@import "tailwindcss"`，而本仓库的 pnpm workspace 和依赖位于 `frontend/`。
 
-先写 `postcss-config.test.ts` 固定解析基准，再将 `@tailwindcss/postcss` 的 `base` 显式设为前端命令的 `process.cwd()`。本仓库所有 host-side pnpm 命令本来就按开发守则从 `frontend/` 执行，因此该值稳定指向依赖根，没有在仓库根制造第二份 `node_modules` 或本地软链接。
+第一次修复先写 `postcss-config.test.ts`，再将 `@tailwindcss/postcss` 的 `base` 设为 `process.cwd()`。该测试从 `frontend/` 运行且只访问首页，遗漏了真实工作区路由，因此产生假通过。复查中分别试验了 PostCSS 绝对基准和 `turbopack.root`；两者都未改变 `/workspace` 的真实故障，相关试验改动已撤销，没有把猜测留在代码里。
+
+决定性证据来自 `.next` source map：其中仍引用迁移前的 `/Users/yangyucheng/Documents/第五版营销系统/frontend/package.json`。停止服务并删除可再生的 `frontend/.next` 后，保留原 PostCSS/Nextra 配置从零编译，`/workspace` 正常跳转到 `/workspace/chats/new` 并返回 200；新缓存不再包含旧路径。
+
+页面随后暴露第二层问题：`localhost:2026` 能完整显示输入框，`127.0.0.1:2026` 只有服务端侧栏骨架，浏览器反复报告 `/_next/webpack-hmr` 握手失败。Next 日志明确要求允许 `127.0.0.1`。先修改 `dev-origins.test.ts` 得到失败测试，再把该回环地址加入默认 `allowedDevOrigins` 并对环境扩展项去重；局域网地址仍须显式配置。
 
 ## 验证
 
-- `make dev`：Gateway、Frontend 与 Nginx 均启动。
-- `curl --max-time 30 http://127.0.0.1:2026/`：`HTTP 200`。
+- `make dev`：Gateway、Frontend 与 Nginx 均启动并保持运行。
+- `curl -L http://127.0.0.1:2026/workspace`：最终路由 `/workspace/chats/new` 返回 200。
+- Playwright 分别访问 `localhost` 与 `127.0.0.1`：两者均为 200、输入框可见，控制台错误、失败请求和 4xx/5xx 响应均为 0。
+- `dev-origins.test.ts`：新增断言先失败，修复后 10 项通过，覆盖默认回环地址、环境扩展和去重。
 - `python3 ../scripts/pnpm.py check`：ESLint 与 TypeScript 通过。
-- `python3 ../scripts/pnpm.py test`：`988 passed`。
-- PostCSS 聚焦失败测试修复后：`1 passed`。
-- Git 变更只包含 PostCSS 配置、测试和同步文档，不包含 `.venv`、`node_modules`、日志或凭证。
+- `python3 ../scripts/pnpm.py test`：126 个测试文件、989 项测试全部通过。
+- `python3 ../scripts/pnpm.py format`：Prettier 通过。
+- 纠正后的 Git 变更只包含开发来源配置、测试和同步文档；`.venv`、`.next`、`node_modules`、日志和凭证均未跟踪。
 
 ## 运行边界
 

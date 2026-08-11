@@ -60,10 +60,18 @@ describe("getAllowedDevOrigins", () => {
   test("reads DEER_FLOW_DEV_ALLOWED_ORIGINS", () => {
     expect(
       getAllowedDevOrigins({ DEER_FLOW_DEV_ALLOWED_ORIGINS: "192.168.1.10" }),
-    ).toEqual(["192.168.1.10"]);
+    ).toEqual(["127.0.0.1", "192.168.1.10"]);
   });
 
-  test("defaults to an empty list, keeping localhost-only the default", () => {
-    expect(getAllowedDevOrigins({})).toEqual([]);
+  test("allows the loopback IP used by the unified local entry", () => {
+    expect(getAllowedDevOrigins({})).toEqual(["127.0.0.1"]);
+  });
+
+  test("does not duplicate the default loopback origin", () => {
+    expect(
+      getAllowedDevOrigins({
+        DEER_FLOW_DEV_ALLOWED_ORIGINS: "127.0.0.1,dev.example.com",
+      }),
+    ).toEqual(["127.0.0.1", "dev.example.com"]);
   });
 });

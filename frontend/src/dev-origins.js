@@ -55,5 +55,10 @@ export function parseAllowedDevOrigins(raw) {
  * @returns {string[]}
  */
 export function getAllowedDevOrigins(env = process.env) {
-  return parseAllowedDevOrigins(env.DEER_FLOW_DEV_ALLOWED_ORIGINS);
+  return [
+    ...new Set([
+      "127.0.0.1",
+      ...parseAllowedDevOrigins(env.DEER_FLOW_DEV_ALLOWED_ORIGINS),
+    ]),
+  ];
 }
