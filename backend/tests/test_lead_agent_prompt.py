@@ -623,6 +623,36 @@ def test_system_prompt_template_preserves_placeholders():
         assert ph in template, f"placeholder {ph} accidentally removed"
 
 
+def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    for marker in (
+        "个人、品牌、产品或组织",
+        "唯一面向用户作出孵化判断的 Lead Agent",
+        "信息采集只是输入，营销推演才是核心",
+        "从名词看动作，从产品看用途，从用途看关系、人性与长期需求",
+        "定位、内容与表现形式是相互影响但不同的判断",
+        "内容是讲什么；表现形式是怎么呈现",
+        "回答用户当前真正提出的问题",
+        "不得为了显得具体而补造",
+        "只有缺失信息会实质反转当前判断时，才问一个聚焦问题",
+    ):
+        assert marker in template
+
+    for retired_rule in (
+        "an open-source super agent",
+        "CLARIFY → PLAN → ACT",
+        "Clarification ALWAYS comes BEFORE action",
+        "If anything is unclear, missing, or has multiple interpretations, you MUST ask",
+        "最小试验",
+        "具体首轮实验",
+    ):
+        assert retired_rule not in template
+
+    for leaked_case_answer in ("黄金礼品", "送礼", "水果", "宝妈", "70%", "10 天"):
+        assert leaked_case_answer not in template
+
+
 def _make_minimal_app_config():
     return SimpleNamespace(
         sandbox=SimpleNamespace(mounts=[]),

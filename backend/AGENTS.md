@@ -73,6 +73,16 @@ deer-flow/
 
 ## Important Development Guidelines
 
+### Local Fifth-Version Incubation Boundary
+
+The active fifth-version customization is intentionally limited to the existing
+Lead Agent prompt in `packages/harness/deerflow/agents/lead_agent/prompt.py`.
+Do not add an incubation runtime, domain package, middleware, method library,
+fixed workflow, score gate, or specialist roster to the active branch without a
+separately reviewed experiment. Freeze alternatives on their own branch or tag;
+never stack rejected prompt candidates into the active prompt. The compact
+history and archive refs live in `docs/mcn-incubation-v5/LEDGER.md`.
+
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**
 

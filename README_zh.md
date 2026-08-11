@@ -16,6 +16,9 @@ https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 > [!NOTE]
 > **DeerFlow 2.0 是一次彻底重写。** 它和 v1 没有共用代码。如果你要找的是最初的 Deep Research 框架，可以前往 [`1.x` 分支](https://github.com/bytedance/deer-flow/tree/main-1.x)。那里仍然欢迎贡献；当前的主要开发已经转向 2.0。
 
+> [!IMPORTANT]
+> 当前本地第五版保持 DeerFlow 运行时原样，只修改 Lead Agent 的 MCN 孵化核心角色与思考提示。此前累积的孵化包和评测器已经移出当前分支并单独归档，详见 [`docs/mcn-incubation-v5/LEDGER.md`](docs/mcn-incubation-v5/LEDGER.md)。
+
 ## 官网
 
 想了解更多，或者直接看**真实演示**，可以访问[**官网**](https://deerflow.tech)。
