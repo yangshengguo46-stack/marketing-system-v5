@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-08-11T05:43:46Z",
+  "scope": "default-agent user-scoped DeerMem context",
+  "method": "get_memory_manager().get_context(user_id=<run actor>, agent_name=null)",
+  "content_disclosed": false,
+  "empty_context_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "runs": [
+    {
+      "run_id": "agent-eval-m01-v3",
+      "actor_sha256": "7f79d70a1f92fddd03631e536946a8f648c61f28806737ec6c925f6aa81e7c0f",
+      "thread_id": "incubation-agent-eval-m01-v3-M01-initial",
+      "project_id": "agent-eval-agent-eval-m01-v3-M01-initial",
+      "memory_context_chars": 0,
+      "memory_context_nonempty": false
+    },
+    {
+      "run_id": "agent-eval-m01-v4",
+      "actor_sha256": "04926a06797d74acea1f4e5665f9720f1924c45771afd27998a031423d9b5ab2",
+      "thread_id": "incubation-agent-eval-m01-v4-M01-initial",
+      "project_id": "agent-eval-agent-eval-m01-v4-M01-initial",
+      "memory_context_chars": 0,
+      "memory_context_nonempty": false
+    }
+  ]
+}

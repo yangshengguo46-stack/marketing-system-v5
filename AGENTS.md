@@ -183,6 +183,12 @@ These apply repo-wide; module guides own the module-specific detail.
   paid v4 retest skipped the available method tool and again failed business
   review. M01 remains business-rejected; do not force a method-tool trajectory
   or spend another paid trial before a new offline hypothesis passes.
+  Audit A34 pins the next offline repair: ask only for subject facts that could
+  reverse a recommendation, and do not promote a familiar or cheap format from
+  candidate to primary without performance, proof, resource, privacy, and
+  sustainable-supply evidence. Full-agent evaluations must disable general
+  DeerMem reads and writes in an isolated config copy; project truth still lives
+  in the typed ledger. Do not turn this into a fixed intake form or stage gate.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

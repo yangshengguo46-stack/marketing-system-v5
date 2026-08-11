@@ -16,6 +16,8 @@ from mcn_incubation.preflight import PreflightLedger
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
+from deerflow.config.app_config import AppConfig
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SCRIPT_PATH = REPO_ROOT / "backend" / "scripts" / "run_incubation_agent_eval.py"
 CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
@@ -52,7 +54,32 @@ def test_agent_eval_prepares_isolated_trials_without_embedding_case_answers() ->
     assert "incubation_project_context" not in initial_prompt
     assert "incubation_project_evidence" not in initial_prompt
     assert "信息不足" in initial_prompt
+    assert "会改变结论的最少主体信息" in initial_prompt
+    assert "不要无依据宣布一种表现形式最适合" in initial_prompt
     assert "不要创建或呈现文件" in initial_prompt
+
+
+def test_agent_eval_disables_general_memory_without_mutating_host_config() -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+            "memory": {
+                "enabled": True,
+                "injection_enabled": True,
+            },
+        }
+    )
+
+    evaluation_config = module.build_agent_eval_app_config(host_config)
+
+    assert evaluation_config is not host_config
+    assert evaluation_config.memory.enabled is False
+    assert evaluation_config.memory.injection_enabled is False
+    assert host_config.memory.enabled is True
+    assert host_config.memory.injection_enabled is True
 
 
 @pytest.mark.asyncio
@@ -207,6 +234,8 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
         def __init__(self, **kwargs):
             assert len(kwargs["middlewares"]) == 1
             assert kwargs["middlewares"][0].max_calls == 6
+            assert kwargs["app_config"].memory.enabled is False
+            assert kwargs["app_config"].memory.injection_enabled is False
 
         def list_models(self):
             return {"models": [{"name": "fake-model"}]}

@@ -18,6 +18,7 @@ DeerFlow (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is a
 > Project evidence is now a separate owner-scoped, append-only path: the Lead Agent can inspect snapshot provenance, hashes, scope, limitations, disputes, and expiry warnings without promoting evidence to truth or receiving browser credentials.
 > Account decomposition now has an offline evidence contract for canonical identity, transparent sampling, post observations, media atoms, pattern hypotheses, and function-only transfer candidates. It has not yet been connected to a real browser or claimed as a production account-analysis feature.
 > The evaluation path runs the existing Lead Agent against isolated versioned projects and seals its configured tool schemas, redacted actual tool trajectory, final output, usage, and database hash. M01 v3 and the later paid v4 retest both completed technically and failed business review; no business-quality claim has been made.
+> Full-Agent incubation evaluations also use a copied application configuration with general DeerMem reads and writes disabled. Real project facts, decisions, experiments, and outcomes remain in the typed project ledger; common or cheap content formats are not treated as evidence that a format fits the subject.
 > Small paid-model preflights use `cd backend && uv run python scripts/run_incubation_preflight.py --execute`; inputs, outputs, hashes, usage, and failures are stored under the ignored local `.deer-flow/incubation-preflight/` ledger.
 > Capped architecture comparisons use `backend/scripts/run_incubation_micro_bakeoff.py` with explicit cases, candidates, and a paid-trial ceiling. They write sealed local evidence under `.deer-flow/incubation-micro-bakeoff/` and do not create another agent runtime.
 
@@ -1092,6 +1093,11 @@ DeerFlow is model-agnostic — it works with any LLM that implements the OpenAI-
 ## Embedded Python Client
 
 DeerFlow can be used as an embedded Python library without running the full HTTP services. The `DeerFlowClient` provides direct in-process access to all agent and Gateway capabilities, returning the same response schemas as the HTTP Gateway API. The HTTP Gateway also exposes `DELETE /api/threads/{thread_id}` to remove DeerFlow-managed local thread data after the LangGraph thread itself has been deleted:
+
+Embedded composition roots may pass an explicit `AppConfig` with
+`DeerFlowClient(app_config=...)`. This is mutually exclusive with `config_path`
+and isolates caller-specific runtime policy without changing the process-wide
+configuration cache.
 
 Thread IDs may be supplied by callers and do not have to be UUIDs. Explicit
 IDs must contain 1–64 ASCII letters, digits, hyphens, or underscores

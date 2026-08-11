@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A33`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同及 M01 付费复测审计。
+- `audits/A20-A34`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、M01 付费复测及主体适配/记忆隔离审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -17,9 +17,10 @@
 - `evidence/2026-08-10-preflight-quality-review.md`：三案例真实输出、thinking 和 B01 四候选微型对照的业务评审。
 - `evidence/method-retrieval-eval.jsonl`：13 条来源化孵化方法检索基线，包含真实 M01 宽查询回归。
 - `evidence/2026-08-11-m01-agent-evaluation.md`：完整 Agent 三次 M01 运行、评测器校准和业务拒绝证据。
+- `evidence/2026-08-11-m01-memory-isolation-check.json`：v3/v4 评测 actor、thread、project 隔离及空 DeerMem 上下文的脱敏复核。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
 
-完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、模型调用上限和 `--execute`；未得到付费确认时只维护离线测试，不发起模型调用。
+完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、模型调用上限和 `--execute`；每次运行使用独立项目、checkpoint 和禁用泛记忆的配置副本。未得到付费确认时只维护离线测试，不发起模型调用。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

@@ -115,6 +115,14 @@ with semantic output middleware. A33 records that the approved paid v4 retest
 did not call the available method reader and again failed business review. Do
 not claim M01 passed, force a method-tool trajectory, or spend another paid
 trial before a new offline repair hypothesis passes.
+Audit A34 governs subject-fit and evaluation-memory isolation. A common or
+cheap format is only a candidate until known subject performance, proof,
+resources, privacy, and sustainable supply support it. Ask only for missing
+subject facts that could reverse the current recommendation; never restore a
+fixed intake questionnaire or completeness gate. Full-agent evaluations copy
+the host `AppConfig` and disable both general-memory injection and writes. The
+real host configuration remains unchanged, and typed project truth—not generic
+DeerMem—is authoritative for incubation.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,
@@ -142,8 +150,9 @@ case or an uncalibrated human impression.
 
 Use `scripts/run_incubation_agent_eval.py` for the next complete Lead Agent
 evaluation. It seeds versioned cases into an isolated SQLite project/evidence
-ledger, uses an `InMemorySaver`, and seals the configured tool schemas plus a
-redacted actual tool trajectory. Every invocation must explicitly select cases,
+ledger, uses an `InMemorySaver`, disables general DeerMem in a copied
+`AppConfig`, and seals the configured tool schemas plus a redacted actual tool
+trajectory. Every invocation must explicitly select cases,
 set `--max-paid-trials`, `--max-agent-steps`, and `--max-model-calls`, and include
 `--execute` after user confirmation. These bounds limit trials, graph recursion,
 and actual lead-model calls respectively, but not exact currency spend. The
@@ -1414,6 +1423,10 @@ Gateway API endpoints and `DeerFlowClient` methods can modify MCP servers and sk
 
 `DeerFlowClient` provides direct in-process access to all DeerFlow capabilities without HTTP services. All return types align with the Gateway API response schemas, so consumer code works identically in HTTP and embedded modes.
 
+Composition roots may pass an explicit `AppConfig` through the keyword-only
+`app_config` argument. It is mutually exclusive with `config_path` and lets a
+caller isolate runtime policy without mutating the process-wide config cache.
+
 **Architecture**: Imports the same `deerflow` modules that Gateway API uses. Shares the same config files and data directories. No FastAPI dependency.
 
 **Agent Conversation**:
@@ -1426,6 +1439,7 @@ Gateway API endpoints and `DeerFlowClient` methods can modify MCP servers and sk
 - **Custom-event invariant** — production DeerFlow emitters must use `emit_custom_event` / `aemit_custom_event`, not call `StreamWriter` alone. Every built-in payload must carry a non-empty string `type`; typeless payloads remain writer-only and are intentionally absent from `astream_events`. The writer runs first and remains authoritative for Gateway, Web UI, and embedded-client compatibility; callback dispatch is best-effort and must not break that path. Async graph hooks must await the async helper rather than invoking synchronous dispatch on a running event loop.
 - Agent created lazily via `create_agent()` + `build_middlewares()`, same as `make_lead_agent`
 - Supports `checkpointer` parameter for state persistence across turns
+- Supports explicit `app_config` for caller-scoped configuration
 - `reset_agent()` forces agent recreation (e.g. after memory or skill changes)
 - See [docs/STREAMING.md](docs/STREAMING.md) for the full design: why Gateway and DeerFlowClient are parallel paths, LangGraph's `stream_mode` semantics, the per-id dedup invariants, and regression testing strategy
 

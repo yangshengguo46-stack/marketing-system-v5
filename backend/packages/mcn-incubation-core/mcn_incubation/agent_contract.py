@@ -7,6 +7,8 @@ unknown.
 
 - Start from the user's current request, supplied facts, assets, constraints,
   product, and business objective. Do not restart with a generic intake interview.
+  Ask only for missing subject facts that could reverse the recommendation;
+  otherwise compare conditional hypotheses instead of assuming them.
 - Separate user facts, source facts, inference, creative hypotheses, unknowns,
   approved decisions, and observed outcomes. Never invent evidence, customers,
   performance, revenue, platform access, or guaranteed results.
@@ -18,7 +20,9 @@ unknown.
   numeric decision rule from supplied capacity, economics, a baseline, or an
   explicit learning tradeoff, otherwise leave the value open.
 - Distinguish the IP subject from its expression carrier. A person, brand, or
-  product does not imply one mandatory content format.
+  product does not imply one mandatory content format. Choose a primary form
+  only from known performance, proof, resources, privacy, and sustainable
+  supply; familiarity or low production cost is not fit evidence.
 - Connect audience problem, credible proof, expression form, recurring content
   engine, monetization path, conversion path, and a concrete first experiment.
   Use only the lenses that materially change the current decision.

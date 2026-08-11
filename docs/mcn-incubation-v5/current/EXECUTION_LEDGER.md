@@ -23,16 +23,17 @@
 | ADR-008 | proposed | 账号拆解只作为下游证据，不成为第二 Agent；MediaKit 路由与授权边界已记录 | 真实账号验收和模式人工复核 |
 | 第四版 Skill 复用 | audit-tested | A30 与 97 项机器可读矩阵；28 已存在、13 蒸馏方法、17 按需候选、2 重写适配、37 排除 | 待采用 Skill 的触发、业务和越权评测 |
 | M01 事实边界修正 | paid-retest-business-rejected | A31/A33；离线检索合同通过，但 v4 未调用方法工具并再次补造路线、资产、价格和阈值 | 离线比较逐主张依据等轻量认识结构；通过前不再付费重跑 |
+| M01 主体适配与记忆隔离 | offline-repair-tested | A34；v3/v4 独立 actor/thread/project 的 DeerMem 上下文均为空；评测现显式禁用泛记忆；薄合同和表现形式卡加入主体适配证据 | 新付费 run 验证初始信息与镜头紧张 mutation 是否合理分化 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。`M01 v3` 证明知识命中不会自动带来正确判断；`M01 v4` 又证明方法工具可用时模型可能完全不读取。A31 的检索修正仍有效，但不足以让真实案例通过，尚未产生架构胜者，任何文档、界面或对外表述都不得写成已验证最佳方案。
+首选方向仍为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。`M01 v3` 证明知识命中不会自动带来正确判断；`M01 v4` 又证明方法工具可用时模型可能完全不读取。A34 进一步确认相似答案不是旧记忆回灌，而是稀疏主体信息触发了模型默认套路；当前只完成离线修正，尚未产生架构胜者，任何文档、界面或对外表述都不得写成已验证最佳方案。
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 检索修正、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `370 passed`。
-- `uv run python -m pytest tests/test_client.py -q`：DeerFlowClient 流式消息、终态工具参数补全和既有嵌入式客户端合同共 `171 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py tests/test_client_explicit_app_config.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 主体适配与记忆隔离、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `374 passed`。
+- `uv run python -m pytest tests/test_client.py tests/test_client_explicit_app_config.py -q`：DeerFlowClient 流式消息、终态工具参数补全、显式配置隔离和既有嵌入式客户端合同共 `173 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
 - 旧 `packages/marketing-os`、`app/marketing` 和 `tests/marketing_os_tests` 已清除；A01-A19 只作为历史审计档案保留，当前依赖图不含 `marketing-os`。
 - MediaKit 子模块固定在官方 `main@279e5bb9`，五个 Skill 软链接有效，本机安装的 CLI 0.2.0 可读取动态 Schema。官方 HEAD 的三个 Node 安装测试仍因 `0.1.7` 硬编码失败，本机也没有 Go 工具链；这两项不得记录为通过。
@@ -65,9 +66,11 @@
 - A32 没有连接浏览器、MediaKit、数据库或 Lead Agent，也没有生成真实账号模式；不得把 `domain-tested` 对外表述成“输入链接即可拆出成功公式”。
 - 用户明确授权后完成 `agent-eval-m01-v4`：23.589 秒，输入 `27,899`、输出 `728`、合计 `28,627` Token，技术 `1/1` 成功且账本完整。实际只调用事实和证据工具，没有调用已注册的 `incubation_context`。
 - A33 人工业务评审再次拒绝 M01：露脸口播、粉丝群、免费资料、99/299 元定价、交付范围、四周八条、双平台和三咨询阈值均无依据；“宝妈家庭理财/兼职报税”又新增业务并形成标签推断。
+- A34 复核 v3/v4 的 actor、thread、project、checkpoint 和长期记忆：两个 DeerMem 上下文均为 0 字符，因此重复不是旧答案回灌。评测器现在使用禁用记忆注入与写入的配置副本，宿主配置不变。
+- A34 将下一离线假设压缩为两条认识边界：只询问会反转建议的最少主体事实；常见或低成本形式必须有主体表现、证明、资源、隐私和持续供给依据。4000 字上下文预算仍能保留受控案例，没有增加固定访谈、评分门或强制工具轨迹。
 - M01 当前正式状态为 `business-rejected`，不是“通过”。A31 只能证明检索合同修正通过；在新的离线修正假设通过前不再自动发起付费 trial。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-M01 v4 付费复测业务不通过。下一步先离线比较“逐主张依据”等不依赖固定工具调用的轻量认识结构，禁止强制方法工具或继续堆核心提示词；账号拆解主线可并行继续 Owner 隔离追加式持久化和面向项目证据的脱敏投影，但不得用工具建设掩盖孵化内核尚未通过。
+M01 v4 付费复测业务不通过；A34 仅完成主体适配和记忆隔离的离线修正。下一次付费验证应同时观察初始信息与“面对镜头紧张、愿意拍手部和桌面”的 mutation，检查 Agent 是否先取得决策相关主体信息、保持条件化形式假设并据新证据修订。未经用户再次确认不执行；账号拆解主线可并行继续，但不得掩盖孵化内核尚未通过。

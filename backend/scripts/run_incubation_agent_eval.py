@@ -43,6 +43,7 @@ from sqlalchemy.pool import NullPool
 
 from deerflow.agents.lead_agent.prompt import SYSTEM_PROMPT_TEMPLATE
 from deerflow.client import DeerFlowClient
+from deerflow.config.app_config import AppConfig, get_app_config
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CORPUS = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
@@ -57,6 +58,18 @@ _REQUIRED_INCUBATION_TOOLS = frozenset(
 _MIN_AGENT_GRAPH_STEPS = 40
 _MAX_AGENT_GRAPH_STEPS = 100
 _MAX_EVALUATION_MODEL_CALLS = 12
+
+
+def build_agent_eval_app_config(host_config: AppConfig) -> AppConfig:
+    """Copy host configuration while removing general-memory confounds."""
+
+    evaluation_memory = host_config.memory.model_copy(
+        update={
+            "enabled": False,
+            "injection_enabled": False,
+        }
+    )
+    return host_config.model_copy(update={"memory": evaluation_memory})
 
 
 class EvaluationModelCallBudget(AgentMiddleware):
@@ -169,7 +182,7 @@ def build_agent_eval_prompt(trial: AgentEvalTrialSpec) -> str:
         "请为系统中已经存在的 MCN 孵化项目做一次首轮业务判断。",
         f"项目 ID：{trial.project_id}",
         "请基于系统保存的项目资料，判断主体适合怎么起号、采用什么表现形式、持续做什么内容、如何形成变现与转化闭环，并给出最小验证实验。",
-        "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时可以继续做暂定判断，但不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
+        "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时指出会改变结论的最少主体信息，在获得它们前只比较条件化备选或最小试验，不要无依据宣布一种表现形式最适合。仍可给出有用的暂定方向，但不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
         "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
     ]
     if trial.include_mutation:
@@ -416,6 +429,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     corpus_sha256 = sha256(args.corpus.read_bytes()).hexdigest()
     actor_id = f"agent-eval-owner-{_safe_component(run_id)}"
     actor_sha256 = sha256(actor_id.encode("utf-8")).hexdigest()
+    evaluation_app_config = build_agent_eval_app_config(get_app_config())
     client = DeerFlowClient(
         checkpointer=InMemorySaver(),
         model_name=args.model,
@@ -425,6 +439,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         available_skills=set(),
         middlewares=[EvaluationModelCallBudget(max_calls=args.max_model_calls)],
         environment="incubation-agent-eval",
+        app_config=evaluation_app_config,
     )
     configured_models = client.list_models()["models"]
     if not configured_models:

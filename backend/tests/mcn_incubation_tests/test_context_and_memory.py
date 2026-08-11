@@ -118,6 +118,9 @@ def test_method_cards_keep_assets_content_supply_and_thresholds_grounded() -> No
     cards = {card.capability: card for card in default_method_cards()}
 
     assert "未确认的人物、场地、团队和素材只能作为待验证方案" in cards["expression_form"].lens
+    assert any(value.startswith("常见或低制作成本不等于适合当前主体") for value in cards["expression_form"].lens)
+    assert "主体的真实表达样本" in cards["expression_form"].evidence_needs
+    assert "因为口播制作简单就默认真人露脸" in cards["expression_form"].counterexamples
     assert "公开配方不等于已证明安全性或效果" in cards["positioning"].counterexamples
     assert "内容供给必须来自已确认可持续获得的真实来源" in cards["content_engine"].lens
     assert "把尚不存在的客户投稿或团队日常当成现有素材" in cards["content_engine"].counterexamples

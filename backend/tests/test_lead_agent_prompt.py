@@ -653,6 +653,15 @@ def test_incubation_prompt_does_not_recreate_a_mandatory_interview_or_stage_gate
     assert "fixed incubation stages" in template
     assert "provisional recommendation" in template
     assert "Do not restart with a generic intake interview" in template
+    assert "missing subject facts that could reverse the recommendation" in template
+    assert "compare conditional hypotheses instead of assuming them" in template
+
+
+def test_incubation_prompt_does_not_treat_a_common_format_as_subject_fit():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "known performance, proof, resources, privacy, and sustainable" in template
+    assert "supply; familiarity or low production cost is not fit evidence" in template
 
 
 def test_incubation_prompt_keeps_proposed_variables_out_of_project_truth():

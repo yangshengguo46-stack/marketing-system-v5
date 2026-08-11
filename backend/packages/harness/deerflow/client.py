@@ -38,7 +38,7 @@ from deerflow.agents.lead_agent.prompt import apply_prompt_template, get_enabled
 from deerflow.agents.thread_state import get_thread_state_schema, normalize_middleware_state_schemas
 from deerflow.authz.principal import build_principal_from_context
 from deerflow.config.agents_config import AGENT_NAME_PATTERN
-from deerflow.config.app_config import get_app_config, is_trace_correlation_enabled, reload_app_config
+from deerflow.config.app_config import AppConfig, get_app_config, is_trace_correlation_enabled, reload_app_config
 from deerflow.config.extensions_config import (
     ExtensionsConfig,
     SkillStateConfig,
@@ -170,6 +170,7 @@ class DeerFlowClient:
         available_skills: set[str] | None = None,
         middlewares: Sequence[AgentMiddleware] | None = None,
         environment: str | None = None,
+        app_config: AppConfig | None = None,
     ):
         """Initialize the client.
 
@@ -193,10 +194,14 @@ class DeerFlowClient:
                 ``DEER_FLOW_ENV`` or ``ENVIRONMENT`` env vars. Pass an
                 explicit value for programmatic callers that do not want
                 env-var coupling.
+            app_config: Explicit application configuration for this client.
+                Mutually exclusive with ``config_path``.
         """
+        if config_path is not None and app_config is not None:
+            raise ValueError("config_path and app_config are mutually exclusive")
         if config_path is not None:
             reload_app_config(config_path)
-        self._app_config = get_app_config()
+        self._app_config = app_config if app_config is not None else get_app_config()
         self._checkpoint_channel_mode = freeze_checkpoint_channel_mode(self._app_config.database.checkpoint_channel_mode)
         self._checkpoint_snapshot_frequency = freeze_checkpoint_snapshot_frequency(self._app_config.database.checkpoint_delta.snapshot_frequency)
 

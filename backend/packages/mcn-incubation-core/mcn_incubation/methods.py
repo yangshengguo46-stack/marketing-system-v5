@@ -94,7 +94,7 @@ def default_method_cards() -> tuple[MethodCard, ...]:
         ),
         MethodCard(
             method_card_id="expression-form-v1",
-            version=3,
+            version=4,
             capability="expression_form",
             title="让表现形式服从资源、隐私与持续产能",
             applies_when=("需要选择本人、产品、员工、旁白、桌面或混合表达",),
@@ -103,9 +103,15 @@ def default_method_cards() -> tuple[MethodCard, ...]:
                 "根据镜头表现、可用人物、空间、素材、隐私和制作能力选择载体",
                 "未确认的人物、场地、团队和素材只能作为待验证方案",
                 "一个隐私限制只约束其明确对象；未确认的镜头意愿、正面出镜、口播或手部拍摄只能作为备选",
+                "常见或低制作成本不等于适合当前主体；还要检验表达表现、可感知差异、可信证明和长期供给",
             ),
-            evidence_needs=("可出镜人员", "素材与场景", "每周产能", "隐私边界"),
-            counterexamples=("个人 IP 必须正面口播", "产品 IP 必须由创始人出镜", "把不展示他人推成主体愿意半身口播"),
+            evidence_needs=("主体的真实表达样本", "可出镜人员", "素材与场景", "每周产能", "隐私边界", "可感知差异与证明方式"),
+            counterexamples=(
+                "个人 IP 必须正面口播",
+                "因为口播制作简单就默认真人露脸",
+                "产品 IP 必须由创始人出镜",
+                "把不展示他人推成主体愿意半身口播",
+            ),
             source_refs=(
                 V4_STRATEGY_SOURCE_ID,
                 V4_ASSET_SOURCE_ID,
