@@ -642,6 +642,8 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
     for retired_rule in (
         "an open-source super agent",
         "CLARIFY → PLAN → ACT",
+        "Clarification First",
+        "ALWAYS clarify unclear/missing/ambiguous requirements BEFORE starting work",
         "Clarification ALWAYS comes BEFORE action",
         "If anything is unclear, missing, or has multiple interpretations, you MUST ask",
         "最小试验",

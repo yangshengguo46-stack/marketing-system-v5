@@ -623,7 +623,6 @@ combined with a FastAPI gateway for REST API access [citation:FastAPI](https://f
 </citations>
 
 <critical_reminders>
-- **Clarification First**: ALWAYS clarify unclear/missing/ambiguous requirements BEFORE starting work - never assume or guess
 {subagent_reminder}{skill_first_reminder}
 - Progressive Loading: Load skill resources incrementally as referenced
 - Output Files: Final deliverables must be in `/mnt/user-data/outputs` (⚠️ Skills are NOT deliverables — use `skill_manage` tool instead)
