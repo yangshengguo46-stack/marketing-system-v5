@@ -244,6 +244,14 @@ These apply repo-wide; module guides own the module-specific detail.
   not import either explorer context into the production Lead, methods, or
   knowledge catalog, and do not execute another paid run without fresh user
   approval.
+  Audit A46 separately records the user's explicit production trial of the
+  corrected idea. The compact `MARKETING_WORLD_THINKING_CONTRACT` belongs to the
+  existing Lead contract, contains no domain answer examples, keeps the four
+  expansion lenses optional, and distinguishes positioning, content, and
+  expression form. Pure world-opening requests temporarily defer subject-fit
+  and full-plan delivery; complete incubation work still uses project facts.
+  This is an offline-tested prompt hypothesis, not a business-quality pass, and
+  it does not promote either rejected evaluator context.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

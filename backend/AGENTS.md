@@ -192,6 +192,15 @@ they omit the production Lead contract and final delivery pressure, support only
 baseline/operator comparison, and have no paid result yet. Never register these
 contexts in production or run them against a paid model without renewed user
 authorization.
+Audit A46 records the user's explicit decision to install only the corrected
+marketing-world idea in the existing Lead. The compact
+`MARKETING_WORLD_THINKING_CONTRACT` is not either failed evaluator context: it
+contains no gold-gift or fruit answer, keeps upward/downward/horizontal/cross-
+domain lenses optional, and distinguishes positioning, content, and expression
+form. When the current request is only to open the content world, subject fit
+and full-plan delivery are deferred for that bounded task; they are not removed
+from complete incubation decisions. This wiring is offline prompt-tested and
+must not be described as a paid or business-quality pass.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

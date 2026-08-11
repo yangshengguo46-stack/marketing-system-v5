@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A45`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测与模板答案提示词溯源。
+- `audits/A20-A46`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测、模板答案提示词溯源和最小生产思路接入。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -40,5 +40,7 @@
 营销领地隔离对照入口为 `backend/scripts/run_marketing_territory_bakeoff.py`。完整对照组使用 `--group`，专家锚点使用 `--anchor-case`；所有运行必须列出候选、给出按实际模型调用计数的 `--max-paid-trials` 并显式 `--execute`。两遍候选的一次架构试验会计为两次调用。评测上下文、机制卡和两遍编排没有接入生产 `incubation_context`。
 
 `--response-mode content_world_exploration` 是 A45 后新增的纯探索隔离候选；它只允许 `baseline` 与 `content_world_operators`，不携带生产 Lead 孵化合同或最终客户交付合同。它目前只有离线合同测试，没有付费模型结果，也不是生产能力。
+
+A46 按用户最新纠偏，将一段不含黄金礼品、水果等答案示例的极薄营销内容世界思路直接加入现有 Lead。它严格区分定位、内容和表现形式，并仅在用户当前要求先打开思路时暂缓主体适配与完整交付。该接线已离线测试，但尚未获得真实业务回答验收。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

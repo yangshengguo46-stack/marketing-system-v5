@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a45_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a46_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 46)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 47)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -388,3 +388,26 @@ def test_template_origin_audit_traces_the_exact_payload_and_keeps_the_repair_eva
         text = path.read_text(encoding="utf-8")
         assert "CONTENT_WORLD_EXPLORATION_CONTEXT" not in text
         assert "CONTENT_WORLD_EXPLORATION_OPERATOR_CARD" not in text
+
+
+def test_a46_wires_only_the_user_corrected_marketing_world_thinking_into_the_lead() -> None:
+    audit = (AUDIT_ROOT / "A46-minimal-marketing-world-thinking-contract.md").read_text(encoding="utf-8")
+    agent_contract = (PACKAGE_ROOT / "agent_contract.py").read_text(encoding="utf-8")
+
+    for marker in (
+        "019ff0ac-ebbf-7520-bae5-2b91f1c4da57",
+        "MARKETING_WORLD_THINKING_CONTRACT",
+        "定位",
+        "内容",
+        "表现形式",
+        "用户真实情况暂不进入这个子任务",
+        "未新增付费调用",
+        "不宣称业务通过",
+    ):
+        assert marker in audit
+
+    assert "MARKETING_WORLD_THINKING_CONTRACT" in agent_contract
+    assert "内容来源不能冒充表现形式" in agent_contract
+    assert "不是必须依次执行的流程" in agent_contract
+    assert "CONTENT_WORLD_EXPLORATION_CONTEXT" not in agent_contract
+    assert "CONTENT_WORLD_EXPLORATION_OPERATOR_CARD" not in agent_contract

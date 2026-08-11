@@ -642,6 +642,49 @@ def test_production_and_evaluation_share_one_incubation_contract():
     assert INCUBATION_AGENT_CONTRACT in LEAD_AGENT_CONSTITUTION
 
 
+def test_incubation_prompt_contains_bounded_marketing_world_thinking():
+    from mcn_incubation.agent_contract import (
+        INCUBATION_AGENT_CONTRACT,
+        MARKETING_WORLD_THINKING_CONTRACT,
+    )
+
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert MARKETING_WORLD_THINKING_CONTRACT in INCUBATION_AGENT_CONTRACT
+    assert MARKETING_WORLD_THINKING_CONTRACT in template
+    for marker in (
+        "商业对象背后藏着哪个内容世界",
+        "真正的语义中心或主语",
+        "向上抽象",
+        "向下拆分",
+        "时间、空间、事件、人物、冲突",
+        "现实、历史、神话、影视、游戏、未来世界",
+        "可选的发散视角",
+        "不是必须依次执行的流程",
+        "用户只给商业对象",
+        "先不把主体条件、表现能力、资源和变现承接混入这个子任务",
+    ):
+        assert marker in MARKETING_WORLD_THINKING_CONTRACT
+
+    for leaked_example in ("黄金礼品", "水果", "B2B", "B2C"):
+        assert leaked_example not in MARKETING_WORLD_THINKING_CONTRACT
+
+
+def test_incubation_prompt_keeps_positioning_content_and_expression_form_distinct():
+    from mcn_incubation.agent_contract import MARKETING_WORLD_THINKING_CONTRACT
+
+    for marker in (
+        "定位包含人设、赛道和粉丝画像",
+        "内容是讲什么",
+        "真实案例、历史故事",
+        "表现形式是怎么呈现",
+        "口播、微短剧、情景剧、纯素材图文",
+        "内容来源不能冒充表现形式",
+        "不是线性的一二三流水线",
+    ):
+        assert marker in MARKETING_WORLD_THINKING_CONTRACT
+
+
 def test_incubation_prompt_does_not_recreate_a_mandatory_interview_or_stage_gate():
     template = prompt_module.SYSTEM_PROMPT_TEMPLATE
 
