@@ -21,6 +21,7 @@ from mcn_incubation.domain import (
     OutcomeObservation,
     ProjectTruth,
     SubjectKind,
+    TerritoryCandidate,
     TruthKind,
 )
 from mcn_incubation.persistence import (
@@ -28,6 +29,8 @@ from mcn_incubation.persistence import (
     ImmutableRecordConflict,
     IncubationRepository,
     OwnershipViolation,
+    _decision_from,
+    _decision_payload,
 )
 from mcn_incubation.persistence_schema import (
     CURRENT_INCUBATION_SCHEMA_VERSION,
@@ -142,6 +145,20 @@ def _decision() -> IncubationDecisionVersion:
         monetization_path="财务体检到月度顾问",
         conversion_path="内容到模板到诊断",
         first_experiment_id="experiment-a",
+        territory_candidates=(
+            TerritoryCandidate(
+                territory_id="territory-ledger",
+                statement="小生意经营判断",
+                lens_refs=("person-capability", "service-offer"),
+                semantic_bridge=("会计经验", "经营账目", "经营判断"),
+                recurring_situations=("公私账混用", "看不懂现金流"),
+                ownership_basis=("十年企业会计经验",),
+                attribution_path="内容判断 -> 一页账本 -> 财务体检",
+                truth_ids=("truth-career",),
+                unknowns=("首批客户是否愿意付费",),
+            ),
+        ),
+        selected_territory_id="territory-ledger",
         basis=DecisionBasis(
             truth_ids=("truth-career",),
             rationale=("职业事实支撑专业判断",),
@@ -150,6 +167,19 @@ def _decision() -> IncubationDecisionVersion:
             confidence=0.5,
         ),
     )
+
+
+def test_decision_payload_is_backward_compatible_with_records_before_territories() -> None:
+    current_payload = _decision_payload(_decision())
+    assert current_payload["territory_candidates"][0]["territory_id"] == "territory-ledger"
+    assert current_payload["selected_territory_id"] == "territory-ledger"
+
+    current_payload.pop("territory_candidates")
+    current_payload.pop("selected_territory_id")
+    restored = _decision_from(current_payload)
+
+    assert restored.territory_candidates == ()
+    assert restored.selected_territory_id is None
 
 
 def _experiment() -> IncubationExperiment:
@@ -228,6 +258,50 @@ async def test_truth_brief_and_decision_are_append_only_owner_scoped_truth(repos
     assert await repo.get_current_brief(owner_id="owner-a", project_id="project-a", brief_id="brief-a") == _brief()
     assert await repo.get_current_decision(owner_id="owner-a", project_id="project-a", decision_id="decision-a") == decision
     assert await repo.get_current_decision(owner_id="owner-b", project_id="project-a", decision_id="decision-a") is None
+
+
+@pytest.mark.asyncio
+async def test_territory_references_must_exist_in_the_same_owner_project(repository) -> None:
+    repo, _engine = repository
+    await repo.create_project(_project(), operation_key="create-project")
+    await repo.append_truth(_truth(), operation_key="append-truth")
+    candidate = _decision().territory_candidates[0]
+
+    missing_truth = replace(
+        _decision(),
+        decision_version_id="decision-missing-truth-v1",
+        decision_id="decision-missing-truth",
+        territory_candidates=(replace(candidate, truth_ids=("truth-missing",)),),
+    )
+    with pytest.raises(OwnershipViolation, match="decision truth"):
+        await repo.append_decision_version(
+            missing_truth,
+            operation_key="append-decision-missing-truth",
+        )
+
+    missing_evidence = replace(
+        _decision(),
+        decision_version_id="decision-missing-evidence-v1",
+        decision_id="decision-missing-evidence",
+        territory_candidates=(replace(candidate, evidence_refs=("evidence-missing",)),),
+    )
+    with pytest.raises(OwnershipViolation, match="decision evidence"):
+        await repo.append_decision_version(
+            missing_evidence,
+            operation_key="append-decision-missing-evidence",
+        )
+
+    await repo.append_evidence(_evidence(), operation_key="append-evidence")
+    grounded = replace(
+        _decision(),
+        territory_candidates=(replace(candidate, evidence_refs=("evidence-a",)),),
+    )
+    stored = await repo.append_decision_version(
+        grounded,
+        operation_key="append-grounded-decision",
+    )
+
+    assert stored.territory_candidates[0].evidence_refs == ("evidence-a",)
 
 
 @pytest.mark.asyncio

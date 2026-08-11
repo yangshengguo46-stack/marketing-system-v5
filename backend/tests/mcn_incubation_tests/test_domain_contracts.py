@@ -20,6 +20,7 @@ from mcn_incubation.domain import (
     OutcomeObservation,
     ProjectTruth,
     SubjectKind,
+    TerritoryCandidate,
     TruthKind,
 )
 
@@ -55,6 +56,70 @@ def test_partial_brief_and_decision_surface_unknowns_without_blocking_work() -> 
     assert "monetization_path" in decision.missing_fields
     assert "first_experiment_id" in decision.missing_fields
     assert decision.basis.confidence is None
+
+
+def test_territory_candidates_preserve_reasoning_without_becoming_a_semantic_gate() -> None:
+    candidate = TerritoryCandidate(
+        territory_id="territory-ledger",
+        statement="小生意经营判断",
+        lens_refs=("person-capability", "service-offer", "person-capability"),
+        semantic_bridge=("会计经验", "经营账目", "日常经营判断"),
+        recurring_situations=("公私账混用", "看不懂现金流"),
+        ownership_basis=("十年企业会计经验",),
+        attribution_path="内容判断 -> 一页账本 -> 财务体检",
+        truth_ids=("truth-career",),
+        unknowns=("小生意客户是否愿意付费",),
+    )
+    decision = IncubationDecisionVersion(
+        decision_version_id="decision-v1",
+        decision_id="decision-a",
+        version=1,
+        owner_id="owner-a",
+        project_id="project-a",
+        created_at=NOW,
+        basis=DecisionBasis(),
+        territory_candidates=(candidate,),
+        selected_territory_id="territory-ledger",
+    )
+
+    assert candidate.lens_refs == ("person-capability", "service-offer")
+    assert decision.territory_candidates == (candidate,)
+    assert decision.selected_territory_id == "territory-ledger"
+    assert "territory_candidates" not in decision.missing_fields
+
+
+def test_decision_rejects_duplicate_or_unknown_territory_references() -> None:
+    candidate = TerritoryCandidate(
+        territory_id="territory-a",
+        statement="家庭协作",
+        lens_refs=(),
+        semantic_bridge=(),
+        recurring_situations=(),
+        ownership_basis=(),
+        attribution_path=None,
+        unknowns=("尚未验证内容供给",),
+    )
+    common = {
+        "decision_version_id": "decision-v1",
+        "decision_id": "decision-a",
+        "version": 1,
+        "owner_id": "owner-a",
+        "project_id": "project-a",
+        "created_at": NOW,
+        "basis": DecisionBasis(),
+    }
+
+    with pytest.raises(ValueError, match="territory candidate ids must be unique"):
+        IncubationDecisionVersion(
+            **common,
+            territory_candidates=(candidate, candidate),
+        )
+    with pytest.raises(ValueError, match="selected territory must reference a candidate"):
+        IncubationDecisionVersion(
+            **common,
+            territory_candidates=(candidate,),
+            selected_territory_id="territory-missing",
+        )
 
 
 def test_truth_ledger_never_collapses_fact_inference_hypothesis_and_unknown() -> None:

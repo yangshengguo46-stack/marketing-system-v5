@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a41_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a42_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 42)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 43)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -253,3 +253,18 @@ def test_cross_domain_marketing_brain_uses_composable_lenses_not_industry_templa
         assert len({case["surface_label"] for case in group_cases}) == 1
         assert len({tuple(case["known_facts"]) for case in group_cases}) == 2
         assert len({tuple(case["subject_lenses"]) for case in group_cases}) == 2
+
+
+def test_marketing_territory_bakeoff_records_rejections_without_promoting_eval_context() -> None:
+    audit = (AUDIT_ROOT / "A42-marketing-territory-bakeoff.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-marketing-territory-bakeoff.md").read_text(encoding="utf-8")
+    decision = (DOC_ROOT / "decisions" / "ADR-010-cross-domain-marketing-brain.md").read_text(encoding="utf-8")
+
+    for marker in ("24", "26", "61,361", "TerritoryCandidate", "两遍法", "部分命中"):
+        assert marker in audit
+    assert "没有候选通过" in audit
+    assert "不接生产" in audit
+    assert "结构化 JSON" in audit
+    assert "territory-gold-anchor-two-pass-v2-20260811" in evidence
+    assert "source-backed mechanism" in evidence
+    assert "status: proposed" in decision

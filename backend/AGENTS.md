@@ -157,6 +157,17 @@ records, durable-storage failure has no chat-memory fallback, and approvals are
 rejected. Keep the tool hidden from subagents and also enforce that boundary at
 runtime. It records an answer after one exists; it must not become a fixed
 intake form, mandatory interview, or forced tool route.
+Audit A42 governs the experimental marketing-territory path. The lightweight
+`TerritoryCandidate` lives inside the existing decision JSON payload, remains
+optional, and adds no table, schema stage, completeness gate, or production
+tool. `territory_evaluation.py` and `run_marketing_territory_bakeoff.py` are
+evaluation-only: their method v1/v2 text, source mechanism card, natural/JSON
+response modes, and one-/two-pass assembly must not be registered in the
+default method library, `incubation_context`, or Lead prompt. The first 24
+sealed trials (26 paid calls) had no business winner; corrected two-pass output
+was only a partial gold-anchor hit and still invented subject assets and
+numbers. Count two-pass trials as two model calls, preserve failed evaluator
+iterations, and require fresh user approval before another paid run.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

@@ -214,6 +214,13 @@ These apply repo-wide; module guides own the module-specific detail.
   supply answer text or owner identity; subagents cannot write; approvals are
   never subject facts. This is provenance capture, not a fixed questionnaire or
   required tool route.
+  Audit A42 keeps marketing-territory work experimental. `TerritoryCandidate`
+  is an optional record inside the existing decision JSON, not a stage or model
+  output contract. The isolated method, source-mechanism, and two-pass contexts
+  all remain outside production after 24 technically complete but
+  business-rejected trials; do not wire them into the Lead prompt or default
+  method library. A two-pass evaluation consumes two paid model calls and still
+  leaves the Lead as the sole decision authority.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

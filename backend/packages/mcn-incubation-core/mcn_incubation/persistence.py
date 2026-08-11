@@ -27,6 +27,7 @@ from mcn_incubation.domain import (
     OutcomeObservation,
     ProjectTruth,
     SubjectKind,
+    TerritoryCandidate,
     TruthKind,
 )
 from mcn_incubation.persistence_schema import (
@@ -239,6 +240,44 @@ def _basis_from(value: object) -> DecisionBasis:
     )
 
 
+def _territory_payload(value: TerritoryCandidate) -> dict[str, Any]:
+    return {
+        "territory_id": value.territory_id,
+        "statement": value.statement,
+        "lens_refs": list(value.lens_refs),
+        "semantic_bridge": list(value.semantic_bridge),
+        "recurring_situations": list(value.recurring_situations),
+        "ownership_basis": list(value.ownership_basis),
+        "attribution_path": value.attribution_path,
+        "truth_ids": list(value.truth_ids),
+        "evidence_refs": list(value.evidence_refs),
+        "unknowns": list(value.unknowns),
+    }
+
+
+def _territory_from(value: object) -> TerritoryCandidate:
+    if not isinstance(value, Mapping):
+        raise TypeError("territory candidate must be an object")
+    return TerritoryCandidate(
+        territory_id=str(value["territory_id"]),
+        statement=str(value["statement"]),
+        lens_refs=_strings(value.get("lens_refs", [])),
+        semantic_bridge=_strings(value.get("semantic_bridge", [])),
+        recurring_situations=_strings(value.get("recurring_situations", [])),
+        ownership_basis=_strings(value.get("ownership_basis", [])),
+        attribution_path=_optional(value.get("attribution_path")),
+        truth_ids=_strings(value.get("truth_ids", [])),
+        evidence_refs=_strings(value.get("evidence_refs", [])),
+        unknowns=_strings(value.get("unknowns", [])),
+    )
+
+
+def _territories_from(value: object) -> tuple[TerritoryCandidate, ...]:
+    if not isinstance(value, (list, tuple)):
+        raise TypeError("territory candidates must be a list")
+    return tuple(_territory_from(candidate) for candidate in value)
+
+
 def _decision_payload(value: IncubationDecisionVersion) -> dict[str, Any]:
     return {
         "decision_version_id": value.decision_version_id,
@@ -260,6 +299,8 @@ def _decision_payload(value: IncubationDecisionVersion) -> dict[str, Any]:
         "conversion_path": value.conversion_path,
         "first_experiment_id": value.first_experiment_id,
         "supersedes_decision_version_id": value.supersedes_decision_version_id,
+        "territory_candidates": [_territory_payload(candidate) for candidate in value.territory_candidates],
+        "selected_territory_id": value.selected_territory_id,
     }
 
 
@@ -284,6 +325,8 @@ def _decision_from(payload: _Record) -> IncubationDecisionVersion:
         conversion_path=_optional(payload.get("conversion_path")),
         first_experiment_id=_optional(payload.get("first_experiment_id")),
         supersedes_decision_version_id=_optional(payload.get("supersedes_decision_version_id")),
+        territory_candidates=_territories_from(payload.get("territory_candidates", [])),
+        selected_territory_id=_optional(payload.get("selected_territory_id")),
     )
 
 
@@ -725,10 +768,27 @@ class IncubationRepository:
                 session,
                 table=incubation_project_truths,
                 id_column="truth_id",
-                identities=tuple(dict.fromkeys((*decision.basis.truth_ids, *decision.trust_evidence))),
+                identities=tuple(
+                    dict.fromkeys(
+                        (
+                            *decision.basis.truth_ids,
+                            *decision.trust_evidence,
+                            *(truth_id for candidate in decision.territory_candidates for truth_id in candidate.truth_ids),
+                        )
+                    )
+                ),
                 owner_id=decision.owner_id,
                 project_id=decision.project_id,
                 label="decision truth",
+            )
+            await self._require_ids(
+                session,
+                table=incubation_evidence_items,
+                id_column="evidence_id",
+                identities=tuple(dict.fromkeys(evidence_ref for candidate in decision.territory_candidates for evidence_ref in candidate.evidence_refs)),
+                owner_id=decision.owner_id,
+                project_id=decision.project_id,
+                label="decision evidence",
             )
             await self._validate_version_lineage(
                 session,

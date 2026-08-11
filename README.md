@@ -22,6 +22,7 @@ DeerFlow (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is a
 > Project-specific clarification replies can now be preserved verbatim from the current structured human-input exchange as owner-scoped facts. Later answers form an append-only version chain; the model cannot provide the answer or owner as tool arguments, subagents cannot perform this fact write, and approvals are never converted into ordinary subject facts.
 > Small paid-model preflights use `cd backend && uv run python scripts/run_incubation_preflight.py --execute`; inputs, outputs, hashes, usage, and failures are stored under the ignored local `.deer-flow/incubation-preflight/` ledger.
 > Capped architecture comparisons use `backend/scripts/run_incubation_micro_bakeoff.py` with explicit cases, candidates, and a paid-trial ceiling. They write sealed local evidence under `.deer-flow/incubation-micro-bakeoff/` and do not create another agent runtime.
+> Cross-domain content-territory experiments use `backend/scripts/run_marketing_territory_bakeoff.py`; it supports complete same-label contrast groups, rubric-hidden expert anchors, and paid-call-aware one- or two-pass candidates. The first 24 sealed trials were technically complete but business-rejected, so the experimental method, source mechanism, and two-pass contexts are not registered in production.
 
 https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 

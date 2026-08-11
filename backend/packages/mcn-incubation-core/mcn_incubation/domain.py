@@ -296,6 +296,41 @@ class IncubationBrief:
 
 
 @dataclass(frozen=True, slots=True)
+class TerritoryCandidate:
+    territory_id: str
+    statement: str
+    lens_refs: tuple[str, ...]
+    semantic_bridge: tuple[str, ...]
+    recurring_situations: tuple[str, ...]
+    ownership_basis: tuple[str, ...]
+    attribution_path: str | None
+    truth_ids: tuple[str, ...] = field(default_factory=tuple)
+    evidence_refs: tuple[str, ...] = field(default_factory=tuple)
+    unknowns: tuple[str, ...] = field(default_factory=tuple)
+
+    def __post_init__(self) -> None:
+        _require_id(self.territory_id, field_name="territory_id")
+        statement = " ".join(self.statement.split())
+        _require_id(statement, field_name="statement")
+        object.__setattr__(self, "statement", statement)
+        for name in (
+            "lens_refs",
+            "semantic_bridge",
+            "recurring_situations",
+            "ownership_basis",
+            "truth_ids",
+            "evidence_refs",
+            "unknowns",
+        ):
+            object.__setattr__(self, name, _text_tuple(getattr(self, name), field_name=name))
+        object.__setattr__(
+            self,
+            "attribution_path",
+            _optional_text(self.attribution_path, field_name="attribution_path"),
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class IncubationDecisionVersion:
     decision_version_id: str
     decision_id: str
@@ -316,6 +351,8 @@ class IncubationDecisionVersion:
     conversion_path: str | None = None
     first_experiment_id: str | None = None
     supersedes_decision_version_id: str | None = None
+    territory_candidates: tuple[TerritoryCandidate, ...] = field(default_factory=tuple)
+    selected_territory_id: str | None = None
 
     def __post_init__(self) -> None:
         for name in ("decision_version_id", "decision_id", "owner_id", "project_id"):
@@ -335,6 +372,7 @@ class IncubationDecisionVersion:
             "conversion_path",
             "first_experiment_id",
             "supersedes_decision_version_id",
+            "selected_territory_id",
         ):
             object.__setattr__(self, name, _optional_text(getattr(self, name), field_name=name))
         object.__setattr__(
@@ -342,6 +380,15 @@ class IncubationDecisionVersion:
             "trust_evidence",
             _text_tuple(self.trust_evidence, field_name="trust_evidence"),
         )
+        candidates = tuple(self.territory_candidates)
+        if any(not isinstance(candidate, TerritoryCandidate) for candidate in candidates):
+            raise TypeError("territory_candidates must contain TerritoryCandidate values")
+        candidate_ids = tuple(candidate.territory_id for candidate in candidates)
+        if len(candidate_ids) != len(set(candidate_ids)):
+            raise ValueError("territory candidate ids must be unique")
+        if self.selected_territory_id is not None and self.selected_territory_id not in candidate_ids:
+            raise ValueError("selected territory must reference a candidate")
+        object.__setattr__(self, "territory_candidates", candidates)
 
     @property
     def missing_fields(self) -> tuple[str, ...]:
@@ -602,5 +649,6 @@ __all__ = [
     "OutcomeObservation",
     "ProjectTruth",
     "SubjectKind",
+    "TerritoryCandidate",
     "TruthKind",
 ]

@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A41`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地，以及跨行业营销脑学科与落地架构审计。
+- `audits/A20-A42`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构，以及真实营销领地对照审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -25,10 +25,13 @@
 - `evidence/2026-08-11-sparse-gold-gift-query-review.md`：真实右侧会话中黄金礼品加工稀疏首问的回答、思考误读、人工业务拒绝和回归边界。
 - `evidence/marketing-territory-eval-cases.jsonl`：商品到人类内容领地的判别集；当前只有黄金礼品为用户确认的专家锚点，其余案例待人工复核。
 - `evidence/marketing-territory-contrast-cases.jsonl`：水果店、果农和宝妈的六个同标签异事实对照；当前均待专家复核，不是行业答案库。
+- `evidence/2026-08-11-marketing-territory-bakeoff.md`：24 个密封试验、26 次模型调用的技术回执与人工业务拒绝；修正两遍法仅部分命中，不是生产胜者。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
 
 完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、Lead 模型调用上限和 `--execute`；不同案例使用独立项目与线程，同一案例的 mutation 在第二轮前追加到原项目并复用原线程，泛记忆在配置副本中关闭。`--subagent-mode evidence-review` 只在评测配置副本中开放一个只读证据研究员，并额外强制显式给出子 Agent 图步数和 Token 上限。未得到付费确认时只维护离线测试，不发起模型调用。
+
+营销领地隔离对照入口为 `backend/scripts/run_marketing_territory_bakeoff.py`。完整对照组使用 `--group`，专家锚点使用 `--anchor-case`；所有运行必须列出候选、给出按实际模型调用计数的 `--max-paid-trials` 并显式 `--execute`。两遍候选的一次架构试验会计为两次调用。评测上下文、机制卡和两遍编排没有接入生产 `incubation_context`。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。
