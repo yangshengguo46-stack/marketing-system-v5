@@ -113,6 +113,13 @@ program descriptions from becoming project-fit claims, and observed model
 failures are distilled into sourced method counterexamples. Do not replace this
 with semantic output middleware or claim M01 passed before an approved paid
 retest.
+The host-independent account evidence types live in
+`mcn_incubation.account_decomposition` under audit A32. They preserve canonical
+identity, sampling coverage, per-metric capture time, media rights/receipts,
+pattern support/counterexamples, and function-only transfer conditions. Missing
+evidence produces warnings; cross-account references, sample-forged refs, hash
+mismatches, and cloud receipts without consent are integrity errors. Do not add
+account scores, verdicts, fixed sample minima, or incubation decisions there.
 
 Run a deliberately small real-model preflight with
 `uv run python scripts/run_incubation_preflight.py --execute`. The explicit

@@ -19,7 +19,7 @@
 | 标准 Agent 与知识层 | business-rejected / offline-repair-tested | A25-A28/A31；来源化方法、项目事实和项目证据已接入；M01 检索召回、平台来源边界和三项方法反例已离线修正 | `v3` 原答案仍不合格；修正后的付费复测、受控浏览器/MCP 与真实闭环未完成 |
 | 完整 Agent 评测入口 | tested-business-rejected | `v1/v2` 校准评测器；`v3` 以聊天交付和硬预算技术成功，工具参数、Token 和结果均已密封 | 修正业务质量前不扩大 36 案例，不宣称 M01 通过 |
 | ADR-007 | proposed | 增强型单 Agent、四类知识和先 BM25 后 embedding 的候选已记录 | 生产验证与三个真实业务闭环 |
-| 账号拆解证据层 | contract-tested | A29、ADR-008 和 10 个跨六平台失败案例；MediaKit 直接能力与缺口已逐项确认 | 浏览器快照、媒体原子任务、聚合合同和一个授权真实账号闭环 |
+| 账号拆解证据层 | domain-tested | A29/A32、ADR-008、10 个跨六平台失败案例；六类对象与聚合证据束已实现，14 个聚焦合同测试通过 | Owner 隔离持久化、脱敏投影、浏览器快照、媒体原子任务和一个授权真实账号闭环 |
 | ADR-008 | proposed | 账号拆解只作为下游证据，不成为第二 Agent；MediaKit 路由与授权边界已记录 | 真实账号验收和模式人工复核 |
 | 第四版 Skill 复用 | audit-tested | A30 与 97 项机器可读矩阵；28 已存在、13 蒸馏方法、17 按需候选、2 重写适配、37 排除 | 待采用 Skill 的触发、业务和越权评测 |
 | M01 事实边界修正 | offline-tested | A31；失败测试先复现四个断点，聚焦回归 `8 passed`；核心提示词和 Agent 运行时未改变 | 新 run ID 的付费模型复测与人工业务评审 |
@@ -31,7 +31,7 @@
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 检索修正、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `358 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 检索修正、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `370 passed`。
 - `uv run python -m pytest tests/test_client.py -q`：DeerFlowClient 流式消息、终态工具参数补全和既有嵌入式客户端合同共 `171 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
 - 旧 `packages/marketing-os`、`app/marketing` 和 `tests/marketing_os_tests` 已清除；A01-A19 只作为历史审计档案保留，当前依赖图不含 `marketing-os`。
@@ -61,8 +61,10 @@
 - A30 完成第四版 97 个 Skill 逐项审计和账号拆解 Git 追溯：不重演曾一次挂载约 77 个 Skill 的失败；复用 V4 精确身份、作品归属、缺失值、部分失败、证据引用和脱敏用例，不迁移旧账号判决编译器、固定 12/3/full 上限或一万多行 MediaKit 包装层。
 - A31 从 `M01 v3` 密封轨迹确认了能力漏召回、平台来源锚定、方法反例过于抽象和经营信号混层四类断点。核心提示词未继续加规则；真实宽查询现在有界召回定位、表现形式、内容、变现、转化和实验，且不再携带小红书 MCN 来源。
 - A31 聚焦回归为 `8 passed`，但本轮没有付费模型调用。M01 保持 `business-rejected / offline-repair-tested`；旧 `v3` 答案不会因代码变化被追溯改写成通过。
+- A32 新增宿主无关的账号拆解领域合同：同名串号、样本外引用、伪造证据 ref、媒体输入哈希不匹配和未经同意的云回执会拒绝；身份、覆盖、指标、媒体原子和反例缺失会以结构化警告继续存在。12 个对象测试与 2 个语料测试共 `14 passed`。
+- A32 没有连接浏览器、MediaKit、数据库或 Lead Agent，也没有生成真实账号模式；不得把 `domain-tested` 对外表述成“输入链接即可拆出成功公式”。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-M01 的确定性检索与知识边界修正已经离线通过，付费复测继续等待用户单独确认。现在按 A29/A30 用离线夹具实现账号快照、透明样本框、作品观察、媒体原子和模式/反例的最小合同，再接一个用户授权账号的只读浏览器快照；不得借此恢复第四版账号判决编译器、固定样本数量或第二 Agent。
+M01 的确定性检索与知识边界修正已经离线通过，付费复测继续等待用户单独确认。账号拆解最小领域合同也已通过；下一步先实现 Owner 隔离追加式持久化和面向项目证据的脱敏投影，再接一个用户授权账号的只读浏览器快照。不得借此恢复第四版账号判决编译器、固定样本数量或第二 Agent。

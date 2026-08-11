@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A31`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用及 M01 检索修正审计。
+- `audits/A20-A32`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正及账号拆解领域合同审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。

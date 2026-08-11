@@ -181,5 +181,10 @@ These apply repo-wide; module guides own the module-specific detail.
   project fit or priority, and observed failures become sourced method
   counterexamples rather than new prompt gates. M01 remains business-rejected
   until a separately approved paid retest succeeds.
+  Audit A32 owns the host-independent account-decomposition evidence objects.
+  Missing identity, coverage, metrics, media atoms, or counterexamples remain
+  explicit warnings; cross-account references and unconsented cloud receipts
+  are integrity failures. The module must not grow verdict, score, fixed sample,
+  or incubation-decision fields.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
