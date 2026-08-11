@@ -1,6 +1,6 @@
 # MCN Incubation Core Guide
 
-Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A38 audits before changing this package.
+Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A45 audits before changing this package.
 
 ## Ownership
 
@@ -23,6 +23,7 @@ Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A38 audits
 - Deterministic code may calculate and validate objective integrity, not choose positioning, expression form, content direction, or monetization.
 - Preflight records are append-only local evidence. Provider fallback messages and empty outputs are failures; incomplete runs cannot support an architecture decision.
 - Micro-bakeoff runs must explicitly name cases and candidates, enforce a paid-call ceiling, use the same configured model and context budget, and seal every input and output. A one-case run can reject a candidate but cannot establish an architecture winner.
+- A44-A45 preserve the business-rejected conversation-v1 content-world card and its exact prompt provenance. `ResponseMode.CONTENT_WORLD_EXPLORATION`, `CONTENT_WORLD_EXPLORATION_CONTEXT`, and the conversation-v2 operator card are evaluator-only task-isolation contracts; they must remain absent from the production Lead prompt, method library, and knowledge catalog. Their existence is not a passing model result, and another paid run requires fresh user authorization.
 - Full Agent evaluation runs must use the existing `DeerFlowClient`, an isolated evaluation database and in-memory checkpoint, explicit trial and recursion limits, and a redacted tamper-evident tool trace. Do not describe either limit as an exact currency cap, require a fixed tool route, or run paid trials without `--execute` and user confirmation.
 - Do not test `thin_prompt_methods_truth_cases` with synthetic or merely authored examples. It requires observed outcomes plus human review under the case-memory contract.
 - Add a failing behavior test before implementation and keep the public product name outside this internal package.

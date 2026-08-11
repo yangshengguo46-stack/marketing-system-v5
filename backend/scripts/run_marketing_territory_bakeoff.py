@@ -17,6 +17,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from mcn_incubation.preflight import PreflightLedger
 from mcn_incubation.territory_evaluation import (
     COMMON_SYSTEM_CONTEXT,
+    CONTENT_WORLD_EXPLORATION_CONTEXT,
+    CONTENT_WORLD_EXPLORATION_OPERATOR_CARD,
+    CONTENT_WORLD_OPERATOR_CARD,
     NATURAL_RESPONSE_CONTRACT,
     OUTPUT_CONTRACT,
     TERRITORY_METHOD_CARD,
@@ -127,6 +130,7 @@ def prepare_trials(
             system_context = render_system_context(
                 variant,
                 mechanism_query=user_message,
+                response_mode=response_mode,
             )
             estimated_chars = len(system_context) + len(user_message)
             if estimated_chars > context_budget_chars:
@@ -187,6 +191,7 @@ def prepare_anchor_trials(
             system_context = render_system_context(
                 variant,
                 mechanism_query=user_message,
+                response_mode=response_mode,
             )
             estimated_chars = len(system_context) + len(user_message)
             if estimated_chars > context_budget_chars:
@@ -419,7 +424,13 @@ def main(argv: Sequence[str] | None = None) -> int:
     run_id = args.run_id or created_at.strftime("territory-bakeoff-%Y%m%dT%H%M%SZ")
     ledger = PreflightLedger(args.output_root)
     mechanism_context = render_mechanism_context(default_territory_mechanism_library().cards)
-    contract_text = f"{COMMON_SYSTEM_CONTEXT}\n{TERRITORY_METHOD_CARD}\n{TERRITORY_METHOD_V2_CARD}\n{mechanism_context}\n{OUTPUT_CONTRACT}\n{NATURAL_RESPONSE_CONTRACT}"
+    contract_text = (
+        f"{COMMON_SYSTEM_CONTEXT}\n{CONTENT_WORLD_OPERATOR_CARD}\n"
+        f"{CONTENT_WORLD_EXPLORATION_CONTEXT}\n"
+        f"{CONTENT_WORLD_EXPLORATION_OPERATOR_CARD}\n"
+        f"{TERRITORY_METHOD_CARD}\n{TERRITORY_METHOD_V2_CARD}\n"
+        f"{mechanism_context}\n{OUTPUT_CONTRACT}\n{NATURAL_RESPONSE_CONTRACT}"
+    )
     ledger.create_run(
         run_id=run_id,
         model_id=model_id,

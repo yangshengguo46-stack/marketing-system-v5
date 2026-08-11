@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a43_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a45_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 44)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 46)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -315,3 +315,76 @@ def test_content_world_reasoning_preserves_corrections_and_stays_out_of_producti
         text = path.read_text(encoding="utf-8")
         assert "content-world-exploration-v1" not in text
         assert "时间 × 空间 × 事件 × 人物 × 冲突" not in text
+
+
+def test_conversation_operator_trial_records_business_rejection_without_production_promotion() -> None:
+    audit = (AUDIT_ROOT / "A44-conversation-content-world-trial.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-content-world-operator-trial.md").read_text(encoding="utf-8")
+    decision = (DOC_ROOT / "decisions" / "ADR-011-content-world-exploration.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "content-world-conversation-v1-20260811",
+        "4/4",
+        "10,278",
+        "CW01-gold-gift",
+        "CW02-fruit-world",
+        "business-rejected",
+    ):
+        assert marker in audit
+        assert marker in evidence
+    assert "没有进入送、收、拒、回与人情世界" in audit
+    assert "没有展开母世界、子世界、五维叙事或跨维连接" in audit
+    assert "未使用查理" in audit
+    assert "不接生产" in audit
+    assert "单遍方法卡候选已被拒绝" in decision
+    assert "status: proposed" in decision
+
+    production_files = (
+        PACKAGE_ROOT / "agent_contract.py",
+        PACKAGE_ROOT / "methods.py",
+        PACKAGE_ROOT / "knowledge.py",
+    )
+    for path in production_files:
+        text = path.read_text(encoding="utf-8")
+        assert "content_world_operators" not in text
+        assert "CONTENT_WORLD_OPERATOR_CARD" not in text
+
+
+def test_template_origin_audit_traces_the_exact_payload_and_keeps_the_repair_eval_only() -> None:
+    audit = (AUDIT_ROOT / "A45-content-world-template-origin.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-content-world-prompt-provenance.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "messages_exact=True",
+        "message_count=2",
+        "has_tools=False",
+        "has_previous_response_id=False",
+        "PatchedChatDeepSeek",
+        "MT01-gold-gift",
+        "B/C",
+        "INCUBATION_AGENT_CONTRACT",
+        "NATURAL_RESPONSE_CONTRACT",
+        "模型默认先验",
+        "任务边界混杂",
+        "未使用查理",
+        "未新增付费调用",
+    ):
+        assert marker in audit
+        assert marker in evidence
+
+    assert "不是旧版记忆或 Skill 污染" in audit
+    assert "不是完整 DeerFlow 母提示词注入" in audit
+    assert "第五版共享孵化合同" in audit
+    assert "不修改生产 Lead 提示词" in audit
+    assert "content_world_exploration" in audit
+
+    production_files = (
+        PACKAGE_ROOT / "agent_contract.py",
+        PACKAGE_ROOT / "methods.py",
+        PACKAGE_ROOT / "knowledge.py",
+        REPO_ROOT / "backend" / "packages" / "harness" / "deerflow" / "agents" / "lead_agent" / "prompt.py",
+    )
+    for path in production_files:
+        text = path.read_text(encoding="utf-8")
+        assert "CONTENT_WORLD_EXPLORATION_CONTEXT" not in text
+        assert "CONTENT_WORLD_EXPLORATION_OPERATOR_CARD" not in text

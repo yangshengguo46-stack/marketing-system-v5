@@ -30,17 +30,20 @@
 | 稀疏首问决策边界 | live-business-rejected / secondary-audit-reviewed | A39；真实回答确有事实补造和提问边界问题，但用户复核后确认这不是本轮核心根因；原证据保留并链接 A40 | 作为交互回归保留；不能再用“信息不足”替代营销脑评测，也禁止恢复访谈状态机、关键词拦截和 Writer Brain |
 | 营销脑与内容领地 | live-business-rejected / audit-reviewed / eval-scaffolded | A40；黄金礼品专家锚点确认“黄金是修饰、礼品是中心”，应保留送礼品类行为并经营人情、关系、仪式与购买情境；第四版从正确语义拆解过度修正为最大远联、固定故事和商品/品类一并 absent 的证据已追溯 | 其余跨个人、品牌、产品和服务案例待 MCN 人工复核；先对比基线、方法卡、来源知识和 Lead 内发散收敛，再决定是否接入方法，不改核心提示词 |
 | 跨行业营销脑架构 | domain-tested / paid-bakeoff-business-rejected / ADR-proposed | A41/A42、ADR-010；轻量 `TerritoryCandidate` 已在现有决策 JSON 内向后兼容落地且无生产入口；24 个密封试验、26 次调用比较结构化/自然回答、方法、来源机制和两遍法，技术 24/24 成功 | 没有候选通过业务验收；两遍法仅在黄金锚点部分命中且仍补造事实，六个对照均待 MCN 人工复核，方法/机制/两遍上下文不接生产 |
-| 内容世界扩展算子 | expert-correction-recorded / audit-reviewed / ADR-proposed | A43、ADR-011；指定九轮会话已保存，第四版查理相关 Skill 与 `27e48e10` 已追溯，课程来源、V4 跨来源综合和第五版综合已分开；候选采用向上、向下、横向和跨维四种可选算子 | 方法卡、即时研究和只读 explorer 尚未完成跨案例对照；当前不改核心提示词、不按关键词路由、不建向量库、不接生产 |
+| 内容世界扩展算子 | paid-single-pass-business-rejected / prompt-origin-audited / exploration-only-offline-tested / ADR-proposed | A43-A45、ADR-011；指定对话及课程来源边界已保存；`content-world-conversation-v1-20260811` 4/4 技术成功、10,278 Token，但黄金仍为 B/C/行业号、水果仍为角色模板，业务拒绝；实际载荷排除记忆、Skill、V4 和完整 DeerFlow 母提示词污染，确认评测混合了完整孵化合同与纯探索；新 `content_world_exploration` 模式已离线测试 | conversation-v2 纯探索基线/算子对照尚无付费结果；品牌、产品、个人和服务留出锚点待 MCN 人工复核；不改生产 Lead、不建向量库、不接生产 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
 | 单一决策权多 Agent 候选 | offline-repaired / paid-untriggered / business-rejected | A37、ADR-009；运行级角色白名单、只读证据研究员、独立步数/Token/超时/总委派上限和密封实验 manifest 已离线通过；试后发现并测试先行修复嵌入式配置传播缺口 | Lead 实际未调用 `task`，因此真实运行既未证明专业子 Agent 可执行，也未测其质量；最终答案仍补造路线与数字，ADR 保持 proposed |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。A41 确认其通用化不能靠行业模板；A42 随后证明可选领域对象可以很薄，但单张方法卡、完整 JSON 合同和单张机制知识都不能补出营销脑，修正两遍法也只有局部增量。A43 将下一候选缩小为“内容世界探索 -> Lead 营销取舍 -> 叙事加工”：四向扩展只引导模型打开搜索空间，模型参数知识只产出假设，浏览器/MCP核验外部主张，查理方法只加工选中节点。第四版的硬门教训继续有效：评测上下文不得因一次漂亮答案接入生产，当前不宣称架构胜者。
+首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。A41-A43 确认这不能靠行业模板、完整 JSON 或单张知识卡补齐。A44 进一步拒绝了“完整最终交付上下文 + conversation-v1 算子卡”；A45 通过实际请求载荷确认，该失败不是旧记忆或 Skill 污染，而是纯探索与完整孵化交付边界混杂，再叠加模型默认先验。下一候选因此只隔离评价“内容世界地图”，然后才由 Lead 做营销取舍。生产 Lead 提示词没有修改，当前不宣称架构胜者。
 
 ## 本轮验证
 
+- `uv run python -m pytest tests/mcn_incubation_tests/test_marketing_territory_bakeoff_runner_script.py tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：conversation-v1 业务拒绝、A44-A45 提示词溯源、纯探索输入隔离和生产不接线共 `26 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests -q`：孵化包领域、持久化、评测、文档连号与架构边界共 `99 passed`。
+- `uv run python -m pytest tests/test_lead_agent_prompt.py tests/test_lead_agent_model_resolution.py -q`：生产 Lead 提示词组装与模型解析回归共 `77 passed`；本轮未将纯探索上下文接入生产。
 - `uv run python -m pytest tests/mcn_incubation_tests ... tests/test_app_config_reload.py -q`：A20-A38、孵化合同、主体回答工具、方法/事实/证据、评测器、子 Agent 配置和 4000 字上下文预算共 `338 passed`。
 - `uv run python -m pytest tests/test_subagent_*.py tests/test_task_tool*.py tests/test_client.py tests/test_client_explicit_app_config.py -q`：子 Agent 权限、委派、Token/超时背压、检查点与客户端共 `511 passed`。
 - `uv run python -m pytest tests/test_create_deerflow_agent.py tests/test_tool_deduplication.py tests/test_input_sanitization_middleware.py tests/test_human_input.py tests/test_thread_data_middleware.py tests/test_gateway_services.py -q`：全局工具注册、人类回执清洗、当前 run 盖章和 Gateway 输入合同共 `343 passed`。
@@ -107,8 +110,10 @@
 - `run_marketing_territory_bakeoff.py` 完成 7 个本地 run、24 个密封试验记录和 26 次实际模型调用，技术 24/24 成功、总计 61,361 Token。结构化 v1、自然 v2、v2 加来源机制均业务不通过；首次两遍实现因探索输入混入最终交付要求而作废，修正轮只部分命中黄金“关系场景”且继续补造主体资产和数字。
 - A42 对照证据确认没有生产胜者：评测方法、机制卡和两遍编排均未写入 `methods.py`、`knowledge.py`、`incubation_context` 或 Lead 提示词，ADR-010 保持 `proposed`。聚焦回归为 `27 passed`，孵化包全集为 `94 passed`，相关宿主 Agent 回归为 `140 passed`。
 - A43 已保存指定会话的九轮专家纠偏，追溯第四版查理内容只存在于大规模综合方法栈，并经公开课程目录、书目和讲座对照确认：四向扩展是第五版综合，不冒充查理课程固定公式。先增加缺文件失败测试，再补 A43、会话证据与 ADR-011；聚焦架构文档为 `13 passed`，孵化包全集为 `95 passed`，没有模型付费调用或生产接线。
+- A44 在用户授权后执行 conversation-v1 对照：`CW01-gold-gift` 与 `CW02-fruit-world` 各比较基线/算子卡，4/4 技术成功、总计 10,278 Token，但人工判定 `business-rejected`；方法卡不接生产。
+- A45 对密封输入和 `PatchedChatDeepSeek` 客户端载荷做离线复核：`message_count=2`、`messages_exact=True`、`has_tools=False`、`has_previous_response_id=False`；没有记忆、Skill、V4 或完整母提示词。先写失败测试再新增 `content_world_exploration` 纯探索模式，本轮未新增付费调用。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-下一孵化纵切继续是营销脑验证：先把指定会话的四向扩展变成评测侧短方法候选，并由用户或 MCN 人工复核水果店、果农、宝妈六个对照，补品牌、单品、服务和组织锚点。比较薄基线、可选四向方法、强制四步失败对照、即时外部研究和有界只读 explorer；评分最终候选差异、语义桥、主体拥有权、商业归因、事实边界、反例与纠错记忆，不检查固定工具轨迹。暂不改核心提示词，不迁入生产方法，不引入行业路由、语义 Schema、评分门、向量数据库、固定故事流程或强制子 Agent。未经用户再次确认不执行新的付费 run。
+下一孵化纵切继续是营销脑验证，但先只检查“内容世界是否真的被打开”：使用相同原始请求对比 `content_world_exploration` 纯基线与 conversation-v2 算子卡，单独复核节点、语义桥、张力、反例和待外查主张。黄金礼品和水果只是已见纠偏锚点；架构判断还需个人、品牌、单品和服务留出案例，避免把示例当成答案。只有探索层跨案例胜出后，才评估是否由 Lead 做第二遍取舍。暂不改生产提示词，不迁入生产方法，不引入行业路由、语义 Schema、评分门、向量数据库或强制子 Agent。未经用户再次确认不执行新的付费 run。

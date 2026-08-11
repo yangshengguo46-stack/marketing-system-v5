@@ -14,6 +14,7 @@ from mcn_incubation.context import LEAD_AGENT_CONSTITUTION
 
 class TerritoryEvalVariant(StrEnum):
     BASELINE = "baseline"
+    CONTENT_WORLD_OPERATORS = "content_world_operators"
     TERRITORY_METHOD = "territory_method"
     TERRITORY_METHOD_V2 = "territory_method_v2"
     TERRITORY_METHOD_V2_MECHANISMS = "territory_method_v2_mechanisms"
@@ -23,6 +24,7 @@ class TerritoryEvalVariant(StrEnum):
 class ResponseMode(StrEnum):
     STRUCTURED_JSON = "structured_json"
     NATURAL_JUDGMENT = "natural_judgment"
+    CONTENT_WORLD_EXPLORATION = "content_world_exploration"
 
 
 @dataclass(frozen=True, slots=True)
@@ -274,6 +276,41 @@ TERRITORY_METHOD_V2_CARD = """<content_territory_method_v2>
 信息不足时保留候选和关键未知。不要擅自补人口统计、价格、频率、流量阈值、客户结果、产品线或平台规则；呈现形式和变现只能写成与已知资源匹配的暂定方案与最小验证。
 </content_territory_method_v2>"""
 
+CONTENT_WORLD_OPERATOR_CARD = """<content_world_operators>
+候选版本：conversation-v1。
+这是帮助你打开内容世界的可选思考算子，不是固定流程，也不是必须逐项填写的矩阵。只组合当前真正有帮助的方向，先探索，再由你根据项目事实和经营目标取舍。
+
+- 向上抽象：从具体对象寻找它所属的品类、反复行为、人类任务、关系或更大的生活系统。每次上移都要说明语义桥，不能用“更宏大”代替关联。
+- 向下拆分：把过大的母世界拆成具有独立知识、人物、生产、使用或文化的子世界。子世界是候选节点，不是自动成为最终定位的商品目录。
+- 横向展开：围绕母世界或子世界，从时间 × 空间 × 事件 × 人物 × 冲突打开可持续题材。五个维度用于发现遗漏，不要求全部出现，也不能把没有依据的故事写成事实。
+- 跨维连接：在现实、历史、神话、影视、游戏和未来世界之间寻找结构相似的角色、规则、事件或象征。必须说明对象在目标世界中承担什么作用；只有同名或热点不算连接。
+
+先保留少量语义桥真正不同的候选，避免把前一个案例的好答案机械迁移到当前主体。每个候选说明：它如何从已知事实长出来；主体能否持续接触、观察、证明或参与；受众为什么关心；内容价值如何自然回到账号与生意；最强反例、漂移风险和会改变判断的未知是什么。
+
+可以用模型已有知识产生创意假设，但历史、作品、文化、产业和当前市场主张在核验前只能标为待研究。信息不足时先给条件化候选和一个高信息问题，不得补造客户、素材、能力、表现形式、产品、价格、频率、指标或结果。
+</content_world_operators>"""
+
+CONTENT_WORLD_EXPLORATION_CONTEXT = """<read_only_content_world_explorer>
+这是一次只读的内容世界探索，供唯一 Lead 后续判断，不是面向客户的起号方案。
+
+这一遍只回答：从已给主体或商业对象出发，有哪些语义连续的更大世界、子世界、横向切面和跨界连接值得 Lead 再考察。保留多个真正不同的分支、语义桥、反例和未知，不代替 Lead 选最终路线。
+
+这一遍不决定账号服务谁、如何呈现、如何成交、发什么平台或先做哪个运营试验。不因为信息稀疏就用常见账号类型补齐答案。
+
+严格区分输入事实、语义推断、模型知识产生的创意假设、需要外查的主张和未知。不得补造客户、订单、能力、资源、作品、历史事实或市场结论。
+</read_only_content_world_explorer>"""
+
+CONTENT_WORLD_EXPLORATION_OPERATOR_CARD = """<content_world_exploration_operators>
+候选版本：conversation-v2。这些是打开语义搜索空间的可选算子，不是固定步骤，也不要为了填满而全部使用。
+
+- 向上抽象：从具体对象寻找它所属的品类、反复行为、人类任务、关系或更大生活系统。每次上移都要写出中间的语义桥。
+- 向下拆分：把过大的母世界拆成具有独立知识、人物、生产、使用或文化的子世界。子世界只是地图节点，不是自动答案。
+- 横向展开：围绕母世界或子世界，用时间 × 空间 × 事件 × 人物 × 冲突发现未被看见的切面，不要把假设写成真实故事。
+- 跨维连接：在现实、历史、神话、影视、游戏和未来世界之间寻找结构相似的角色、规则、事件或象征，并说明结构对应；只有同名或热点不算连接。
+
+不把前一个案例的优秀路径机械迁移给当前对象。输出简洁的地图笔记：起点词义、可选节点、节点间的语义桥、可反复发生的张力、最强反例与待外查主张；不作最终取舍。
+</content_world_exploration_operators>"""
+
 OUTPUT_CONTRACT = """只输出一个有效 JSON 对象，不要 Markdown 代码围栏。结构如下；允许信息不全，禁止为了补字段而编造：
 {
   "known_facts_used": ["F1"],
@@ -357,9 +394,18 @@ def render_system_context(
     variant: TerritoryEvalVariant,
     *,
     mechanism_query: str = "",
+    response_mode: ResponseMode = ResponseMode.STRUCTURED_JSON,
 ) -> str:
+    if response_mode is ResponseMode.CONTENT_WORLD_EXPLORATION:
+        if variant is TerritoryEvalVariant.BASELINE:
+            return CONTENT_WORLD_EXPLORATION_CONTEXT
+        if variant is TerritoryEvalVariant.CONTENT_WORLD_OPERATORS:
+            return f"{CONTENT_WORLD_EXPLORATION_CONTEXT}\n\n{CONTENT_WORLD_EXPLORATION_OPERATOR_CARD}"
+        raise ValueError("content-world exploration supports only baseline and content_world_operators variants")
     if variant is TerritoryEvalVariant.BASELINE:
         return COMMON_SYSTEM_CONTEXT
+    if variant is TerritoryEvalVariant.CONTENT_WORLD_OPERATORS:
+        return f"{COMMON_SYSTEM_CONTEXT}\n\n{CONTENT_WORLD_OPERATOR_CARD}"
     if variant is TerritoryEvalVariant.TERRITORY_METHOD:
         return f"{COMMON_SYSTEM_CONTEXT}\n\n{TERRITORY_METHOD_CARD}"
     if variant is TerritoryEvalVariant.TERRITORY_METHOD_V2:
@@ -392,7 +438,9 @@ def render_case_message(
     response_mode: ResponseMode = ResponseMode.STRUCTURED_JSON,
 ) -> str:
     sections = [render_case_evidence_message(case, include_mutation=include_mutation)]
-    if response_mode is ResponseMode.STRUCTURED_JSON:
+    if response_mode is ResponseMode.CONTENT_WORLD_EXPLORATION:
+        pass
+    elif response_mode is ResponseMode.STRUCTURED_JSON:
         sections.append(OUTPUT_CONTRACT)
     elif response_mode is ResponseMode.NATURAL_JUDGMENT:
         sections.append(NATURAL_RESPONSE_CONTRACT)
@@ -426,7 +474,9 @@ def render_anchor_message(
     response_mode: ResponseMode = ResponseMode.NATURAL_JUDGMENT,
 ) -> str:
     sections = [render_anchor_evidence_message(case, include_mutation=include_mutation)]
-    if response_mode is ResponseMode.STRUCTURED_JSON:
+    if response_mode is ResponseMode.CONTENT_WORLD_EXPLORATION:
+        pass
+    elif response_mode is ResponseMode.STRUCTURED_JSON:
         sections.append(OUTPUT_CONTRACT)
     elif response_mode is ResponseMode.NATURAL_JUDGMENT:
         sections.append(NATURAL_RESPONSE_CONTRACT)
@@ -452,6 +502,9 @@ def render_anchor_evidence_message(
 
 __all__ = [
     "COMMON_SYSTEM_CONTEXT",
+    "CONTENT_WORLD_EXPLORATION_CONTEXT",
+    "CONTENT_WORLD_EXPLORATION_OPERATOR_CARD",
+    "CONTENT_WORLD_OPERATOR_CARD",
     "HumanMechanismCard",
     "NATURAL_RESPONSE_CONTRACT",
     "OUTPUT_CONTRACT",

@@ -180,6 +180,18 @@ cultural, media, industry, and current claims require browser/MCP evidence.
 Charlie-derived narrative craft can elaborate a selected territory node but
 cannot choose the incubation strategy or restore the excluded cinematic-IP
 stack.
+Audits A44-A45 record that the conversation-v1 card completed four paid calls
+but failed both gold-gift and fruit business review. Exact request-payload
+inspection excludes thread memory, skills, V4 runtime code, tools, and the full
+DeerFlow system prompt; the isolated evaluator did include the canonical full
+incubation contract plus the natural final-delivery contract, so it mixed world
+exploration with strategy, format, monetization, and experiment decisions. Keep
+that failed variant immutable as evidence. `ResponseMode.CONTENT_WORLD_EXPLORATION`
+and its conversation-v2 operator card are evaluation-only isolation candidates:
+they omit the production Lead contract and final delivery pressure, support only
+baseline/operator comparison, and have no paid result yet. Never register these
+contexts in production or run them against a paid model without renewed user
+authorization.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

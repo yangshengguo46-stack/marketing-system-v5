@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A43`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照，以及内容世界推演与查理课程来源边界审计。
+- `audits/A20-A45`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测与模板答案提示词溯源。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -28,6 +28,9 @@
 - `evidence/marketing-territory-contrast-cases.jsonl`：水果店、果农和宝妈的六个同标签异事实对照；当前均待专家复核，不是行业答案库。
 - `evidence/2026-08-11-marketing-territory-bakeoff.md`：24 个密封试验、26 次模型调用的技术回执与人工业务拒绝；修正两遍法仅部分命中，不是生产胜者。
 - `evidence/2026-08-11-content-world-expert-corrections.md`：指定会话中从黄金礼品、水果、榴莲到跨维世界的九轮专家纠偏；它是方法评测锚点，不是真实业务成功案例。
+- `evidence/content-world-exploration-eval-cases.jsonl`：指定对话蒸馏的黄金礼品和水果答案隔离纠偏案例，专家答案只用于人工复核。
+- `evidence/2026-08-11-content-world-operator-trial.md`：conversation-v1 四向算子的 4/4 技术成功与业务拒绝证据。
+- `evidence/2026-08-11-content-world-prompt-provenance.md`：B/C/行业号模板的实际请求载荷、已排除来源、任务边界混杂与模型先验推断。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
@@ -35,5 +38,7 @@
 完整 Agent 小样本评测入口为 `backend/scripts/run_incubation_agent_eval.py`。它必须显式指定案例、trial 上限、LangGraph 图超步上限、Lead 模型调用上限和 `--execute`；不同案例使用独立项目与线程，同一案例的 mutation 在第二轮前追加到原项目并复用原线程，泛记忆在配置副本中关闭。`--subagent-mode evidence-review` 只在评测配置副本中开放一个只读证据研究员，并额外强制显式给出子 Agent 图步数和 Token 上限。未得到付费确认时只维护离线测试，不发起模型调用。
 
 营销领地隔离对照入口为 `backend/scripts/run_marketing_territory_bakeoff.py`。完整对照组使用 `--group`，专家锚点使用 `--anchor-case`；所有运行必须列出候选、给出按实际模型调用计数的 `--max-paid-trials` 并显式 `--execute`。两遍候选的一次架构试验会计为两次调用。评测上下文、机制卡和两遍编排没有接入生产 `incubation_context`。
+
+`--response-mode content_world_exploration` 是 A45 后新增的纯探索隔离候选；它只允许 `baseline` 与 `content_world_operators`，不携带生产 Lead 孵化合同或最终客户交付合同。它目前只有离线合同测试，没有付费模型结果，也不是生产能力。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

@@ -232,6 +232,18 @@ These apply repo-wide; module guides own the module-specific detail.
   promotion. Charlie-derived craft may shape a selected node into a story, but
   it does not own incubation judgment and must not restore the cinematic-IP
   product stack.
+  Audits A44-A45 reject the first direct single-pass operator card and trace its
+  B2B/B2C/industry-account outputs. The sealed request contained exactly one
+  system message and one user message, with no tools, history, skills, V4 code,
+  or full DeerFlow prompt. The evaluation itself mixed the canonical complete
+  incubation contract, final customer-delivery pressure, and world exploration;
+  a generic model prior then remained the best-supported explanation for the
+  stock taxonomy. Preserve that failed card as evidence. The evaluation-only
+  `content_world_exploration` response mode removes final strategy pressure and
+  compares a plain read-only explorer with a conversation-v2 operator card. Do
+  not import either explorer context into the production Lead, methods, or
+  knowledge catalog, and do not execute another paid run without fresh user
+  approval.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

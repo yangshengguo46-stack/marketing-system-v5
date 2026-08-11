@@ -7,6 +7,9 @@ from pathlib import Path
 
 import pytest
 from mcn_incubation.territory_evaluation import (
+    CONTENT_WORLD_EXPLORATION_CONTEXT,
+    CONTENT_WORLD_EXPLORATION_OPERATOR_CARD,
+    CONTENT_WORLD_OPERATOR_CARD,
     TERRITORY_METHOD_V2_CARD,
     ResponseMode,
     TerritoryEvalVariant,
@@ -19,6 +22,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 SCRIPT_PATH = REPO_ROOT / "backend" / "scripts" / "run_marketing_territory_bakeoff.py"
 CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "marketing-territory-contrast-cases.jsonl"
 ANCHOR_CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "marketing-territory-eval-cases.jsonl"
+CONTENT_WORLD_CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "content-world-exploration-eval-cases.jsonl"
 NOW = datetime(2026, 8, 11, 10, 0, tzinfo=UTC)
 
 
@@ -71,6 +75,115 @@ def test_expert_anchor_loader_keeps_the_answer_out_of_model_context() -> None:
         assert "observable_success" not in trial.user_message
         assert "礼物如何参与人情、关系、礼仪" not in trial.user_message
         assert all(failure not in trial.user_message for failure in anchor.observable_failures)
+
+
+def test_conversation_operator_candidate_is_answer_blind_and_contains_no_charlie_material() -> None:
+    module = _load_script()
+    cases = load_territory_anchor_cases(CONTENT_WORLD_CASE_PATH)
+    trials = module.prepare_anchor_trials(
+        cases=cases,
+        variants=(
+            TerritoryEvalVariant.BASELINE,
+            TerritoryEvalVariant.CONTENT_WORLD_OPERATORS,
+        ),
+        context_budget_chars=8_000,
+        seed=43,
+        include_mutation=False,
+        response_mode=ResponseMode.NATURAL_JUDGMENT,
+    )
+
+    assert {case.case_id for case in cases} == {
+        "CW01-gold-gift",
+        "CW02-fruit-world",
+    }
+    assert all(case.review_status == "expert_correction" for case in cases)
+    assert len(trials) == 4
+    for case in cases:
+        by_variant = {trial.variant: trial for trial in trials if trial.case.case_id == case.case_id}
+        baseline = by_variant[TerritoryEvalVariant.BASELINE]
+        operators = by_variant[TerritoryEvalVariant.CONTENT_WORLD_OPERATORS]
+        assert baseline.user_message == operators.user_message
+        assert "<content_world_operators>" not in baseline.system_context
+        assert "<content_world_operators>" in operators.system_context
+        assert all(expectation not in operators.user_message for expectation in case.observable_success)
+        assert all(failure not in operators.user_message for failure in case.observable_failures)
+        assert str(case.expert_anchor) not in operators.user_message
+
+    for marker in (
+        "向上抽象",
+        "向下拆分",
+        "横向展开",
+        "跨维连接",
+        "时间 × 空间 × 事件 × 人物 × 冲突",
+        "不是固定流程",
+    ):
+        assert marker in CONTENT_WORLD_OPERATOR_CARD
+    for leaked_answer in ("查理", "黄金", "礼品", "水果", "榴莲"):
+        assert leaked_answer not in CONTENT_WORLD_OPERATOR_CARD
+
+
+def test_exploration_only_mode_removes_final_strategy_pressure_and_isolates_the_operator_card() -> None:
+    module = _load_script()
+    cases = load_territory_anchor_cases(CONTENT_WORLD_CASE_PATH)
+    trials = module.prepare_anchor_trials(
+        cases=cases,
+        variants=(
+            TerritoryEvalVariant.BASELINE,
+            TerritoryEvalVariant.CONTENT_WORLD_OPERATORS,
+        ),
+        context_budget_chars=8_000,
+        seed=47,
+        include_mutation=False,
+        response_mode=ResponseMode.CONTENT_WORLD_EXPLORATION,
+    )
+
+    assert len(trials) == 4
+    assert "只读" in CONTENT_WORLD_EXPLORATION_CONTEXT
+    for case in cases:
+        by_variant = {trial.variant: trial for trial in trials if trial.case.case_id == case.case_id}
+        baseline = by_variant[TerritoryEvalVariant.BASELINE]
+        operators = by_variant[TerritoryEvalVariant.CONTENT_WORLD_OPERATORS]
+
+        assert baseline.user_message == operators.user_message
+        assert baseline.system_context == CONTENT_WORLD_EXPLORATION_CONTEXT
+        assert operators.system_context == (f"{CONTENT_WORLD_EXPLORATION_CONTEXT}\n\n{CONTENT_WORLD_EXPLORATION_OPERATOR_CARD}")
+        assert case.request in baseline.user_message
+        assert all(fact in baseline.user_message for fact in case.known_facts)
+        assert baseline.model_call_count == operators.model_call_count == 1
+
+        combined = f"{baseline.system_context}\n{operators.system_context}\n{baseline.user_message}"
+        for final_delivery_pressure in (
+            "Incubation is your root responsibility",
+            "负责结果的 MCN 孵化负责人",
+            "表现形式",
+            "变现假设",
+            "最小实验",
+            "B端",
+            "C端",
+            "行业号",
+        ):
+            assert final_delivery_pressure not in combined
+
+    for marker in (
+        "向上抽象",
+        "向下拆分",
+        "横向展开",
+        "跨维连接",
+        "时间 × 空间 × 事件 × 人物 × 冲突",
+    ):
+        assert marker in CONTENT_WORLD_EXPLORATION_OPERATOR_CARD
+    for leaked_answer in ("查理", "黄金", "礼品", "水果", "榴莲"):
+        assert leaked_answer not in CONTENT_WORLD_EXPLORATION_OPERATOR_CARD
+
+    with pytest.raises(ValueError, match="content-world exploration"):
+        module.prepare_anchor_trials(
+            cases=(cases[0],),
+            variants=(TerritoryEvalVariant.TERRITORY_METHOD_V2,),
+            context_budget_chars=8_000,
+            seed=47,
+            include_mutation=False,
+            response_mode=ResponseMode.CONTENT_WORLD_EXPLORATION,
+        )
 
 
 def test_source_mechanism_candidate_retrieves_context_without_changing_the_anchor_request() -> None:
