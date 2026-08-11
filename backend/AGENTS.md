@@ -111,8 +111,10 @@ Audit A31 governs the M01 grounding repair: `incubation_context` keeps a bounded
 six-card default for broad judgments, source limitations must prevent platform
 program descriptions from becoming project-fit claims, and observed model
 failures are distilled into sourced method counterexamples. Do not replace this
-with semantic output middleware or claim M01 passed before an approved paid
-retest.
+with semantic output middleware. A33 records that the approved paid v4 retest
+did not call the available method reader and again failed business review. Do
+not claim M01 passed, force a method-tool trajectory, or spend another paid
+trial before a new offline repair hypothesis passes.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

@@ -179,8 +179,10 @@ These apply repo-wide; module guides own the module-specific detail.
   Audit A31 pins the first full-agent failure repair: broad method queries may
   retrieve up to six bounded lenses, platform-program sources cannot establish
   project fit or priority, and observed failures become sourced method
-  counterexamples rather than new prompt gates. M01 remains business-rejected
-  until a separately approved paid retest succeeds.
+  counterexamples rather than new prompt gates. A33 records that the approved
+  paid v4 retest skipped the available method tool and again failed business
+  review. M01 remains business-rejected; do not force a method-tool trajectory
+  or spend another paid trial before a new offline hypothesis passes.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts
