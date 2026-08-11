@@ -27,14 +27,15 @@
 | M01 主体适配与记忆隔离 | paid-retest-business-rejected | A34/A35；泛记忆已隔离，但 v5 初始与 mutation 均继续补造形式、平台、供给、价格和阈值 | 用有效连续对话评测主体信息获取与修订 |
 | 连续修订评测 | offline-harness-tested | A35；同案例现共享项目/线程，mutation 只在第二轮前追加，两个 trace 分别密封 | 修正后的真实连续对话尚未付费验证 |
 | 主体问答来源与版本链 | offline-tested | A38；Lead 从当前 run 的结构化用户回执记录原文，Owner 隔离、同请求幂等、同语义键替代链、项目投影、审批排除和子 Agent 禁写均已测试 | 真实 UI 连续会话、问题信息增益和据回答修订的业务评审 |
-| 稀疏首问决策边界 | live-business-rejected / audit-reviewed | A39；真实黄金礼品加工首问暴露 Lead 将“不要问卷”误读为“不必提问”，并补造 B/C 路线、平台、产能、预算、价格和阈值；第四版聊天、台账与 Git 已完成交叉追溯 | 先建立五类同组输出评测，再考虑最小语义修正；禁止恢复访谈状态机、关键词拦截和 Writer Brain |
+| 稀疏首问决策边界 | live-business-rejected / secondary-audit-reviewed | A39；真实回答确有事实补造和提问边界问题，但用户复核后确认这不是本轮核心根因；原证据保留并链接 A40 | 作为交互回归保留；不能再用“信息不足”替代营销脑评测，也禁止恢复访谈状态机、关键词拦截和 Writer Brain |
+| 营销脑与内容领地 | live-business-rejected / audit-reviewed / eval-scaffolded | A40；黄金礼品专家锚点确认“黄金是修饰、礼品是中心”，应保留送礼品类行为并经营人情、关系、仪式与购买情境；第四版从正确语义拆解过度修正为最大远联、固定故事和商品/品类一并 absent 的证据已追溯 | 其余跨个人、品牌、产品和服务案例待 MCN 人工复核；先对比基线、方法卡、来源知识和 Lead 内发散收敛，再决定是否接入方法，不改核心提示词 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
 | 单一决策权多 Agent 候选 | offline-repaired / paid-untriggered / business-rejected | A37、ADR-009；运行级角色白名单、只读证据研究员、独立步数/Token/超时/总委派上限和密封实验 manifest 已离线通过；试后发现并测试先行修复嵌入式配置传播缺口 | Lead 实际未调用 `task`，因此真实运行既未证明专业子 Agent 可执行，也未测其质量；最终答案仍补造路线与数字，ADR 保持 proposed |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A37 将“唯一决策权”与“只能有一次 Agent 调用”分开：专业子 Agent 可以作为只读工具，但不能是并列大脑。A38 又补上了连续孵化的来源断点：关键主体回答现在能从当前真实人类回执进入项目事实版本链，不再只存在于聊天或模型摘要中；它没有引入固定问卷。A39 进一步确认当前缺口是“何时可以承诺路线”的判断，而不是问卷或知识库：稀疏首问仍被 Lead 用假设补成完整模板，但第四版已经证明用访谈控制器、结构合同和 Writer Brain 修复会把系统再次带偏。当前先冻结输出层失败评测，不修改运行时。专业子 Agent 只在真正证据密集的账号拆解或多来源研究中继续验证。尚未产生架构胜者。
+首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A37 将“唯一决策权”与“只能有一次 Agent 调用”分开，A38 补上主体回答进入事实版本链的来源断点。A39 记录的事实补造与提问边界仍成立，但用户复核后已明确降级为次要问题。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。第四版已证明，中心词 Schema、最大远联、固定故事合同和 Writer Brain 会把这项判断再次写死；因此先做内容领地业务评测，不修改运行时，不宣称架构胜者。
 
 ## 本轮验证
 
@@ -46,7 +47,7 @@
 - 本轮变更的 Ruff 检查与格式检查通过，`uv lock --check` 通过，`git diff --check` 无空白错误。
 - 本轮 tracked 新增行与 untracked 文件的凭证特征扫描未发现 API Key、Token 或私钥值；README 全文件扫描只命中既有示例占位符，完整本地输出仍只位于被忽略的 `.deer-flow/`。
 - 仓库迁移后的本地运行复核先暴露旧 `.venv` shebang 与 Tailwind 解析根两个故障；重装本地 Python 环境并测试先行固定 PostCSS `base` 后，`make dev` 三服务正常，统一入口 `HTTP 200`，前端 `check` 通过且 `988 passed`。详见 `../evidence/2026-08-11-local-runtime-relocation-repair.md`。
-- `uv run python -m pytest tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：A20-A39 连续编号、`reviewed` 状态、来源、结论、第五版决定和稀疏首问防过度修正合同共 `9 passed`；对应 Ruff 检查和格式检查通过。
+- `uv run python -m pytest tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：A20-A40 连续编号、`reviewed` 状态、来源、结论、第五版决定、稀疏首问纠正和营销领地专家锚点合同共 `10 passed`；对应 Ruff 检查和格式检查通过。
 - `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py tests/test_client_explicit_app_config.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 主体适配与记忆隔离、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `374 passed`。
 - `uv run python -m pytest tests/test_client.py tests/test_client_explicit_app_config.py -q`：DeerFlowClient 流式消息、终态工具参数补全、显式配置隔离和既有嵌入式客户端合同共 `174 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
@@ -96,8 +97,11 @@
 - 记录工具只对 Lead 开放，子 Agent 在默认配置、专业评测配置和运行时三层禁写；审批、风险确认和不可逆授权不能伪装成主体事实。持久库不可用时明确失败，不回退聊天记忆。
 - A38 当前只有离线合同证据，没有新的付费模型运行。它不能证明 Lead 会提出高信息问题，也不能把 M01 或宝妈案例改记为通过。
 - A39 已交叉核对指定 Codex 聊天、第四版最终台账、`5fbabe36`/`fc61bde6` 访谈链、`9a18fa1d` 编导研究快照、`1aa2242b`/`84ccb4dd` Writer Brain 生产化和 `58f4e0c9` 未提交救援快照。真实黄金礼品加工首问判定为 `business-rejected`；本轮只新增审计和防跑偏测试，不修改 Lead 运行时或重新发起模型调用。
+- 用户随后纠正 A39 的根因判断：黄金礼品案例首先考验“商品 -> 品类行为 -> 人类题材 -> 商业归因”的营销脑，而不是是否继续提问。A40 已追加式记录纠正，没有删除原失败证据。
+- A40 对照第四版方法、场景、两版黄金礼品 canary 和 Git 快照，确认旧版先正确识别礼品中心，后为满足最大远联与 `absent` 合同连送礼行为一起删除。新增 `marketing-territory-eval-cases.jsonl`；仅 `MT01` 为用户专家锚点，其余七例明确标记待人工复核。
+- A40 文档、产品合同、专家锚点和防回归测试先经历缺文件的预期失败，再通过；`tests/mcn_incubation_tests` 全集为 `77 passed`，Ruff 检查与格式检查通过，未修改 Lead 提示词、方法卡或运行时。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-主体信息回答的来源与版本链已完成离线实现，但真实稀疏首问证明 Lead 还不会稳定判断何时应暂停路线承诺。下一孵化纵切先建立“稀疏首问、信息充分、明确具体任务、拒绝补充信息、新事实修订”五类同组输出评测；它只评价最终业务行为，不固定提问或工具。评测冻结后才允许对薄合同做最小语义修正，再在右侧界面用同一项目、同一线程完成真实“提问 -> 用户回答 -> 记录 -> 再读取 -> 修订”闭环。禁止恢复第四版访谈控制器、关键词路由、字段硬门和 Writer Brain。未经用户再次确认不执行新的付费 run。
+下一孵化纵切改为营销脑验证。先由用户或 MCN 人工复核 `marketing-territory-eval-cases.jsonl` 的非黄金案例，并为黄金礼品冻结“产品展示过窄、送礼技巧过浅、泛家庭故事过远、可归因内容领地”四类判别样本。随后在同一模型和上下文预算下比较当前基线、单张内容领地方法卡、方法卡加来源知识、Lead 内部发散收敛四种候选；只有业务结果显著改善才接入运行时。暂不改核心提示词，不引入语义 Schema、评分门、固定故事流程或强制子 Agent。A39 的五类交互评测保留为后续回归，不再占用当前主线。未经用户再次确认不执行新的付费 run。

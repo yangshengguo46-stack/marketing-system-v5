@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a39_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a40_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 40)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 41)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -173,3 +173,42 @@ def test_sparse_query_audit_rejects_both_no_question_and_forced_interview_extrem
     assert "不强制 `tool_choice`" in audit
     assert "不把字段完整度作为继续条件" in audit
     assert "先冻结失败评测" in audit
+
+
+def test_marketing_brain_audit_preserves_category_action_and_commercial_return_path() -> None:
+    sparse_audit = (AUDIT_ROOT / "A39-v4-interview-overcorrection-and-sparse-query.md").read_text(encoding="utf-8")
+    brain_audit = (AUDIT_ROOT / "A40-marketing-brain-and-content-territory.md").read_text(encoding="utf-8")
+    product_contract = (DOC_ROOT / "current" / "PRODUCT_CONTRACT.md").read_text(encoding="utf-8")
+    corpus_path = DOC_ROOT / "evidence" / "marketing-territory-eval-cases.jsonl"
+    cases = [json.loads(line) for line in corpus_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    gold = next(case for case in cases if case["case_id"] == "MT01-gold-gift")
+
+    assert "次要失败" in sparse_audit
+    assert "A40" in sparse_audit
+    assert "具体商品" in brain_audit
+    assert "品类行为" in brain_audit
+    assert "最大可占领" in brain_audit
+    assert "最大语义距离" in brain_audit
+    assert "Lead Agent" in brain_audit
+    assert "不修改核心提示词" in brain_audit
+    assert "品类行为" in product_contract
+    assert "内容领地" in product_contract
+
+    assert len(cases) == 8
+    assert len({case["case_id"] for case in cases}) == len(cases)
+    assert {case["review_status"] for case in cases} == {"expert_anchor", "needs_expert_review"}
+    assert sum(case["review_status"] == "expert_anchor" for case in cases) == 1
+    assert {"person", "brand", "product", "service", "organization"}.issubset({case["subject_kind"] for case in cases})
+    for case in cases:
+        assert case["known_facts"]
+        assert case["observable_success"]
+        assert case["observable_failures"]
+        assert case["mutation"]
+
+    assert gold["review_status"] == "expert_anchor"
+    assert gold["expert_anchor"]["head_category"] == "礼品"
+    assert "黄金" in gold["expert_anchor"]["modifiers"]
+    assert "送礼" in gold["expert_anchor"]["category_actions"]
+    assert any("具体商品" in item for item in gold["observable_success"])
+    assert any("送礼" in item and "消失" in item for item in gold["observable_failures"])
+    assert any("归因" in item for item in gold["observable_success"])
