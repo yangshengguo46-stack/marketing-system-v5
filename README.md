@@ -23,6 +23,7 @@ DeerFlow (**D**eep **E**xploration and **E**fficient **R**esearch **Flow**) is a
 > Small paid-model preflights use `cd backend && uv run python scripts/run_incubation_preflight.py --execute`; inputs, outputs, hashes, usage, and failures are stored under the ignored local `.deer-flow/incubation-preflight/` ledger.
 > Capped architecture comparisons use `backend/scripts/run_incubation_micro_bakeoff.py` with explicit cases, candidates, and a paid-trial ceiling. They write sealed local evidence under `.deer-flow/incubation-micro-bakeoff/` and do not create another agent runtime.
 > Cross-domain content-territory experiments use `backend/scripts/run_marketing_territory_bakeoff.py`; it supports complete same-label contrast groups, rubric-hidden expert anchors, and paid-call-aware one- or two-pass candidates. The first 24 sealed trials were technically complete but business-rejected, so the experimental method, source mechanism, and two-pass contexts are not registered in production.
+> The next audited candidate treats upward abstraction, downward decomposition, horizontal time/space/event/character/conflict expansion, and cross-domain connection as optional content-world operators. They remain documentation and evaluation material only: they are not keyword-routed, not a mandatory workflow, not stored in a new vector database, and not yet registered in the Lead Agent or default method library.
 
 https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 

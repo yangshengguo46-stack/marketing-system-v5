@@ -168,6 +168,18 @@ sealed trials (26 paid calls) had no business winner; corrected two-pass output
 was only a partial gold-anchor hit and still invented subject assets and
 numbers. Count two-pass trials as two model calls, preserve failed evaluator
 iterations, and require fresh user approval before another paid run.
+Audit A43 and proposed ADR-011 govern the next content-world reasoning
+candidate. Treat upward abstraction, downward decomposition, horizontal
+expansion, and cross-domain connection as optional reasoning operators, not a
+fixed four-step workflow, industry-keyword route, or verified Charlie-course
+formula. The evaluation-only name `content-world-exploration-v1` must not enter
+`methods.py`, `knowledge.py`, `incubation_context`, or the Lead prompt before a
+cross-case winner exists. Do not add a vector database for this small method;
+the model may use parametric knowledge to suggest hypotheses, while historical,
+cultural, media, industry, and current claims require browser/MCP evidence.
+Charlie-derived narrative craft can elaborate a selected territory node but
+cannot choose the incubation strategy or restore the excluded cinematic-IP
+stack.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

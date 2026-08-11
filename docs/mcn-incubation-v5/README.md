@@ -8,12 +8,13 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A42`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构，以及真实营销领地对照审计。
+- `audits/A20-A43`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照，以及内容世界推演与查理课程来源边界审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
 - `decisions/ADR-009-single-authority-multi-agent-trial.md`：Lead 保留唯一孵化决策权、专业子 Agent 仅作只读工具的待验证决定。
 - `decisions/ADR-010-cross-domain-marketing-brain.md`：稳定商业连续性内核、可组合主体镜头和轻量领地候选的待验证决定。
+- `decisions/ADR-011-content-world-exploration.md`：四种可选内容世界扩展算子、即时外部核验和叙事加工分层的待验证决定。
 - `evidence/incubation-eval-cases.jsonl`：36 个版本化业务案例。
 - `evidence/2026-08-10-model-connectivity-incident.md`：首次真实模型预检的网络根因、对照证据和修复候选。
 - `evidence/2026-08-10-preflight-quality-review.md`：三案例真实输出、thinking 和 B01 四候选微型对照的业务评审。
@@ -26,6 +27,7 @@
 - `evidence/marketing-territory-eval-cases.jsonl`：商品到人类内容领地的判别集；当前只有黄金礼品为用户确认的专家锚点，其余案例待人工复核。
 - `evidence/marketing-territory-contrast-cases.jsonl`：水果店、果农和宝妈的六个同标签异事实对照；当前均待专家复核，不是行业答案库。
 - `evidence/2026-08-11-marketing-territory-bakeoff.md`：24 个密封试验、26 次模型调用的技术回执与人工业务拒绝；修正两遍法仅部分命中，不是生产胜者。
+- `evidence/2026-08-11-content-world-expert-corrections.md`：指定会话中从黄金礼品、水果、榴莲到跨维世界的九轮专家纠偏；它是方法评测锚点，不是真实业务成功案例。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。

@@ -221,6 +221,17 @@ These apply repo-wide; module guides own the module-specific detail.
   business-rejected trials; do not wire them into the Lead prompt or default
   method library. A two-pass evaluation consumes two paid model calls and still
   leaves the Lead as the sole decision authority.
+  Audit A43 and proposed ADR-011 separate content-world discovery, marketing
+  selection, and narrative craft. Upward abstraction, downward decomposition,
+  horizontal expansion, and cross-domain connection are optional candidate
+  operators, not a required four-step workflow or a Charlie-course quotation.
+  Do not route them by industry keywords, register the evaluation-only
+  `content-world-exploration-v1`, or add a vector database before cross-case
+  evaluation. Model parametric knowledge may suggest hypotheses; historical,
+  cultural, media, industry, and current claims need browser/MCP evidence before
+  promotion. Charlie-derived craft may shape a selected node into a story, but
+  it does not own incubation judgment and must not restore the cinematic-IP
+  product stack.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

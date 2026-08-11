@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a42_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a43_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 43)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 44)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -268,3 +268,50 @@ def test_marketing_territory_bakeoff_records_rejections_without_promoting_eval_c
     assert "territory-gold-anchor-two-pass-v2-20260811" in evidence
     assert "source-backed mechanism" in evidence
     assert "status: proposed" in decision
+
+
+def test_content_world_reasoning_preserves_corrections_and_stays_out_of_production() -> None:
+    audit = (AUDIT_ROOT / "A43-content-world-reasoning-and-charlie-course.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-content-world-expert-corrections.md").read_text(encoding="utf-8")
+    decision = (DOC_ROOT / "decisions" / "ADR-011-content-world-exploration.md").read_text(encoding="utf-8")
+    product_contract = (DOC_ROOT / "current" / "PRODUCT_CONTRACT.md").read_text(encoding="utf-8")
+
+    assert "019ff0ac-ebbf-7520-bae5-2b91f1c4da57" in evidence
+    assert "不是业务成功案例" in evidence
+    for marker in (
+        "向上抽象",
+        "向下拆分",
+        "横向展开",
+        "跨维连接",
+        "时间 × 空间 × 事件 × 人物 × 冲突",
+        "水果 -> 礼品",
+        "榴莲",
+    ):
+        assert marker in evidence
+
+    assert "27e48e10" in audit
+    assert "查理" in audit
+    assert "未找到可靠原始来源" in audit
+    assert "课程来源" in audit
+    assert "第五版综合" in audit
+    assert "不使用关键词决定" in audit
+    assert "不引入向量数据库" in audit
+    assert "参数知识" in audit
+    assert "外部证据" in audit
+
+    assert "status: proposed" in decision
+    assert "可选认知算子" in decision
+    assert "不是固定四步流程" in decision
+    assert "叙事加工" in decision
+    assert "营销取舍" in decision
+    assert "内容世界探索" in product_contract
+
+    production_files = (
+        PACKAGE_ROOT / "agent_contract.py",
+        PACKAGE_ROOT / "methods.py",
+        PACKAGE_ROOT / "knowledge.py",
+    )
+    for path in production_files:
+        text = path.read_text(encoding="utf-8")
+        assert "content-world-exploration-v1" not in text
+        assert "时间 × 空间 × 事件 × 人物 × 冲突" not in text
