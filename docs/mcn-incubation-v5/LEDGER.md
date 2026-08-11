@@ -53,3 +53,7 @@ Lead 是唯一面向用户作出孵化判断的总脑。核心提示只保留营
 - 使用 `DEER_FLOW_AUTH_DISABLED=0` 执行完整后端回归：`11067 passed / 74 skipped`，零失败。
 
 当前决策：豆包 Pro、豆包 Evolving 和 DeepSeek 退出主模型候选；GLM 作为本地阶段性默认模型，但仍未签署孵化内核验收。下一轮不再增加提示层，而是用更多未见业务案例检查这两项残差是偶发输出还是稳定失败。
+
+## 2026-08-12 Kimi K3 访问检查
+
+Kimi 官方已公布 API 型号 `kimi-k3`。当前 `VOLCENGINE_API_KEY` 在火山标准按量与 Coding Plan 两个模型目录中都只能看到 `kimi-k2-250711`、`kimi-k2-250905` 和 `kimi-k2-thinking-251104`；对 `kimi-k3` 的两个非生成型精确查询均返回 `404`。本轮未发起模型生成，未修改现役 GLM 配置。
