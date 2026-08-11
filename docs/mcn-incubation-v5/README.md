@@ -21,6 +21,7 @@
 - `evidence/2026-08-11-m01-memory-isolation-check.json`：v3/v4 评测 actor、thread、project 隔离及空 DeerMem 上下文的脱敏复核。
 - `evidence/2026-08-11-m01-multiagent-trial.md`：只读证据研究员首试的密封参数、未触发轨迹和 M01 业务拒绝结论。
 - `evidence/2026-08-11-subject-answer-provenance-offline.md`：当前运行用户回答、Owner 隔离、幂等、版本链和审批排除的离线合同证据。
+- `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
 

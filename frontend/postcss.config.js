@@ -1,5 +1,8 @@
 export default {
   plugins: {
-    "@tailwindcss/postcss": {},
+    "@tailwindcss/postcss": {
+      // Next workers can resolve the Git root as cwd; dependencies live here.
+      base: process.cwd(),
+    },
   },
 };

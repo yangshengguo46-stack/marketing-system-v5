@@ -8,6 +8,7 @@
 | --- | --- | --- | --- |
 | 独立产品边界 | tested | 新包、新文档和架构测试不依赖旧 `marketing-os` | 用户可见产品名称 |
 | DeerFlow 总控 | tested | 唯一 Lead Agent 已直接负责孵化；生产与评测逐字共用单一孵化合同；方法、项目事实和项目证据读取保持只读，只有主体回答记录器可按当前真实人类回执追加事实；旧“必须先澄清”硬门已移除 | 同一工具面的真实会话验收 |
+| 本地开发入口 | tested | 迁移遗留的 Python 绝对入口已在现目录重装；Tailwind PostCSS 解析基准固定在 `frontend/`；Gateway、Frontend、Nginx 启动且统一入口返回 `HTTP 200` | 真实付费连续会话仍未执行 |
 | 真实模型预检 | business-rejected | 自动 DNS 恢复；真实模型 1.44 秒返回 `OK`；三轮 M01/B01/G01 均 3/3 技术成功且完整性通过；B01 thinking 技术成功 | 方法卡 v2 与原生 thinking 均未解决无依据事实、资产、效果和指标 |
 | 孵化领域合同 | tested | 简报、事实、外部证据快照、决策、实验、结果、学习和案例对象 | 真实 Agent 输出 |
 | 项目事实与证据账本 | tested | 独立 V2 metadata、Owner 隔离、不可变追加、幂等、替代链、来源/哈希/范围/局限/过期合同，事实与证据两个只读工具，以及当前人类回答的受控事实写入 | 受控外部证据采集和当前决策投影 |
@@ -43,6 +44,7 @@
 - 新增能力的七文件聚焦回归为 `147 passed`；A38 连号、来源、产品合同与架构边界单测为 `8 passed`。
 - 本轮变更的 Ruff 检查与格式检查通过，`uv lock --check` 通过，`git diff --check` 无空白错误。
 - 本轮 tracked 新增行与 untracked 文件的凭证特征扫描未发现 API Key、Token 或私钥值；README 全文件扫描只命中既有示例占位符，完整本地输出仍只位于被忽略的 `.deer-flow/`。
+- 仓库迁移后的本地运行复核先暴露旧 `.venv` shebang 与 Tailwind 解析根两个故障；重装本地 Python 环境并测试先行固定 PostCSS `base` 后，`make dev` 三服务正常，统一入口 `HTTP 200`，前端 `check` 通过且 `988 passed`。详见 `../evidence/2026-08-11-local-runtime-relocation-repair.md`。
 - `uv run python -m pytest tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：A20-A36 连续编号、`reviewed` 状态、来源、结论和第五版决定合同共 `6 passed`；对应 Ruff 检查和格式检查通过。
 - `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py tests/test_client_explicit_app_config.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 主体适配与记忆隔离、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `374 passed`。
 - `uv run python -m pytest tests/test_client.py tests/test_client_explicit_app_config.py -q`：DeerFlowClient 流式消息、终态工具参数补全、显式配置隔离和既有嵌入式客户端合同共 `174 passed`。

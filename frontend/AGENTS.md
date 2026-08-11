@@ -167,6 +167,8 @@ NEXT_PUBLIC_LANGGRAPH_BASE_URL=http://localhost:8001/api
 
 Leave these unset for the standard `make dev` / Docker flow, where nginx serves the public `/api/langgraph/*` prefix and rewrites it to Gateway's native `/api/*` routes.
 
+Tailwind 4's PostCSS `base` is explicitly pinned to `process.cwd()` in `postcss.config.js`. Host-side pnpm commands must therefore continue to run from `frontend/`, as the root runner already guarantees. The Git root has no Node workspace or `node_modules`; removing this base can make Next workers resolve `@import "tailwindcss"` from the wrong directory and leave the first page request hanging.
+
 To reach a dev server on anything other than localhost — a LAN address, or a proxied hostname — list the host in `DEER_FLOW_DEV_ALLOWED_ORIGINS` (comma-separated; a full URL is reduced to its host). It feeds Next's `allowedDevOrigins`, which gates `/_next/*`, fonts, and HMR. Without it those requests get a 403 and the page renders server-side but never hydrates, so nothing on it — including the login form — responds. Development only; production builds ignore it.
 
 ## Resources
