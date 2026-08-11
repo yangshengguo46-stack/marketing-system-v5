@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a36_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a37_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 37)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 38)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -127,3 +127,17 @@ def test_internal_codename_does_not_freeze_the_public_product_name() -> None:
     assert "mcn-incubation-core" in contract
     assert "内部工作名" in contract
     assert "产品名称未定" in contract
+
+
+def test_multiagent_decision_keeps_one_incubation_authority() -> None:
+    decision = (DOC_ROOT / "decisions" / "ADR-009-single-authority-multi-agent-trial.md").read_text(encoding="utf-8")
+    product_contract = (DOC_ROOT / "current" / "PRODUCT_CONTRACT.md").read_text(encoding="utf-8")
+
+    assert "status: proposed" in decision
+    assert "Lead Agent" in decision
+    assert "agents-as-tools" in decision
+    assert "handoff" in decision
+    assert "不强制委派" in decision
+    assert "只读" in decision
+    assert "唯一孵化决策权" in product_contract
+    assert "子 Agent" in product_contract

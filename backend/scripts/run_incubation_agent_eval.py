@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import importlib
 import json
+import os
 import re
 import threading
 from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
@@ -44,6 +45,8 @@ from sqlalchemy.pool import NullPool
 from deerflow.agents.lead_agent.prompt import SYSTEM_PROMPT_TEMPLATE
 from deerflow.client import DeerFlowClient
 from deerflow.config.app_config import AppConfig, get_app_config
+from deerflow.config.subagents_config import CustomSubagentConfig, SubagentOverrideConfig
+from deerflow.config.token_budget_config import TokenBudgetConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CORPUS = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
@@ -58,10 +61,43 @@ _REQUIRED_INCUBATION_TOOLS = frozenset(
 _MIN_AGENT_GRAPH_STEPS = 40
 _MAX_AGENT_GRAPH_STEPS = 100
 _MAX_EVALUATION_MODEL_CALLS = 12
+_MIN_SUBAGENT_GRAPH_STEPS = 40
+_MAX_SUBAGENT_GRAPH_STEPS = 80
+_MIN_SUBAGENT_TOKENS = 1_000
+_MAX_SUBAGENT_TOKENS = 100_000
+_SUBAGENT_MODES = ("disabled", "evidence-review")
+INCUBATION_EVIDENCE_RESEARCHER_NAME = "incubation-evidence-researcher"
+_EVIDENCE_RESEARCHER_TIMEOUT_SECONDS = 120
+_EVIDENCE_RESEARCHER_DESCRIPTION = "Use only when an incubation judgment needs a bounded, read-only reconciliation of project truths, source evidence, and reviewed methods; returns an evidence brief, never a final strategy."
+_EVIDENCE_RESEARCHER_SYSTEM_PROMPT = """你是总控 Lead Agent 的只读孵化证据研究员，不是面向用户的第二个孵化顾问。
+
+你的职责是检查被委派项目的事实、外部证据和已复核方法，为 Lead 提供一份有界证据简报。最终孵化判断、与用户沟通、项目状态修改和不可逆操作都只属于 Lead Agent。
+
+权限边界：
+- 只能读取委派范围内的项目事实、项目证据和方法上下文；不得修改、创建或批准任何业务状态。
+- 不得向用户提问，不得再次委派，不得发布内容，不得操作浏览器、桌面、文件或外部账号。
+- 不得把常见做法、主体标签、方法卡、平台项目说明或相似案例写成当前项目已证实的结论。
+- 不得补造身份、表现力、资产、案例、效果、渠道、产能、价格、预算、频率或指标阈值。
+- 可以提出条件化选项，但不能替 Lead 选择定位、表现形式、内容路线、平台或变现方案。
+
+返回一份简洁证据简报，固定包含以下五个标题；允许某一项为空，但不能填造内容：
+1. 支持事实与证据：逐项写明事实或观察以及可用引用。
+2. 会反转判断的未知：只列会真正改变路线的最少主体信息。
+3. 条件化选项：写清每个选项成立所需条件，不作最终推荐。
+4. 无依据假设：指出 Lead 应避免沿用或新增的具体假设。
+5. 冲突与局限：记录证据冲突、过期、适用范围和仍不可判断之处。
+
+只返回这份研究简报，不写最终孵化判断。"""
 
 
-def build_agent_eval_app_config(host_config: AppConfig) -> AppConfig:
-    """Copy host configuration while removing general-memory confounds."""
+def build_agent_eval_app_config(
+    host_config: AppConfig,
+    *,
+    subagent_mode: str = "disabled",
+    max_subagent_steps: int | None = None,
+    max_subagent_tokens: int | None = None,
+) -> AppConfig:
+    """Copy host configuration and isolate the selected evaluation architecture."""
 
     evaluation_memory = host_config.memory.model_copy(
         update={
@@ -69,7 +105,51 @@ def build_agent_eval_app_config(host_config: AppConfig) -> AppConfig:
             "injection_enabled": False,
         }
     )
-    return host_config.model_copy(update={"memory": evaluation_memory})
+    if subagent_mode not in _SUBAGENT_MODES:
+        raise ValueError(f"unknown subagent mode: {subagent_mode}")
+    if subagent_mode == "disabled":
+        if max_subagent_steps is not None or max_subagent_tokens is not None:
+            raise ValueError("subagent caps require an enabled subagent mode")
+        return host_config.model_copy(update={"memory": evaluation_memory})
+    if max_subagent_steps is None or max_subagent_tokens is None:
+        raise ValueError("evidence-review mode requires explicit subagent step and token caps")
+    if not _MIN_SUBAGENT_GRAPH_STEPS <= max_subagent_steps <= _MAX_SUBAGENT_GRAPH_STEPS:
+        raise ValueError("subagent step cap is outside the evaluation range")
+    if not _MIN_SUBAGENT_TOKENS <= max_subagent_tokens <= _MAX_SUBAGENT_TOKENS:
+        raise ValueError("subagent token cap is outside the evaluation range")
+
+    specialist = CustomSubagentConfig(
+        description=_EVIDENCE_RESEARCHER_DESCRIPTION,
+        system_prompt=_EVIDENCE_RESEARCHER_SYSTEM_PROMPT,
+        tools=sorted(_REQUIRED_INCUBATION_TOOLS),
+        disallowed_tools=["task", "ask_clarification", "present_files"],
+        skills=[],
+        model="inherit",
+        max_turns=max_subagent_steps,
+        timeout_seconds=_EVIDENCE_RESEARCHER_TIMEOUT_SECONDS,
+    )
+    specialist_override = SubagentOverrideConfig(
+        token_budget=TokenBudgetConfig(
+            enabled=True,
+            max_tokens=max_subagent_tokens,
+            warn_threshold=0.7,
+            hard_stop_threshold=1.0,
+        )
+    )
+    evaluation_subagents = host_config.subagents.model_copy(
+        update={
+            "allowed_agents": [INCUBATION_EVIDENCE_RESEARCHER_NAME],
+            "max_total_per_run": 1,
+            "agents": {INCUBATION_EVIDENCE_RESEARCHER_NAME: specialist_override},
+            "custom_agents": {INCUBATION_EVIDENCE_RESEARCHER_NAME: specialist},
+        }
+    )
+    return host_config.model_copy(
+        update={
+            "memory": evaluation_memory,
+            "subagents": evaluation_subagents,
+        }
+    )
 
 
 class EvaluationModelCallBudget(AgentMiddleware):
@@ -356,13 +436,116 @@ def _select_cases(
     return tuple(by_id[case_id] for case_id in case_ids)
 
 
-def _tool_surface(client: DeerFlowClient, *, model_name: str) -> list[dict[str, Any]]:
-    tools = client._get_tools(model_name=model_name, subagent_enabled=False)
+def _tool_surface(
+    client: DeerFlowClient,
+    *,
+    model_name: str,
+    subagent_enabled: bool,
+) -> list[dict[str, Any]]:
+    tools = client._get_tools(
+        model_name=model_name,
+        subagent_enabled=subagent_enabled,
+    )
     schemas_by_name = {tool.name: convert_to_openai_tool(tool) for tool in tools}
-    missing = _REQUIRED_INCUBATION_TOOLS - schemas_by_name.keys()
+    required_tools = set(_REQUIRED_INCUBATION_TOOLS)
+    if subagent_enabled:
+        required_tools.add("task")
+    missing = required_tools - schemas_by_name.keys()
     if missing:
         raise RuntimeError(f"required incubation tools are missing: {sorted(missing)}")
     return [schemas_by_name[name] for name in sorted(schemas_by_name)]
+
+
+def _evaluation_system_contract_sha256(
+    *,
+    app_config: AppConfig,
+    subagent_mode: str,
+) -> str:
+    if subagent_mode == "disabled":
+        return sha256(SYSTEM_PROMPT_TEMPLATE.encode("utf-8")).hexdigest()
+    specialist = app_config.subagents.custom_agents[INCUBATION_EVIDENCE_RESEARCHER_NAME]
+    contract = {
+        "lead_system_prompt_template": SYSTEM_PROMPT_TEMPLATE,
+        "subagent_mode": subagent_mode,
+        "allowed_agents": app_config.subagents.allowed_agents,
+        "max_total_per_run": app_config.subagents.max_total_per_run,
+        "specialist": specialist.model_dump(mode="json"),
+        "specialist_override": app_config.subagents.agents[INCUBATION_EVIDENCE_RESEARCHER_NAME].model_dump(mode="json"),
+    }
+    encoded = json.dumps(
+        contract,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return sha256(encoded).hexdigest()
+
+
+def _write_experiment_manifest(
+    *,
+    run_dir: Path,
+    subagent_mode: str,
+    app_config: AppConfig,
+    max_agent_steps: int,
+    max_model_calls: int,
+    max_subagent_steps: int | None,
+    max_subagent_tokens: int | None,
+    created_at: datetime,
+) -> None:
+    subagent_enabled = subagent_mode != "disabled"
+    payload = {
+        "schema_version": "mcn-incubation-agent-eval-experiment-v1",
+        "subagent_mode": subagent_mode,
+        "decision_authority": "lead-agent",
+        "allowed_subagents": (list(app_config.subagents.allowed_agents or []) if subagent_enabled else []),
+        "max_total_delegations": (app_config.subagents.max_total_per_run if subagent_enabled else 0),
+        "max_agent_steps": max_agent_steps,
+        "max_lead_model_calls": max_model_calls,
+        "max_subagent_steps": max_subagent_steps,
+        "max_subagent_tokens": max_subagent_tokens,
+        "system_contract_sha256": _evaluation_system_contract_sha256(
+            app_config=app_config,
+            subagent_mode=subagent_mode,
+        ),
+        "created_at": created_at.isoformat(),
+    }
+    text = (
+        json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        + "\n"
+    )
+    manifest_path = run_dir / "experiment.json"
+    digest_path = run_dir / "experiment.json.sha256"
+    try:
+        with manifest_path.open("x", encoding="utf-8") as handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except FileExistsError:
+        if manifest_path.read_text(encoding="utf-8") != text:
+            raise RuntimeError("agent evaluation experiment manifest already differs") from None
+    digest_text = sha256(text.encode("utf-8")).hexdigest() + "\n"
+    try:
+        with digest_path.open("x", encoding="utf-8") as handle:
+            handle.write(digest_text)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except FileExistsError:
+        if digest_path.read_text(encoding="utf-8") != digest_text:
+            raise RuntimeError("agent evaluation experiment digest already differs") from None
+
+
+def _verify_experiment_manifest(run_dir: Path) -> None:
+    manifest_path = run_dir / "experiment.json"
+    digest_path = run_dir / "experiment.json.sha256"
+    expected = digest_path.read_text(encoding="utf-8").strip()
+    actual = sha256(manifest_path.read_bytes()).hexdigest()
+    if actual != expected:
+        raise RuntimeError("agent evaluation experiment manifest hash mismatch")
 
 
 @contextmanager
@@ -399,7 +582,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--include-mutations",
         action="store_true",
-        help="Create a separate project and trial with each case's new evidence",
+        help="Append each case's new evidence before a second turn on the same project and thread",
     )
     parser.add_argument(
         "--max-paid-trials",
@@ -417,7 +600,23 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--max-model-calls",
         type=int,
         required=True,
-        help="Hard model-call cap per trial for evaluation cost control",
+        help="Hard Lead Agent model-call cap per trial for evaluation cost control",
+    )
+    parser.add_argument(
+        "--subagent-mode",
+        choices=_SUBAGENT_MODES,
+        default="disabled",
+        help="Evaluation architecture variant; evidence-review enables one read-only specialist",
+    )
+    parser.add_argument(
+        "--max-subagent-steps",
+        type=int,
+        help="Required graph-step cap for the enabled evidence specialist",
+    )
+    parser.add_argument(
+        "--max-subagent-tokens",
+        type=int,
+        help="Required total-token backstop for the enabled evidence specialist",
     )
     parser.add_argument(
         "--model",
@@ -448,6 +647,16 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
     if not 1 <= args.max_model_calls <= _MAX_EVALUATION_MODEL_CALLS:
         parser.error(f"--max-model-calls must be between 1 and {_MAX_EVALUATION_MODEL_CALLS}")
+    if args.subagent_mode == "disabled":
+        if args.max_subagent_steps is not None or args.max_subagent_tokens is not None:
+            parser.error("subagent caps can only be used with an enabled --subagent-mode")
+    else:
+        if args.max_subagent_steps is None or args.max_subagent_tokens is None:
+            parser.error("evidence-review requires --max-subagent-steps and --max-subagent-tokens")
+        if not _MIN_SUBAGENT_GRAPH_STEPS <= args.max_subagent_steps <= _MAX_SUBAGENT_GRAPH_STEPS:
+            parser.error(f"--max-subagent-steps must be between {_MIN_SUBAGENT_GRAPH_STEPS} and {_MAX_SUBAGENT_GRAPH_STEPS}")
+        if not _MIN_SUBAGENT_TOKENS <= args.max_subagent_tokens <= _MAX_SUBAGENT_TOKENS:
+            parser.error(f"--max-subagent-tokens must be between {_MIN_SUBAGENT_TOKENS} and {_MAX_SUBAGENT_TOKENS}")
     return args
 
 
@@ -481,12 +690,18 @@ def main(argv: Sequence[str] | None = None) -> int:
     corpus_sha256 = sha256(args.corpus.read_bytes()).hexdigest()
     actor_id = f"agent-eval-owner-{_safe_component(run_id)}"
     actor_sha256 = sha256(actor_id.encode("utf-8")).hexdigest()
-    evaluation_app_config = build_agent_eval_app_config(get_app_config())
+    subagent_enabled = args.subagent_mode != "disabled"
+    evaluation_app_config = build_agent_eval_app_config(
+        get_app_config(),
+        subagent_mode=args.subagent_mode,
+        max_subagent_steps=args.max_subagent_steps,
+        max_subagent_tokens=args.max_subagent_tokens,
+    )
     client = DeerFlowClient(
         checkpointer=InMemorySaver(),
         model_name=args.model,
         thinking_enabled=args.thinking,
-        subagent_enabled=False,
+        subagent_enabled=subagent_enabled,
         plan_mode=False,
         available_skills=set(),
         middlewares=[EvaluationModelCallBudget(max_calls=args.max_model_calls)],
@@ -497,7 +712,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not configured_models:
         raise RuntimeError("no DeerFlow model is configured")
     model_id = args.model or str(configured_models[0]["name"])
-    tool_surface = _tool_surface(client, model_name=model_id)
+    tool_surface = _tool_surface(
+        client,
+        model_name=model_id,
+        subagent_enabled=subagent_enabled,
+    )
     trial_ids = tuple(trial.trial_id for trial in trials)
     preflight_ledger = PreflightLedger(args.output_root)
     trace_ledger = AgentTraceLedger(args.output_root)
@@ -505,7 +724,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         run_id=run_id,
         model_id=model_id,
         trial_ids=trial_ids,
-        system_prompt_sha256=sha256(SYSTEM_PROMPT_TEMPLATE.encode("utf-8")).hexdigest(),
+        system_prompt_sha256=_evaluation_system_contract_sha256(
+            app_config=evaluation_app_config,
+            subagent_mode=args.subagent_mode,
+        ),
         corpus_sha256=corpus_sha256,
         created_at=created_at,
     )
@@ -518,6 +740,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
     run_dir = args.output_root / run_id
+    _write_experiment_manifest(
+        run_dir=run_dir,
+        subagent_mode=args.subagent_mode,
+        app_config=evaluation_app_config,
+        max_agent_steps=args.max_agent_steps,
+        max_model_calls=args.max_model_calls,
+        max_subagent_steps=args.max_subagent_steps,
+        max_subagent_tokens=args.max_subagent_tokens,
+        created_at=created_at,
+    )
     database_path = run_dir / "agent-state.db"
     engine = create_async_engine(
         f"sqlite+aiosqlite:///{database_path}",
@@ -620,6 +852,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     trace_verification = trace_ledger.verify_run(run_id)
     if not trace_verification.complete:
         raise RuntimeError("agent evaluation trace ledger is incomplete")
+    _verify_experiment_manifest(run_dir)
     print(f"run={run_id} status={completion.status} succeeded={completion.succeeded} failed={completion.failed}")
     print(f"evidence={run_dir}")
     return 0 if completion.failed == 0 else 1

@@ -113,6 +113,30 @@ class TestSubagentsAppConfigDefaults:
         config = SubagentsAppConfig()
         assert config.agents == {}
 
+    def test_default_agent_allowlist_is_unrestricted(self):
+        config = SubagentsAppConfig()
+        assert config.allowed_agents is None
+
+    def test_explicit_agent_allowlist_can_disable_builtin_roles(self):
+        config = SubagentsAppConfig(
+            allowed_agents=["incubation-evidence-researcher"],
+            custom_agents={
+                "incubation-evidence-researcher": {
+                    "description": "Read-only incubation evidence review",
+                    "system_prompt": "Return evidence, not a final decision.",
+                }
+            },
+        )
+
+        assert config.allowed_agents == ["incubation-evidence-researcher"]
+
+    def test_empty_agent_allowlist_disables_every_role(self):
+        from deerflow.subagents.registry import get_available_subagent_names
+
+        config = SubagentsAppConfig(allowed_agents=[])
+
+        assert get_available_subagent_names(app_config=config) == []
+
     def test_custom_global_runtime_overrides(self):
         config = SubagentsAppConfig(timeout_seconds=1800, max_turns=120, max_total_per_run=8)
         assert config.timeout_seconds == 1800
@@ -611,6 +635,21 @@ class TestRegistryListSubagents:
         assert by_name["bash"].timeout_seconds == 60
         assert by_name["general-purpose"].max_turns == 200
         assert by_name["bash"].max_turns == 80
+
+    def test_available_names_respect_explicit_agent_allowlist(self):
+        from deerflow.subagents.registry import get_available_subagent_names
+
+        config = SubagentsAppConfig(
+            allowed_agents=["incubation-evidence-researcher"],
+            custom_agents={
+                "incubation-evidence-researcher": {
+                    "description": "Read-only incubation evidence review",
+                    "system_prompt": "Return evidence, not a final decision.",
+                }
+            },
+        )
+
+        assert get_available_subagent_names(app_config=config) == ["incubation-evidence-researcher"]
 
 
 # ---------------------------------------------------------------------------

@@ -1,16 +1,16 @@
 # MCN Incubation Core Guide
 
-Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A29 audits before changing this package.
+Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A37 audits before changing this package.
 
 ## Ownership
 
-- DeerFlow's Lead Agent owns incubation judgment and the final user-facing recommendation.
+- DeerFlow's Lead Agent owns the sole incubation decision authority and the final user-facing recommendation. A bounded read-only subagent may return advisory evidence through the existing `task` tool, but never owns project state or a recommendation.
 - This package owns data contracts, owner-scoped persistence, reviewed method cards, selective case recall, context comparison, and evaluation records.
 - Browser, audience, media, publication, and analytics capabilities are downstream tools. They may consume incubation decisions or return evidence, but cannot become decision-makers.
 
 ## Non-Negotiable Boundaries
 
-- Do not add another agent runtime, semantic middleware, model-output rewrite, forced tool route, or fixed incubation stage.
+- Do not add another agent runtime, handoff, semantic middleware, model-output rewrite, forced tool route, or fixed incubation stage. A37's evaluation-only evidence specialist must stay read-only, non-recursive, optional, and capped until ADR-009 is accepted.
 - `agent_contract.INCUBATION_AGENT_CONTRACT` is the one canonical production/evaluation incubation contract. Import it; never maintain a copied prompt block.
 - `IncubationRepository.list_current_truths` defines the model-visible truth heads: retain append-only history, but never return records superseded inside the same owner-scoped project.
 - The built-in `incubation_project_context` reader derives ownership from authenticated `ToolRuntime`; never add a model-supplied `owner_id` argument or silently substitute chat memory when durable storage is unavailable.

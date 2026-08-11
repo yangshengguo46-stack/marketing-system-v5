@@ -200,6 +200,13 @@ These apply repo-wide; module guides own the module-specific detail.
   focused evaluation, and treat fixed-stage marketing agencies or large
   persona/skill teams as architecture counterexamples rather than migration
   targets.
+  Audit A37 and proposed ADR-009 clarify that one incubation authority does
+  not require one model invocation: the Lead remains the only user-facing
+  decision-maker, while bounded read-only subagents may be evaluated through
+  DeerFlow's existing `task` tool as agents-as-tools. Do not use handoffs,
+  force delegation, give a subagent project writes, or register a department
+  of strategy personas. The first evidence specialist exists only in an
+  isolated capped evaluator until business outcomes justify adoption.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

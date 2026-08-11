@@ -1432,6 +1432,13 @@ sandbox:
 #   # `max_total_subagents`, clamped to the same 1-50 range.
 #   max_total_per_run: 6
 #
+#   # Optional execution allowlist for built-in and custom subagent names.
+#   # Omit/null to expose every available type; [] disables every type.
+#   # The task tool rechecks this list before executing a requested role.
+#   # allowed_agents:
+#   #   - general-purpose
+#   #   - analysis
+#
 #   # Per-run token ceiling for subagents (#3875 Phase 2). A backstop against a
 #   # subagent that burns tokens on trivial work. At the hard-stop threshold the
 #   # in-flight turn is capped (tool calls stripped, finish_reason forced to

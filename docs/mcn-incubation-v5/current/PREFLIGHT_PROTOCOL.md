@@ -1,6 +1,6 @@
 # 孵化真实模型预检协议
 
-更新日期：2026-08-10
+更新日期：2026-08-11
 
 ## 目的
 
@@ -96,3 +96,23 @@ uv run python scripts/run_incubation_agent_eval.py \
 `agent-eval-m01-v3` 以聊天交付、100 图超步和 6 次模型调用硬上限技术成功，但人工业务评审拒绝其无依据平台判断、素材资产、表现形式和数字阈值。它是失败证据，不是成功案例；修正方案完成离线测试前，不继续付费扩大案例。
 
 `agent-eval-m01-v4` 与带 initial/mutation 的 `agent-eval-m01-v5` 均技术成功、业务不通过。v5 还证明旧 mutation 编排使用独立项目和线程时不能评价真实修订能力；当前运行器已改为同项目同线程并在第二轮前追加证据。该修复只有离线回归，新的真实连续修订仍需单独确认付费调用。
+
+### 单一决策权多 Agent 候选
+
+`--subagent-mode evidence-review` 仅在评测配置副本中注册一个只读证据研究员，并要求额外显式提供 `--max-subagent-steps` 和 `--max-subagent-tokens`。总委派上限在该模式内固定为 1；Lead 仍受 `--max-model-calls` 独立限制。
+
+```bash
+cd backend
+uv run python scripts/run_incubation_agent_eval.py \
+  --case M01 \
+  --max-paid-trials 1 \
+  --max-agent-steps 100 \
+  --max-model-calls 6 \
+  --subagent-mode evidence-review \
+  --max-subagent-steps 50 \
+  --max-subagent-tokens 30000 \
+  --run-id agent-eval-NEW-UNIQUE-ID \
+  --execute
+```
+
+该模式不强制 `task`。`agent-eval-m01-multiagent-v1` 完成了 Lead 运行，但 Lead 直接读取三项孵化工具而没有委派，因此专业子 Agent 状态为 `untriggered`。试后发现当时嵌入式客户端没有把评测配置副本传播到工具运行时；该链路已经测试先行离线修复，但未再次付费验证。因此这次运行既不能证明子 Agent 可执行，也不能评价其质量。Lead 最终答案仍无依据生成产能、资产、价格、周期和阈值，业务评审不通过。详见 `../evidence/2026-08-11-m01-multiagent-trial.md`。

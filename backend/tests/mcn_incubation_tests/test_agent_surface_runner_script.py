@@ -86,6 +86,71 @@ def test_agent_eval_disables_general_memory_without_mutating_host_config() -> No
     assert host_config.memory.injection_enabled is True
 
 
+def test_agent_eval_evidence_research_mode_is_read_only_and_run_scoped() -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+            "memory": {
+                "enabled": True,
+                "injection_enabled": True,
+            },
+            "subagents": {
+                "max_total_per_run": 6,
+                "custom_agents": {
+                    "host-agent": {
+                        "description": "Host custom role",
+                        "system_prompt": "Host custom prompt",
+                    }
+                },
+            },
+        }
+    )
+
+    evaluation_config = module.build_agent_eval_app_config(
+        host_config,
+        subagent_mode="evidence-review",
+        max_subagent_steps=50,
+        max_subagent_tokens=30_000,
+    )
+
+    specialist_name = module.INCUBATION_EVIDENCE_RESEARCHER_NAME
+    specialist = evaluation_config.subagents.custom_agents[specialist_name]
+    specialist_budget = evaluation_config.subagents.agents[specialist_name].token_budget
+    assert evaluation_config.subagents.allowed_agents == [specialist_name]
+    assert evaluation_config.subagents.max_total_per_run == 1
+    assert set(evaluation_config.subagents.custom_agents) == {specialist_name}
+    assert specialist.tools == sorted(module._REQUIRED_INCUBATION_TOOLS)
+    assert specialist.disallowed_tools == ["task", "ask_clarification", "present_files"]
+    assert specialist.skills == []
+    assert specialist.max_turns == 50
+    assert specialist.timeout_seconds == 120
+    assert specialist_budget is not None
+    assert specialist_budget.enabled is True
+    assert specialist_budget.max_tokens == 30_000
+    assert "最终孵化判断" in specialist.system_prompt
+    assert "不得修改" in specialist.system_prompt
+    assert "支持事实与证据" in specialist.system_prompt
+    assert "会反转判断的未知" in specialist.system_prompt
+    assert "无依据假设" in specialist.system_prompt
+    from deerflow.agents.lead_agent.prompt import apply_prompt_template
+
+    rendered_prompt = apply_prompt_template(
+        subagent_enabled=True,
+        max_concurrent_subagents=1,
+        max_total_subagents=1,
+        app_config=evaluation_config,
+        available_skills=set(),
+    )
+    assert f"- **{specialist_name}**:" in rendered_prompt
+    assert "- **general-purpose**:" not in rendered_prompt
+    assert "- **bash**:" not in rendered_prompt
+    assert host_config.subagents.max_total_per_run == 6
+    assert set(host_config.subagents.custom_agents) == {"host-agent"}
+
+
 @pytest.mark.asyncio
 async def test_agent_eval_seeds_versioned_project_truth_and_evidence(tmp_path) -> None:
     module = _load_script()
@@ -225,6 +290,51 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
         module.enforce_paid_trial_cap(trial_count=2, max_paid_trials=1)
 
 
+def test_agent_eval_requires_separate_subagent_caps_for_evidence_mode() -> None:
+    module = _load_script()
+    common = [
+        "--case",
+        "M01",
+        "--max-paid-trials",
+        "1",
+        "--max-agent-steps",
+        "100",
+        "--max-model-calls",
+        "6",
+        "--subagent-mode",
+        "evidence-review",
+        "--execute",
+    ]
+
+    with pytest.raises(SystemExit):
+        module._parse_args(common)
+    with pytest.raises(SystemExit):
+        module._parse_args([*common, "--max-subagent-steps", "50"])
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                *common,
+                "--max-subagent-steps",
+                "8",
+                "--max-subagent-tokens",
+                "30000",
+            ]
+        )
+
+    args = module._parse_args(
+        [
+            *common,
+            "--max-subagent-steps",
+            "50",
+            "--max-subagent-tokens",
+            "30000",
+        ]
+    )
+    assert args.subagent_mode == "evidence-review"
+    assert args.max_subagent_steps == 50
+    assert args.max_subagent_tokens == 30_000
+
+
 def test_agent_eval_model_call_budget_is_hard_and_per_run() -> None:
     module = _load_script()
     budget = module.EvaluationModelCallBudget(max_calls=2)
@@ -245,7 +355,6 @@ def test_agent_eval_uses_existing_deerflow_lead_agent_runtime() -> None:
 
     assert "DeerFlowClient" in source
     assert "InMemorySaver" in source
-    assert "subagent_enabled=False" in source
     assert "create_chat_model" not in source
     assert "create_react_agent" not in source
     assert "create_agent(" not in source
@@ -370,3 +479,120 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     assert "incubation_project_context" in json.dumps(initial_trace)
     assert initial_trace["project_id"] == mutation_trace["project_id"]
     assert initial_trace["thread_id"] == mutation_trace["thread_id"]
+
+
+def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    module = _load_script()
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            assert kwargs["subagent_enabled"] is True
+            config = kwargs["app_config"]
+            assert config.subagents.allowed_agents == [module.INCUBATION_EVIDENCE_RESEARCHER_NAME]
+            assert config.subagents.max_total_per_run == 1
+
+        def list_models(self):
+            return {"models": [{"name": "fake-model"}]}
+
+        @staticmethod
+        def _get_tools(*, model_name, subagent_enabled):
+            assert model_name == "fake-model"
+            assert subagent_enabled is True
+            from deerflow.tools.builtins import (
+                incubation_context_tool,
+                incubation_project_context_tool,
+                incubation_project_evidence_tool,
+                task_tool,
+            )
+
+            return [
+                incubation_context_tool,
+                incubation_project_context_tool,
+                incubation_project_evidence_tool,
+                task_tool,
+            ]
+
+        def stream(self, prompt, *, thread_id, **kwargs):
+            assert kwargs["recursion_limit"] == 100
+            yield SimpleNamespace(
+                type="messages-tuple",
+                data={
+                    "type": "ai",
+                    "id": "delegate",
+                    "content": "",
+                    "tool_calls": [
+                        {
+                            "name": "task",
+                            "id": "task-1",
+                            "args": {
+                                "description": "review project evidence",
+                                "prompt": "Return a bounded evidence brief for the project.",
+                                "subagent_type": module.INCUBATION_EVIDENCE_RESEARCHER_NAME,
+                            },
+                        }
+                    ],
+                },
+            )
+            yield SimpleNamespace(
+                type="messages-tuple",
+                data={
+                    "type": "tool",
+                    "name": "task",
+                    "tool_call_id": "task-1",
+                    "content": "Task completed. Result: facts and unknowns only",
+                },
+            )
+            yield SimpleNamespace(
+                type="messages-tuple",
+                data={"type": "ai", "id": "final", "content": "Lead的条件化孵化判断"},
+            )
+            yield SimpleNamespace(
+                type="end",
+                data={"usage": {"input_tokens": 90, "output_tokens": 30, "total_tokens": 120}},
+            )
+
+    monkeypatch.setattr(module, "DeerFlowClient", FakeClient)
+    output_root = tmp_path / "multiagent-eval-output"
+
+    result = module.main(
+        [
+            "--case",
+            "M01",
+            "--max-paid-trials",
+            "1",
+            "--max-agent-steps",
+            "100",
+            "--max-model-calls",
+            "6",
+            "--subagent-mode",
+            "evidence-review",
+            "--max-subagent-steps",
+            "50",
+            "--max-subagent-tokens",
+            "30000",
+            "--model",
+            "fake-model",
+            "--run-id",
+            "offline-multiagent",
+            "--output-root",
+            str(output_root),
+            "--execute",
+        ]
+    )
+
+    assert result == 0
+    run_dir = output_root / "offline-multiagent"
+    experiment = json.loads((run_dir / "experiment.json").read_text(encoding="utf-8"))
+    assert experiment["subagent_mode"] == "evidence-review"
+    assert experiment["decision_authority"] == "lead-agent"
+    assert experiment["allowed_subagents"] == [module.INCUBATION_EVIDENCE_RESEARCHER_NAME]
+    assert experiment["max_total_delegations"] == 1
+    assert experiment["max_subagent_steps"] == 50
+    assert experiment["max_subagent_tokens"] == 30_000
+    assert (run_dir / "experiment.json.sha256").is_file()
+    trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
+    task_calls = [event for event in trace["events"] if event["tool_name"] == "task" and event["event_type"] == "tool_call"]
+    assert task_calls[0]["arguments"]["subagent_type"] == module.INCUBATION_EVIDENCE_RESEARCHER_NAME

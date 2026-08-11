@@ -305,6 +305,14 @@ async def task_tool(
                 status="failed",
                 error=LOCAL_BASH_SUBAGENT_DISABLED_MESSAGE,
             )
+    if subagent_type not in available_subagent_names:
+        available = ", ".join(available_subagent_names) or "none"
+        error = f"Subagent type '{subagent_type}' is not allowed in this run. Available: {available}"
+        return _task_result_command(
+            tool_call_id=tool_call_id,
+            status="failed",
+            error=error,
+        )
 
     # Build config overrides
     overrides: dict = {}

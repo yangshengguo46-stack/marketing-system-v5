@@ -856,7 +856,15 @@ class DeerFlowClient:
             config["callbacks"] = [*existing_callbacks, *tracing_callbacks]
 
         run_id = str(uuid.uuid4())
-        context: dict[str, Any] = {"thread_id": thread_id, "run_id": run_id}
+        # Keep embedded runs on the same per-run configuration snapshot as the
+        # Gateway worker. Delegated tools read this internal context value so a
+        # client-scoped custom subagent cannot silently fall back to ambient
+        # process configuration.
+        context: dict[str, Any] = {
+            "thread_id": thread_id,
+            "run_id": run_id,
+            "app_config": self._app_config,
+        }
         for key in _EMBEDDED_AUTHORIZATION_CONTEXT_KEYS:
             if key in kwargs:
                 context[key] = kwargs[key]

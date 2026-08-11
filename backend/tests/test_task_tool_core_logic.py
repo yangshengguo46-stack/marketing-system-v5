@@ -259,6 +259,37 @@ def test_task_tool_returns_error_for_unknown_subagent(monkeypatch):
     assert message.additional_kwargs[SUBAGENT_ERROR_KEY] == "Unknown subagent type 'general-purpose'. Available: general-purpose"
 
 
+def test_task_tool_rejects_configured_agent_outside_runtime_allowlist(monkeypatch):
+    runtime = _make_runtime()
+    runtime.context["app_config"] = object()
+    configured_agent = SimpleNamespace(name="general-purpose")
+    lookups = []
+    monkeypatch.setattr(
+        task_tool_module,
+        "get_available_subagent_names",
+        lambda *, app_config: ["incubation-evidence-researcher"],
+    )
+
+    def configured_lookup(name, *, app_config):
+        lookups.append((name, app_config))
+        return configured_agent
+
+    monkeypatch.setattr(task_tool_module, "get_subagent_config", configured_lookup)
+
+    result = _run_task_tool(
+        runtime=runtime,
+        description="review evidence",
+        prompt="inspect the project",
+        subagent_type="general-purpose",
+        tool_call_id="tc-disallowed",
+    )
+
+    message = _task_tool_message(result)
+    assert message.content == ("Task failed. Error: Subagent type 'general-purpose' is not allowed in this run. Available: incubation-evidence-researcher")
+    assert message.additional_kwargs[SUBAGENT_STATUS_KEY] == "failed"
+    assert lookups == [("general-purpose", runtime.context["app_config"])]
+
+
 def test_task_tool_forwards_the_run_extension_snapshot_to_executor(monkeypatch):
     """The lead run binds one immutable extension snapshot; delegation must
     carry that same object rather than re-reading the process singleton, which
@@ -481,6 +512,7 @@ def test_task_tool_rejects_non_mapping_attributes(monkeypatch):
 
 def test_task_tool_rejects_bash_subagent_when_host_bash_disabled(monkeypatch):
     monkeypatch.setattr(task_tool_module, "get_subagent_config", lambda _: _make_subagent_config())
+    monkeypatch.setattr(task_tool_module, "get_available_subagent_names", lambda: [])
     monkeypatch.setattr(task_tool_module, "is_host_bash_allowed", lambda: False)
 
     result = _run_task_tool(
