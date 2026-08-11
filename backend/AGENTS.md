@@ -100,6 +100,13 @@ Gateway startup bootstraps the independent
 incubation metadata before these readers are used. Read `docs/mcn-incubation-v5/`
 before changing either side. New
 fifth-version code must not import or depend on the historical `marketing-os` runtime.
+V4 capability reuse is governed by
+`docs/mcn-incubation-v5/audits/A30-v4-skills-and-account-decomposition-reuse.md`
+and its 97-entry matrix. Do not bulk-copy V4 Skills: incubation judgment belongs
+in sourced method cards, narrowly selected evidence/content craft can use the
+existing deferred Skill mechanism after focused evals, and account collection
+must be a thin current adapter that preserves identity, coverage, provenance,
+and partial-failure semantics without restoring the retired verdict compiler.
 
 Run a deliberately small real-model preflight with
 `uv run python scripts/run_incubation_preflight.py --execute`. The explicit

@@ -21,6 +21,7 @@
 | ADR-007 | proposed | 增强型单 Agent、四类知识和先 BM25 后 embedding 的候选已记录 | 生产验证与三个真实业务闭环 |
 | 账号拆解证据层 | contract-tested | A29、ADR-008 和 10 个跨六平台失败案例；MediaKit 直接能力与缺口已逐项确认 | 浏览器快照、媒体原子任务、聚合合同和一个授权真实账号闭环 |
 | ADR-008 | proposed | 账号拆解只作为下游证据，不成为第二 Agent；MediaKit 路由与授权边界已记录 | 真实账号验收和模式人工复核 |
+| 第四版 Skill 复用 | audit-tested | A30 与 97 项机器可读矩阵；28 已存在、13 蒸馏方法、17 按需候选、2 重写适配、37 排除 | 待采用 Skill 的触发、业务和越权评测 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
@@ -29,7 +30,7 @@
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `354 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `355 passed`。
 - `uv run python -m pytest tests/test_client.py -q`：DeerFlowClient 流式消息、终态工具参数补全和既有嵌入式客户端合同共 `171 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
 - 旧 `packages/marketing-os`、`app/marketing` 和 `tests/marketing_os_tests` 已清除；A01-A19 只作为历史审计档案保留，当前依赖图不含 `marketing-os`。
@@ -56,8 +57,9 @@
 - `agent-eval-m01-v2` 在 79.9 秒后耗尽 50 图超步；事实、证据、方法三项只读工具均成功，第四步因通用交付规则转向 `write_file`。修正改为聊天文本、100 图超步和独立 6 次模型调用硬上限，并让失败轨迹保留部分 usage 与终态完整工具参数。
 - `agent-eval-m01-v3` 技术成功：66.841 秒，输入 `43,527`、输出 `2,209`、合计 `45,736` Token；事实、证据、方法和聊天结果均完整密封。人工业务评审拒绝其无依据平台断言、未确认案例资产、表现形式和 500 播放/三评论/五私信等任意阈值，不能记为宝妈孵化通过。
 - A29 证明账号拆解可行但不属于单条 MediaKit 命令：MediaKit 直接承担元信息、ASR、OCR 和场景切分；浏览器负责账号观察；模式聚合必须带样本、反例、覆盖率和时间口径。10 条跨六平台合同用例已先行通过。
+- A30 完成第四版 97 个 Skill 逐项审计和账号拆解 Git 追溯：不重演曾一次挂载约 77 个 Skill 的失败；复用 V4 精确身份、作品归属、缺失值、部分失败、证据引用和脱敏用例，不迁移旧账号判决编译器、固定 12/3/full 上限或一万多行 MediaKit 包装层。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-先按 A29 用离线夹具实现账号快照、透明样本框、作品观察、媒体原子和模式/反例的最小合同，再接一个用户授权账号的只读浏览器快照。M01 不再自动付费重跑；必须先离线提出并验证“知识已读仍被违反”的修正假设，且不得增加固定孵化阶段、模型输出改写或营销分数硬门。
+先离线提出并验证 M01 “知识已读仍编造平台结论、内容资产和任意数字”的修正假设；不得增加固定孵化阶段、模型输出改写或营销分数硬门，未经用户确认不自动付费重跑。M01 修正通过后，按 A29/A30 用离线夹具实现账号快照、透明样本框、作品观察、媒体原子和模式/反例的最小合同，再接一个用户授权账号的只读浏览器快照。

@@ -170,5 +170,11 @@ These apply repo-wide; module guides own the module-specific detail.
   `packages/mcn-incubation-core` or the Lead Agent prompt. Do not add another
   agent runtime, semantic middleware, fixed incubation stage, or score gate.
   New fifth-version work must not depend on the legacy `marketing-os` package.
+  V4 Skills follow audit A30: strategy and platform judgment is distilled into
+  sourced method cards, evidence/content craft may be loaded one package at a
+  time only after focused evaluation, and retired orchestration or cinematic
+  systems are never bulk-copied. V4 account-decomposition code is a source of
+  identity, coverage, provenance, and failure-test semantics, not a runtime
+  dependency or an account-verdict compiler.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

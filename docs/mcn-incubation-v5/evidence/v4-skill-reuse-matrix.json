@@ -1,0 +1,601 @@
+{
+  "schema_version": "mcn-incubation-v5-v4-skill-reuse-v1",
+  "source": {
+    "repository": "/Users/yangyucheng/Documents/第四版营销系统",
+    "branch": "codex/ip-agent-v1-final",
+    "commit": "58f4e0c900a2dc589fe4a23bdebbe8e3211b67b7",
+    "sorted_skill_name_inventory_sha256": "9cbc411230a4383fab5bacf95840e717ce13b982457360132b880584742fcff8",
+    "worktree_note": "The repository has unrelated uncommitted rescue changes. All audited skill, evidence MCP, evidence binding, and cited test paths are clean against HEAD."
+  },
+  "decision_meanings": {
+    "already_present": "The fifth-version checkout already contains the capability or an official pinned replacement; do not copy the V4 package.",
+    "adopt_on_demand": "Candidate for selective Lead Agent loading after package review and a task-specific evaluation; never preload the whole set.",
+    "distill_method": "Extract reviewed, source-backed judgment lenses into the incubation method library; do not activate the V4 workflow package.",
+    "rewrite_adapter": "Preserve the capability contract and reliability lessons, but implement a thin fifth-version adapter against current tools and schemas.",
+    "exclude": "Do not migrate into the fifth-version product because it is a retired orchestrator, out-of-scope film system, duplicate runtime, or unsafe fit."
+  },
+  "skills": [
+    {
+      "name": "personal-ip-operator",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Retired V4 orchestration package; it would compete with the sole DeerFlow Lead Agent."
+    },
+    {
+      "name": "ip-strategy-director",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Its purified judgment lenses are valuable and are already partly represented by sourced V5 method cards; the full package must not become a second strategy owner."
+    },
+    {
+      "name": "design-ip-differentiation",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Keep proprietary-truth, reason-to-choose, sacrifice, and recognition lenses; discard retired V4 tool and persistence instructions."
+    },
+    {
+      "name": "ip-content-calibration",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Keep falsifiable prediction, measured retrospective, and revisable learning ideas without restoring a mandatory preflight ritual."
+    },
+    {
+      "name": "engineer-audience-response",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Attention, meaning, sharing, and action are useful observable lenses; they belong in compact methods rather than a scoring gate."
+    },
+    {
+      "name": "diagnose-douyin-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain evidence-first diagnosis lenses only; refresh all platform facts from current official or authenticated evidence before use."
+    },
+    {
+      "name": "diagnose-wechat-channels-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain stable observation lenses only; do not treat the quarantined platform package as current rules or an account verdict engine."
+    },
+    {
+      "name": "diagnose-wechat-official-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain stable observation lenses only; current platform mechanics require fresh evidence."
+    },
+    {
+      "name": "diagnose-xiaohongshu-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain note, search, trust, intent, and conversion lenses while revalidating all platform claims."
+    },
+    {
+      "name": "diagnose-x-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain stable account-observation lenses only; do not migrate static platform assertions."
+    },
+    {
+      "name": "diagnose-instagram-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain stable account-observation lenses only; live eligibility and analytics evidence must be refreshed."
+    },
+    {
+      "name": "diagnose-youtube-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain search, recommendation, satisfaction, and conversion lenses without importing a fixed diagnosis flow."
+    },
+    {
+      "name": "diagnose-tiktok-account",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Retain evidence-first For You, content, audience, and commercial lenses; refresh rules and never infer hidden weights."
+    },
+    {
+      "name": "build-cinematic-ip-system",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Explicitly excluded cinematic orchestration and a competing router."
+    },
+    {
+      "name": "query-cinematic-library",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The film research library is outside the fifth-version incubation scope."
+    },
+    {
+      "name": "run-cinematic-curriculum",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "A 96-module film curriculum is not a creator-incubation runtime capability."
+    },
+    {
+      "name": "ingest-ip-evidence",
+      "decision": "distill_method",
+      "role": "incubation_method",
+      "reason": "Its fact, testimony, inference, hypothesis, unknown, consent, and privacy distinctions belong in V5 evidence policy, not its old workflow."
+    },
+    {
+      "name": "calibrate-cinematic-ip",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Cinematic calibration duplicates the general outcome-learning loop and belongs to the excluded film system."
+    },
+    {
+      "name": "distill-screen-methods",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Film-method distillation is not needed for the current MCN incubation core."
+    },
+    {
+      "name": "engineer-desire-behavior",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful for a selected narrative or demonstration format; it may shape one piece of content but cannot choose the IP direction."
+    },
+    {
+      "name": "design-ip-series-bible",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The cinematic series-bible workflow is too broad for the first fifth-version content layer."
+    },
+    {
+      "name": "route-ip-genre-engine",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre routing must not become another mandatory route selector."
+    },
+    {
+      "name": "shape-ip-emotion",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The multi-level cinematic emotion system is outside the current minimum content capability."
+    },
+    {
+      "name": "write-ip-episode",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "A purified, shootable short-form episode writer is useful after incubation selects a narrative format."
+    },
+    {
+      "name": "direct-ip-visual-language",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The film-directing system is excluded; compact visual identity guidance can be researched separately if an eval exposes the need."
+    },
+    {
+      "name": "coach-ip-screen-performance",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful when the chosen expression depends on a real person's performance; it remains a downstream craft aid."
+    },
+    {
+      "name": "audit-ip-continuity",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The cinematic continuity audit belongs to the excluded film production system."
+    },
+    {
+      "name": "develop-theme-premise",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful for a recurring content premise after the Lead Agent has selected the positioning and expression route."
+    },
+    {
+      "name": "design-character-relations",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful only for a selected recurring-person or role-play format; it does not define the account strategy."
+    },
+    {
+      "name": "engineer-plot-information",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful for structuring one chosen narrative format, not as a default incubation step."
+    },
+    {
+      "name": "write-scenes-dialogue",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "The purified action-and-subtext method is useful for sketches, customer situations, and role-play after route selection."
+    },
+    {
+      "name": "direct-scene-blocking",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Detailed film blocking is outside the first marketing-content capability."
+    },
+    {
+      "name": "design-cinematography",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Cinematography workflow is part of the excluded film system."
+    },
+    {
+      "name": "design-light-color-texture",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Series-level cinematic look development is out of scope."
+    },
+    {
+      "name": "edit-screen-rhythm",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Film editing craft is deferred until a concrete short-form production evaluation needs it."
+    },
+    {
+      "name": "design-screen-sound",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Screen-sound design belongs to the excluded film production stack."
+    },
+    {
+      "name": "design-production-world",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Production-world design is outside the fifth-version incubation core."
+    },
+    {
+      "name": "previsualize-screen-direction",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Director previsualization is explicitly outside the product scope."
+    },
+    {
+      "name": "write-mystery-thriller",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film writing is not enabled without a validated content-route need."
+    },
+    {
+      "name": "write-comedy-satire",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Potentially useful later, but the full genre package is not part of the minimum evaluated content set."
+    },
+    {
+      "name": "write-crime-power-western",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film writing is outside scope."
+    },
+    {
+      "name": "write-romance-family-growth",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film writing is not a default MCN incubation capability."
+    },
+    {
+      "name": "write-scifi-fantasy-animation",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film and animation writing is outside scope."
+    },
+    {
+      "name": "write-horror",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film writing is outside scope."
+    },
+    {
+      "name": "write-action-adventure",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific film writing is outside scope."
+    },
+    {
+      "name": "write-war-history-epic",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Genre-specific epic writing is outside scope."
+    },
+    {
+      "name": "write-musical-performance",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Musical and performance-film writing is outside the current product scope."
+    },
+    {
+      "name": "write-documentary-reality",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Truth-preserving documentary practice is directly useful for real-person IP after the Lead Agent selects that expression form."
+    },
+    {
+      "name": "video-pattern-learning",
+      "decision": "adopt_on_demand",
+      "role": "evidence_interpretation",
+      "reason": "Its observation-function-interpretation-adaptation separation fits the V5 account-decomposition evidence layer and remains advisory."
+    },
+    {
+      "name": "video-method-distillation",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "The old Cangjie-derived automatic method compiler is unnecessary until source ingestion and held-out method evaluation are designed."
+    },
+    {
+      "name": "precise-video-description",
+      "decision": "adopt_on_demand",
+      "role": "evidence_interpretation",
+      "reason": "Objective temporal description can normalize media observations before any marketing interpretation."
+    },
+    {
+      "name": "reference-media-analysis",
+      "decision": "adopt_on_demand",
+      "role": "evidence_interpretation",
+      "reason": "Its extract-function-not-identity and provenance boundaries support safe benchmark adaptation."
+    },
+    {
+      "name": "asset-continuity-management",
+      "decision": "rewrite_adapter",
+      "role": "media_execution",
+      "reason": "Asset lineage, hashes, rights, and approvals belong in deterministic V5 media-job contracts rather than an instruction-only workflow."
+    },
+    {
+      "name": "captions-media-accessibility",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Accessible captions are a general short-form production capability, activated only when a content task needs them."
+    },
+    {
+      "name": "character-design-continuity",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Generated-character continuity belongs to the excluded cinematic stack."
+    },
+    {
+      "name": "cinematic-shot-direction",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Cinematic shot direction is explicitly out of scope."
+    },
+    {
+      "name": "color-grading-finishing",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Professional finishing is deferred to the later media execution layer and should not enter the incubation context."
+    },
+    {
+      "name": "dialogue-editing-adr",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "ADR and film dialogue post-production are outside the current product scope."
+    },
+    {
+      "name": "lighting-direction",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Detailed generated-media lighting direction is deferred and not part of incubation judgment."
+    },
+    {
+      "name": "music-supervision-scoring",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Music supervision and scoring belong to a later production layer."
+    },
+    {
+      "name": "performance-direction",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Performance coaching may serve a selected presenter or UGC format but cannot select that format itself."
+    },
+    {
+      "name": "production-design-direction",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Film and generated-media production design are deferred."
+    },
+    {
+      "name": "sound-design-foley",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Foley and screen sound production are outside the current scope."
+    },
+    {
+      "name": "visual-style-direction",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "A compact visual system can support brand or product expression after the incubation direction is chosen."
+    },
+    {
+      "name": "brand-launch-film-production",
+      "decision": "exclude",
+      "role": "retired_or_out_of_scope",
+      "reason": "Hero-film production is part of the explicitly excluded cinematic production system."
+    },
+    {
+      "name": "product-ad-production",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful after product positioning, proof, claims, and conversion path are decided; it is an execution skill, not the incubator."
+    },
+    {
+      "name": "ugc-ad-production",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful for a selected UGC advertising route with consent, disclosure, and claim controls."
+    },
+    {
+      "name": "talking-head-podcast-recut",
+      "decision": "adopt_on_demand",
+      "role": "content_craft",
+      "reason": "Useful when the chosen content engine has long-form source material; it does not choose the account strategy."
+    },
+    {
+      "name": "byted-mediakit-shared",
+      "decision": "already_present",
+      "role": "media_execution",
+      "reason": "V5 already links the official pinned MediaKit skill package; the V4 copy must not replace it."
+    },
+    {
+      "name": "byted-mediakit-editing",
+      "decision": "already_present",
+      "role": "media_execution",
+      "reason": "V5 already links the official pinned MediaKit editing package."
+    },
+    {
+      "name": "byted-mediakit-video",
+      "decision": "already_present",
+      "role": "media_execution",
+      "reason": "V5 already links the official pinned MediaKit video package and reads current schemas dynamically."
+    },
+    {
+      "name": "byted-mediakit-image",
+      "decision": "already_present",
+      "role": "media_execution",
+      "reason": "V5 already links the official pinned MediaKit image package."
+    },
+    {
+      "name": "byted-mediakit-audio",
+      "decision": "already_present",
+      "role": "media_execution",
+      "reason": "V5 already links the official pinned MediaKit audio package."
+    },
+    {
+      "name": "volcengine-stack",
+      "decision": "rewrite_adapter",
+      "role": "platform_execution",
+      "reason": "Provider routing must use current V5 capability discovery, approvals, and receipts rather than a V4 instruction router."
+    },
+    {
+      "name": "image-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "A current V5 package already exists; do not copy the V4 version."
+    },
+    {
+      "name": "video-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "A current V5 package already exists; do not copy the V4 version."
+    },
+    {
+      "name": "music-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is byte-identical to the audited V4 SKILL.md."
+    },
+    {
+      "name": "podcast-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "A current V5 package already exists; do not copy the V4 version."
+    },
+    {
+      "name": "academic-paper-review",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "systematic-literature-review",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "deep-research",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "V5 already contains a current research package; keep its version rather than copying V4."
+    },
+    {
+      "name": "github-deep-research",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "consulting-analysis",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "data-analysis",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "chart-visualization",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "code-documentation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "frontend-design",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "web-design-guidelines",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "vercel-deploy-claimable",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "claude-to-deerflow",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "newsletter-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "ppt-generation",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The V5 package is already present and byte-identical at SKILL.md."
+    },
+    {
+      "name": "bootstrap",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The generic DeerFlow bootstrap package already exists; it is not an incubation method and must not rewrite the V5 Lead Agent contract."
+    },
+    {
+      "name": "find-skills",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The generic V5 discovery package already exists."
+    },
+    {
+      "name": "skill-creator",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The generic V5 skill-authoring package already exists and remains outside autonomous production learning."
+    },
+    {
+      "name": "skill-reviewer",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The read-only V5 skill-review package already exists."
+    },
+    {
+      "name": "surprise-me",
+      "decision": "already_present",
+      "role": "existing_general_capability",
+      "reason": "The generic package already exists, but it is not part of the controlled incubation or skill-selection path."
+    }
+  ]
+}

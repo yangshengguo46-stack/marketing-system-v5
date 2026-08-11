@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import ast
+import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -10,16 +12,59 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a29_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a30_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 30)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 31)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
         assert re.search(r"^sources:$", text, re.MULTILINE), path
         assert "## 结论" in text, path
         assert "## 第五版决定" in text, path
+
+
+def test_v4_skill_reuse_matrix_is_complete_and_keeps_decision_authority_with_the_lead_agent() -> None:
+    matrix_path = DOC_ROOT / "evidence" / "v4-skill-reuse-matrix.json"
+    payload = json.loads(matrix_path.read_text(encoding="utf-8"))
+    entries = payload["skills"]
+    by_name = {entry["name"]: entry for entry in entries}
+
+    assert payload["schema_version"] == "mcn-incubation-v5-v4-skill-reuse-v1"
+    assert payload["source"]["commit"] == "58f4e0c900a2dc589fe4a23bdebbe8e3211b67b7"
+    assert payload["source"]["sorted_skill_name_inventory_sha256"] == "9cbc411230a4383fab5bacf95840e717ce13b982457360132b880584742fcff8"
+    inventory = "".join(f"{name}\n" for name in sorted(by_name))
+    assert hashlib.sha256(inventory.encode()).hexdigest() == payload["source"]["sorted_skill_name_inventory_sha256"]
+    assert len(entries) == 97
+    assert len(by_name) == 97
+    assert {entry["decision"] for entry in entries} == {
+        "already_present",
+        "adopt_on_demand",
+        "distill_method",
+        "rewrite_adapter",
+        "exclude",
+    }
+
+    assert by_name["personal-ip-operator"]["decision"] == "exclude"
+    assert by_name["build-cinematic-ip-system"]["decision"] == "exclude"
+    assert by_name["ip-strategy-director"]["decision"] == "distill_method"
+    assert by_name["video-pattern-learning"]["decision"] == "adopt_on_demand"
+    assert by_name["write-ip-episode"]["decision"] == "adopt_on_demand"
+    assert by_name["product-ad-production"]["decision"] == "adopt_on_demand"
+    assert by_name["diagnose-douyin-account"]["decision"] == "distill_method"
+    assert by_name["byted-mediakit-video"]["decision"] == "already_present"
+
+    for entry in entries:
+        assert entry["role"] in {
+            "existing_general_capability",
+            "incubation_method",
+            "evidence_interpretation",
+            "content_craft",
+            "media_execution",
+            "platform_execution",
+            "retired_or_out_of_scope",
+        }
+        assert entry["reason"].strip()
 
 
 def test_new_core_is_independent_from_legacy_marketing_and_agent_runtimes() -> None:
