@@ -9,7 +9,7 @@ from mcn_incubation.knowledge import (
     XHS_MCN_INTRO_SOURCE_ID,
     default_knowledge_catalog,
 )
-from mcn_incubation.methods import default_method_library
+from mcn_incubation.methods import default_method_cards, default_method_library
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 EVAL_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "method-retrieval-eval.jsonl"
@@ -41,3 +41,34 @@ def test_time_sensitive_platform_source_becomes_refresh_due_without_retiring_res
 
     assert catalog.get(XHS_MCN_INTRO_SOURCE_ID).is_refresh_due(as_of=as_of)
     assert not catalog.get(MCN_GATEKEEPING_RESEARCH_SOURCE_ID).is_refresh_due(as_of=as_of)
+
+
+def test_m01_observed_failures_are_source_backed_method_boundaries_not_prompt_gates() -> None:
+    cards = {card.method_card_id: card for card in default_method_cards()}
+    source_id = "V5:docs/mcn-incubation-v5/evidence/2026-08-11-m01-agent-evaluation.md"
+
+    expression_text = " ".join((*cards["expression-form-v1"].lens, *cards["expression-form-v1"].counterexamples))
+    content_text = " ".join((*cards["content-engine-v1"].lens, *cards["content-engine-v1"].counterexamples))
+    experiment_text = " ".join((*cards["experiment-design-v1"].lens, *cards["experiment-design-v1"].counterexamples))
+
+    assert "镜头意愿" in expression_text
+    assert "从业年限" in content_text and "可公开案例" in content_text
+    assert "曝光" in experiment_text and "付费需求" in experiment_text
+    assert all(
+        source_id in cards[card_id].source_refs
+        for card_id in (
+            "expression-form-v1",
+            "content-engine-v1",
+            "experiment-design-v1",
+        )
+    )
+    assert default_method_library().source_catalog.get(source_id).source_id == source_id
+
+
+def test_xiaohongshu_mcn_definition_cannot_support_platform_fit_or_audience_claims() -> None:
+    source = default_knowledge_catalog().get(XHS_MCN_INTRO_SOURCE_ID)
+    limitations = " ".join(source.limitations)
+
+    assert "audience composition" in limitations
+    assert "platform fit" in limitations
+    assert "platform priority" in limitations

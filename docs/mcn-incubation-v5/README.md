@@ -8,14 +8,14 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A30`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层及第四版 97-Skill 复用审计。
+- `audits/A20-A31`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用及 M01 检索修正审计。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
 - `evidence/incubation-eval-cases.jsonl`：36 个版本化业务案例。
 - `evidence/2026-08-10-model-connectivity-incident.md`：首次真实模型预检的网络根因、对照证据和修复候选。
 - `evidence/2026-08-10-preflight-quality-review.md`：三案例真实输出、thinking 和 B01 四候选微型对照的业务评审。
-- `evidence/method-retrieval-eval.jsonl`：12 条来源化孵化方法检索基线。
+- `evidence/method-retrieval-eval.jsonl`：13 条来源化孵化方法检索基线，包含真实 M01 宽查询回归。
 - `evidence/2026-08-11-m01-agent-evaluation.md`：完整 Agent 三次 M01 运行、评测器校准和业务拒绝证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。

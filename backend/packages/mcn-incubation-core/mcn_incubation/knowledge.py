@@ -11,6 +11,7 @@ V4_JUDGMENT_SOURCE_ID = "V4@58f4e0c9:skills/public/ip-strategy-director/referenc
 V4_PILOT_SOURCE_ID = "V4@58f4e0c9:skills/public/ip-strategy-director/references/benchmark-and-launch.md"
 V4_ASSET_SOURCE_ID = "V4@58f4e0c9:product/research/ip-agent/IP_AGENT_INFLUENCE_ASSET_FIRST_PRINCIPLES_RESEARCH.md"
 V5_PREFLIGHT_SOURCE_ID = "V5:docs/mcn-incubation-v5/evidence/2026-08-10-preflight-quality-review.md"
+V5_M01_AGENT_EVAL_SOURCE_ID = "V5:docs/mcn-incubation-v5/evidence/2026-08-11-m01-agent-evaluation.md"
 XHS_MCN_INTRO_SOURCE_ID = "url:https://creator.xiaohongshu.com/mcn-introduce?source=agora"
 MCN_GATEKEEPING_RESEARCH_SOURCE_ID = "doi:10.1080/1369118X.2024.2396614"
 TIKTOK_COMMERCIAL_QUALITY_SOURCE_ID = "url:https://ads.tiktok.com/help/article/about-tiktoks-content-quality-standard-for-creator-commercial-content"
@@ -224,6 +225,20 @@ def default_knowledge_sources() -> tuple[KnowledgeSource, ...]:
             limitations=("This is a small model- and case-specific evaluation; it identifies regressions but does not establish a universal causal law.",),
         ),
         KnowledgeSource(
+            source_id=V5_M01_AGENT_EVAL_SOURCE_ID,
+            kind=KnowledgeSourceKind.INTERNAL_EVIDENCE,
+            title="M01 full-agent evaluation review",
+            locator="docs/mcn-incubation-v5/evidence/2026-08-11-m01-agent-evaluation.md",
+            publisher="Fifth-version local evaluation ledger",
+            retrieved_at=_LOCAL_REVIEWED_AT,
+            reviewed_at=_LOCAL_REVIEWED_AT,
+            supported_claims=(
+                "The evaluated Lead Agent read project facts and relevant methods but still inferred platform fit, camera willingness, publishable cases, sustainable supply, and arbitrary metric thresholds.",
+                "The evaluated answer treated exposure, interaction, and inquiry thresholds as interchangeable proof that paid demand existed.",
+            ),
+            limitations=("This is one sealed case and model run; it is regression evidence, not a general causal law or a successful incubation outcome.",),
+        ),
+        KnowledgeSource(
             source_id=XHS_MCN_INTRO_SOURCE_ID,
             kind=KnowledgeSourceKind.OFFICIAL_PLATFORM,
             title="Xiaohongshu MCN introduction",
@@ -232,7 +247,7 @@ def default_knowledge_sources() -> tuple[KnowledgeSource, ...]:
             retrieved_at=_WEB_REVIEWED_AT,
             reviewed_at=_WEB_REVIEWED_AT,
             supported_claims=("Xiaohongshu describes official MCN cooperation around creator incubation, content incubation, and content monetization.",),
-            limitations=("This is a platform program description, not evidence that a particular incubation strategy works; features and terms can change.",),
+            limitations=("This is a platform program description. It does not establish audience composition, category demand, platform fit, or platform priority for a project, and features and terms can change.",),
             applicable_platforms=("xiaohongshu",),
             applicable_regions=("CN",),
             refresh_after=_PLATFORM_REFRESH_AFTER,
@@ -288,6 +303,7 @@ __all__ = [
     "V4_PILOT_SOURCE_ID",
     "V4_STRATEGY_SOURCE_ID",
     "V5_PREFLIGHT_SOURCE_ID",
+    "V5_M01_AGENT_EVAL_SOURCE_ID",
     "XHS_MCN_INTRO_SOURCE_ID",
     "default_knowledge_catalog",
     "default_knowledge_sources",

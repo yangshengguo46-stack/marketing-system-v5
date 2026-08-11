@@ -12,6 +12,7 @@ sources:
   - V4@58f4e0c9:skills/public/ip-strategy-director/references/benchmark-and-launch.md
   - V4@58f4e0c9:product/research/ip-agent/IP_AGENT_INFLUENCE_ASSET_FIRST_PRINCIPLES_RESEARCH.md
   - V5:docs/mcn-incubation-v5/evidence/2026-08-10-preflight-quality-review.md
+  - V5:docs/mcn-incubation-v5/evidence/2026-08-11-m01-agent-evaluation.md
   - backend/packages/mcn-incubation-core/mcn_incubation/knowledge.py
   - docs/mcn-incubation-v5/evidence/method-retrieval-eval.jsonl
 ---
@@ -62,7 +63,7 @@ sources:
 
 ## 检索评测
 
-`method-retrieval-eval.jsonl` 首批包含 12 条确定性检索题，覆盖宝妈起号、隐私表达、产品证据、对标、受众、内容发动机、转化、实验、品牌定位、产品变现、TikTok 商业内容和无关问题。
+`method-retrieval-eval.jsonl` 当前包含 13 条确定性检索题，覆盖宝妈起号、隐私表达、产品证据、对标、受众、内容发动机、转化、实验、品牌定位、产品变现、TikTok 商业内容和无关问题；第 13 条直接复现 M01 完整 Agent 的宽查询，防止通用词挤掉定位、表现形式、变现和转化。
 
 评测只要求所需能力进入有限结果，不要求唯一卡片、固定顺序或 Agent 必须调用。无关量子问题必须返回空结果，任何题都不得倾倒完整方法库。该评测证明关键词检索的当前最小基线，不证明最终孵化质量，也不排除以后经评测增加 BM25、embedding 或 reranking。
 

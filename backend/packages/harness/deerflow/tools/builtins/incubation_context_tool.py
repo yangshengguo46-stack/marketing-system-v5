@@ -11,12 +11,14 @@ _METHOD_LIBRARY = default_method_library()
 
 
 @tool(parse_docstring=True)
-def incubation_context(query: str, limit: int = 4) -> dict:
+def incubation_context(query: str, limit: int = 6) -> dict:
     """Retrieve reviewed incubation methods relevant to the current judgment.
 
     The returned cards are advisory context. They do not select a strategy,
     enforce a workflow, mutate project truth, or replace the lead agent's
-    judgment. Use the user's concrete business question as the query.
+    judgment. Use the user's concrete business question as the query. One
+    broad judgment can retrieve up to six complementary lenses; do not repeat
+    the same query with punctuation-only changes.
 
     Args:
         query: Current incubation question, including the material goal or unknown.

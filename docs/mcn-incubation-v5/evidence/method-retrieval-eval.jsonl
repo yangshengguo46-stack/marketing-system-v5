@@ -10,3 +10,4 @@
 {"case_id":"KR10","query":"这款产品由谁付费、怎么赚钱，价格和交付能力怎么判断","expected_capabilities":["monetization"],"limit":4}
 {"case_id":"KR11","query":"TikTok 商业内容中的产品实测怎样形成可信背书","expected_capabilities":["trust_proof"],"limit":4}
 {"case_id":"KR12","query":"量子纠缠公式推导","expected_capabilities":[],"limit":4}
+{"case_id":"KR13","query":"十年会计经验宝妈，不展示孩子，每周8小时，验证小生意财务咨询需求，起号策略内容形式变现闭环最小实验","expected_capabilities":["positioning","expression_form","content_engine","monetization","conversion","experiment_design"],"limit":6}

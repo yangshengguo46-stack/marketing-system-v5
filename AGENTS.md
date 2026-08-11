@@ -176,5 +176,10 @@ These apply repo-wide; module guides own the module-specific detail.
   systems are never bulk-copied. V4 account-decomposition code is a source of
   identity, coverage, provenance, and failure-test semantics, not a runtime
   dependency or an account-verdict compiler.
+  Audit A31 pins the first full-agent failure repair: broad method queries may
+  retrieve up to six bounded lenses, platform-program sources cannot establish
+  project fit or priority, and observed failures become sourced method
+  counterexamples rather than new prompt gates. M01 remains business-rejected
+  until a separately approved paid retest succeeds.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

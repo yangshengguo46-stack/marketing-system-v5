@@ -107,6 +107,12 @@ in sourced method cards, narrowly selected evidence/content craft can use the
 existing deferred Skill mechanism after focused evals, and account collection
 must be a thin current adapter that preserves identity, coverage, provenance,
 and partial-failure semantics without restoring the retired verdict compiler.
+Audit A31 governs the M01 grounding repair: `incubation_context` keeps a bounded
+six-card default for broad judgments, source limitations must prevent platform
+program descriptions from becoming project-fit claims, and observed model
+failures are distilled into sourced method counterexamples. Do not replace this
+with semantic output middleware or claim M01 passed before an approved paid
+retest.
 
 Run a deliberately small real-model preflight with
 `uv run python scripts/run_incubation_preflight.py --execute`. The explicit
