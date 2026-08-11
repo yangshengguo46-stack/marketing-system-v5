@@ -653,6 +653,20 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
         assert leaked_case_answer not in template
 
 
+def test_incubation_core_does_not_default_an_expression_form_when_subject_capability_is_unknown():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "不把任何具体表现形式设为默认方案" in template
+    assert "仍先完成当前营销判断，不因此启动问卷" in template
+
+
+def test_incubation_core_keeps_unconfirmed_resources_conditional():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    assert "只能标为条件或未知" in template
+    assert "不得写成主体已经拥有的优势" in template
+
+
 def _make_minimal_app_config():
     return SimpleNamespace(
         sandbox=SimpleNamespace(mounts=[]),
