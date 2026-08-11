@@ -1,6 +1,6 @@
 # 第五版孵化内核执行台账
 
-更新日期：2026-08-11
+更新日期：2026-08-12
 
 ## 当前状态
 
@@ -32,15 +32,17 @@
 | 跨行业营销脑架构 | domain-tested / paid-bakeoff-business-rejected / ADR-proposed | A41/A42、ADR-010；轻量 `TerritoryCandidate` 已在现有决策 JSON 内向后兼容落地且无生产入口；24 个密封试验、26 次调用比较结构化/自然回答、方法、来源机制和两遍法，技术 24/24 成功 | 没有候选通过业务验收；两遍法仅在黄金锚点部分命中且仍补造事实，六个对照均待 MCN 人工复核，方法/机制/两遍上下文不接生产 |
 | 内容世界扩展算子 | paid-candidate-business-rejected / method-interference-confirmed / partial-method-signal / ADR-proposed | A43-A49、ADR-011；A49 用户蒸馏组 61,246 Token，水果扩成“水果生存史”等七个候选，但黄金仍未抓住礼品/送礼主语，两个回答把方法复写成答题表格并补造主张；两例都是方法来源案例，不能证明泛化 | 先离线增加无案例语义替换检查与具体主张核验边界；候选不接生产；品牌、产品、个人和服务留出锚点待复核 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
-| 单一决策权多 Agent 候选 | offline-repaired / paid-untriggered / business-rejected | A37、ADR-009；运行级角色白名单、只读证据研究员、独立步数/Token/超时/总委派上限和密封实验 manifest 已离线通过；试后发现并测试先行修复嵌入式配置传播缺口 | Lead 实际未调用 `task`，因此真实运行既未证明专业子 Agent 可执行，也未测其质量；最终答案仍补造路线与数字，ADR 保持 proposed |
+| 单一决策权多 Agent 候选 | candidate-b-paid-business-rejected / candidate-a-paid-untriggered / ADR-proposed | A37/A50、ADR-009；候选 A 单证据员真实运行 `task=0`；候选 B 的五个专家真实 `5/5` 完成，171.606 秒、43,667 Token，不再默认露脸口播并分开内容与形式 | Lead 仍补造 19.9/99 元、每周 16 单、周更 2 条和制作耗时，业务拒绝；没有匹配单 Lead 对照，不能归因局部改善；生产配置与生产 Lead 未改 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。A47-A48 已确认宽泛方法上下文是重要干扰源；A49 进一步证明用户纠偏可以蒸馏出局部方法信号，但当前卡片仍被模型当成答题表格，且没有解决黄金的语义主语。黄金与水果都是方法来源案例，真正泛化还要靠留出集。第五版因此不会把宽泛 MCN 方法当作孵化根脑，也不会删除受众、内容生产、商业化、达人、发布和复盘等 MCN 下游能力。下一步先离线完善语义主语反事实检查和非表格式综合，不直接替换生产。
+A50 已完成用户提出的五板块团队可用性试验。DeerFlow 的多 Agent 执行链路真实可用，分工也改善了默认口播和内容/形式混淆；但五个同源模型上下文没有自动产生市场证据，Lead 仍用任意价格、单量、频率和制作耗时填满方案。因此当前五角色合同加 Lead 综合方式为 `business-rejected`，不能接生产。A49 的用户思维蒸馏也停止继续实现。下一步不能靠继续加角色、投票器或长提示词修补；若用户决定继续研究，先设计同业务提示的单 Lead 匹配对照和可追责的板块依据传递，再决定是否值得付费。
 
 ## 本轮验证
 
+- `uv run pytest tests/mcn_incubation_tests -q`：A20-A50、五板块角色/权限/轨迹协议和孵化领域回归共 `121 passed`。
+- `uv run pytest tests/test_client.py tests/test_task_tool_core_logic.py tests/test_lead_agent_prompt.py tests/test_subagent_checkpointer_isolation.py -q`：显式并发配置、委派权限、Lead 角色面和子图隔离共 `254 passed`。
 - `uv run python -m pytest tests/mcn_incubation_tests/test_agent_surface_runner_script.py tests/mcn_incubation_tests/test_user_reasoning_evaluation.py tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：评测工具替换、蒸馏卡防答案泄漏、A47-A49 证据与架构边界聚焦回归通过。
 - `uv run python -m pytest tests/mcn_incubation_tests -q`：孵化包领域、持久化、评测、A20-A49 文档连号、蒸馏候选隔离和架构边界共 `109 passed`。
 - `uv run python -m pytest tests/test_lead_agent_prompt.py tests/test_lead_agent_model_resolution.py -q`：生产 Lead 提示词组装与模型解析回归共 `79 passed`；A48 消融开关未修改生产 Lead 提示词、方法卡或正常工具注册。
@@ -117,8 +119,9 @@
 - A47 在用户授权后完成生产 Lead 内容世界试验。v1 因线程 ID 超过 64 字符在模型前失败，两例均 `0 events`、`0 Token`；测试先行修复后，v2 技术 `2/2` 完成、合计 64,005 Token，但两例均 `business-rejected`。黄金仍以黄金为语义中心并补造客户订单；水果只有生命周期局部正信号，仍退回三方向和经营角色模板。两例都读取 `content-engine-v1` 与 `incubation-model-v1`，方法压力只记为待验证推断，本轮未追加付费复测。
 - A48 按用户确认增加评测专用 `method_context_mode=disabled`，只允许纯内容世界、无子 Agent 的消融。相同模型、系统合同和语料下技术 `2/2` 完成、合计 59,967 Token，比基线少 4,038；黄金首次明确“黄金只是载体”，水果首次进入历史、流行文化和未来世界。两例仍因三模板、虚构供给、任意数字和未经核验的健康/价格主张被拒绝，因此方法上下文是重要干扰源但不是唯一病根，生产方法系统未改。
 - A49 按用户确认增加评测专用 `distilled_user_reasoning`：1,056 字符的无案例方法卡在同模型、合同和语料下技术 `2/2` 完成、合计 61,246 Token。水果扩成七个内容世界，黄金仍未命中礼品/送礼主语；两例都复写方法答题表格并补造事实，人工业务拒绝，候选没有进入生产。
+- A50 按用户新方向停止继续实现思维蒸馏，测试先行新增评测专用 `incubation-team`。五个角色只读项目事实与证据、无 Skill、无写入、无提问和无递归；Lead 只看到这五个角色。轨迹协议要求五个唯一调用、结果配对、`task_completed` 终态和当前项目绑定，并显式传入并密封并发 `3`、总委派 `5` 与每人预算。真实 M01 `5/5` 角色完成，43,667 Token、171.606 秒；局部改善非默认口播与内容/形式分离，但任意价格、单量、频率和工时导致人工业务拒绝。独立安全审阅否决了对自由文本子简报的有限正则快照，继续只存哈希和长度，没有重复付费运行。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-下一孵化纵切先离线修正用户思维蒸馏候选：用不含行业答案的反事实替换问题判断哪个词是材料、工艺、渠道或真正客户任务；方法只作为内部检查镜头，最终回答按内容世界组织，不复写固定栏目；每条外部事实单独标记待核验。随后加入个人、品牌、单品和服务留出案例，与宽泛方法、无方法和当前蒸馏卡离线比较。当前不全局删除生产方法或 MCN 下游能力，不引入行业关键词路由、固定阶段、评分门、向量数据库、输出改写或强制子 Agent。未经用户再次确认不执行新的付费 run。
+下一孵化纵切不自动发起新模型调用。先让用户复核 A50 的真实答案与业务拒绝原因；若继续，多 Agent 因果问题要用同业务提示的单 Lead 匹配对照，协作问题要让每个板块依据可读、可追责并明确哪些是事实、假设和反证。当前不改生产配置，不引入更多角色、固定阶段、投票、评分门、共享向量记忆或第二运行时。

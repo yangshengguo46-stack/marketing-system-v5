@@ -203,6 +203,352 @@ def test_agent_eval_evidence_research_mode_is_read_only_and_run_scoped() -> None
     assert set(host_config.subagents.custom_agents) == {"host-agent"}
 
 
+def test_agent_eval_incubation_team_has_five_read_only_board_specialists() -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+            "memory": {
+                "enabled": True,
+                "injection_enabled": True,
+            },
+            "subagents": {
+                "max_total_per_run": 6,
+                "custom_agents": {
+                    "host-agent": {
+                        "description": "Host custom role",
+                        "system_prompt": "Host custom prompt",
+                    }
+                },
+            },
+        }
+    )
+
+    evaluation_config = module.build_agent_eval_app_config(
+        host_config,
+        subagent_mode="incubation-team",
+        max_subagent_steps=40,
+        max_subagent_tokens=12_000,
+    )
+
+    expected_names = (
+        "incubation-positioning-specialist",
+        "incubation-audience-specialist",
+        "incubation-content-specialist",
+        "incubation-expression-specialist",
+        "incubation-commercial-specialist",
+    )
+    assert module.INCUBATION_TEAM_SPECIALIST_NAMES == expected_names
+    assert evaluation_config.subagents.allowed_agents == list(expected_names)
+    assert evaluation_config.subagents.max_total_per_run == len(expected_names)
+    assert set(evaluation_config.subagents.custom_agents) == set(expected_names)
+    assert set(evaluation_config.subagents.agents) == set(expected_names)
+
+    for name in expected_names:
+        specialist = evaluation_config.subagents.custom_agents[name]
+        budget = evaluation_config.subagents.agents[name].token_budget
+        assert specialist.tools == [
+            "incubation_project_context",
+            "incubation_project_evidence",
+        ]
+        assert specialist.disallowed_tools == [
+            "task",
+            "ask_clarification",
+            "present_files",
+            "incubation_record_subject_answer",
+        ]
+        assert specialist.skills == []
+        assert specialist.model == "inherit"
+        assert specialist.max_turns == 40
+        assert specialist.timeout_seconds == 120
+        assert budget is not None
+        assert budget.enabled is True
+        assert budget.max_tokens == 12_000
+        assert "不直接面向用户" in specialist.system_prompt
+        assert "最终整合" in specialist.system_prompt
+        assert "最强反证" in specialist.system_prompt
+        assert "不得补造" in specialist.system_prompt
+
+    positioning = evaluation_config.subagents.custom_agents[expected_names[0]].system_prompt
+    audience = evaluation_config.subagents.custom_agents[expected_names[1]].system_prompt
+    content = evaluation_config.subagents.custom_agents[expected_names[2]].system_prompt
+    expression = evaluation_config.subagents.custom_agents[expected_names[3]].system_prompt
+    commercial = evaluation_config.subagents.custom_agents[expected_names[4]].system_prompt
+    assert "IP 主体" in positioning and "赛道" in positioning and "人设" in positioning
+    assert "受众假设" in audience and "实际受众证据" in audience
+    assert "内容世界" in content and "历史故事" in content
+    assert "表现形式" in expression and "口播" in expression and "默认" in expression
+    assert "历史故事不是表现形式" in expression
+    assert "变现" in commercial and "信任" in commercial and "成交" in commercial
+
+    from deerflow.agents.lead_agent.prompt import apply_prompt_template
+
+    rendered_prompt = apply_prompt_template(
+        subagent_enabled=True,
+        max_concurrent_subagents=3,
+        max_total_subagents=5,
+        app_config=evaluation_config,
+        available_skills=set(),
+    )
+    for name in expected_names:
+        assert f"- **{name}**:" in rendered_prompt
+    assert "- **general-purpose**:" not in rendered_prompt
+    assert "- **bash**:" not in rendered_prompt
+
+    assert host_config.subagents.max_total_per_run == 6
+    assert set(host_config.subagents.custom_agents) == {"host-agent"}
+
+
+def test_agent_eval_team_prompt_requires_parallel_board_work_and_lead_synthesis() -> None:
+    module = _load_script()
+    trial = module.prepare_trial_specs(
+        cases=(_case("M01"),),
+        include_mutations=False,
+        run_id="incubation-team-offline",
+    )[0]
+
+    prompt = module.build_agent_eval_prompt(
+        trial,
+        subagent_mode="incubation-team",
+    )
+
+    for name in module.INCUBATION_TEAM_SPECIALIST_NAMES:
+        assert name in prompt
+    assert "每个专业子 Agent 恰好委派一次" in prompt
+    assert "独立板块尽量并行" in prompt
+    assert "不是线性阶段" in prompt
+    assert "分批只是技术并发限制" in prompt
+    assert "先委派三个" not in prompt
+    assert "不得投票" in prompt
+    assert "不得打分" in prompt
+    assert "不得直接拼接" in prompt
+    assert "内容与表现形式是两个不同板块" in prompt
+    assert "只有 Lead" in prompt
+    assert _case("M01").facts[0] not in prompt
+
+
+def test_agent_eval_team_system_hash_covers_every_specialist_and_concurrency(monkeypatch) -> None:
+    module = _load_script()
+    host_config = AppConfig.model_validate(
+        {
+            "sandbox": {
+                "use": "deerflow.sandbox.local:LocalSandboxProvider",
+            },
+        }
+    )
+    evaluation_config = module.build_agent_eval_app_config(
+        host_config,
+        subagent_mode="incubation-team",
+        max_subagent_steps=40,
+        max_subagent_tokens=12_000,
+    )
+    baseline_hash = module._evaluation_system_contract_sha256(
+        app_config=evaluation_config,
+        subagent_mode="incubation-team",
+    )
+
+    specialist_name = module.INCUBATION_TEAM_SPECIALIST_NAMES[2]
+    changed_agents = dict(evaluation_config.subagents.custom_agents)
+    changed_agents[specialist_name] = changed_agents[specialist_name].model_copy(update={"system_prompt": changed_agents[specialist_name].system_prompt + "\nchanged"})
+    changed_subagents = evaluation_config.subagents.model_copy(update={"custom_agents": changed_agents})
+    changed_config = evaluation_config.model_copy(update={"subagents": changed_subagents})
+    assert (
+        module._evaluation_system_contract_sha256(
+            app_config=changed_config,
+            subagent_mode="incubation-team",
+        )
+        != baseline_hash
+    )
+
+    monkeypatch.setattr(module, "_INCUBATION_TEAM_MAX_CONCURRENT", 2)
+    assert (
+        module._evaluation_system_contract_sha256(
+            app_config=evaluation_config,
+            subagent_mode="incubation-team",
+        )
+        != baseline_hash
+    )
+
+
+def test_agent_eval_team_protocol_accepts_each_role_once_in_any_order() -> None:
+    module = _load_script()
+    shuffled_names = (
+        module.INCUBATION_TEAM_SPECIALIST_NAMES[3],
+        module.INCUBATION_TEAM_SPECIALIST_NAMES[1],
+        module.INCUBATION_TEAM_SPECIALIST_NAMES[4],
+        module.INCUBATION_TEAM_SPECIALIST_NAMES[0],
+        module.INCUBATION_TEAM_SPECIALIST_NAMES[2],
+    )
+    events = []
+    for index, name in enumerate(shuffled_names, start=1):
+        events.append(
+            SimpleNamespace(
+                event_type="tool_call",
+                tool_name="task",
+                tool_call_id=f"task-{index}",
+                arguments={
+                    "subagent_type": name,
+                    "prompt": "Read project project-001 and return a board brief.",
+                },
+            )
+        )
+        events.append(
+            SimpleNamespace(
+                event_type="tool_result",
+                tool_name="task",
+                tool_call_id=f"task-{index}",
+                arguments=None,
+            )
+        )
+
+    task_statuses = {f"task-{index}": "completed" for index in range(1, 6)}
+    assert (
+        module._incubation_team_protocol_error(
+            events,
+            task_statuses=task_statuses,
+            project_id="project-001",
+        )
+        is None
+    )
+
+
+def test_agent_eval_team_protocol_requires_completed_tasks_and_project_binding() -> None:
+    module = _load_script()
+    events = []
+    for index, name in enumerate(module.INCUBATION_TEAM_SPECIALIST_NAMES, start=1):
+        events.extend(
+            (
+                SimpleNamespace(
+                    event_type="tool_call",
+                    tool_name="task",
+                    tool_call_id=f"task-{index}",
+                    arguments={
+                        "subagent_type": name,
+                        "prompt": "Read project project-001 and return a board brief.",
+                    },
+                ),
+                SimpleNamespace(
+                    event_type="tool_result",
+                    tool_name="task",
+                    tool_call_id=f"task-{index}",
+                    arguments=None,
+                ),
+            )
+        )
+
+    statuses = {f"task-{index}": "completed" for index in range(1, 6)}
+    statuses["task-3"] = "failed"
+    assert (
+        module._incubation_team_protocol_error(
+            events,
+            task_statuses=statuses,
+            project_id="project-001",
+        )
+        == "incubation_team_task_not_completed"
+    )
+
+    statuses["task-3"] = "completed"
+    events[0].arguments["prompt"] = "Return a positioning brief."
+    assert (
+        module._incubation_team_protocol_error(
+            events,
+            task_statuses=statuses,
+            project_id="project-001",
+        )
+        == "incubation_team_unbound_project"
+    )
+
+
+@pytest.mark.parametrize(
+    ("names", "include_results", "expected_error"),
+    [
+        (
+            (
+                "incubation-positioning-specialist",
+                "incubation-audience-specialist",
+                "incubation-content-specialist",
+                "incubation-expression-specialist",
+            ),
+            True,
+            "incubation_team_missing_specialist",
+        ),
+        (
+            (
+                "incubation-positioning-specialist",
+                "incubation-positioning-specialist",
+                "incubation-content-specialist",
+                "incubation-expression-specialist",
+                "incubation-commercial-specialist",
+            ),
+            True,
+            "incubation_team_duplicate_specialist",
+        ),
+        (
+            (
+                "incubation-positioning-specialist",
+                "incubation-audience-specialist",
+                "incubation-content-specialist",
+                "incubation-expression-specialist",
+                "unknown-specialist",
+            ),
+            True,
+            "incubation_team_unknown_specialist",
+        ),
+        (
+            (
+                "incubation-positioning-specialist",
+                "incubation-audience-specialist",
+                "incubation-content-specialist",
+                "incubation-expression-specialist",
+                "incubation-commercial-specialist",
+            ),
+            False,
+            "incubation_team_missing_task_result",
+        ),
+    ],
+)
+def test_agent_eval_team_protocol_rejects_invalid_delegation_traces(
+    names,
+    include_results,
+    expected_error,
+) -> None:
+    module = _load_script()
+    events = []
+    for index, name in enumerate(names, start=1):
+        events.append(
+            SimpleNamespace(
+                event_type="tool_call",
+                tool_name="task",
+                tool_call_id=f"task-{index}",
+                arguments={
+                    "subagent_type": name,
+                    "prompt": "Read project project-001 and return a board brief.",
+                },
+            )
+        )
+        if include_results:
+            events.append(
+                SimpleNamespace(
+                    event_type="tool_result",
+                    tool_name="task",
+                    tool_call_id=f"task-{index}",
+                    arguments=None,
+                )
+            )
+
+    task_statuses = {f"task-{index}": "completed" for index in range(1, len(names) + 1)}
+    assert (
+        module._incubation_team_protocol_error(
+            events,
+            task_statuses=task_statuses,
+            project_id="project-001",
+        )
+        == expected_error
+    )
+
+
 @pytest.mark.asyncio
 async def test_agent_eval_seeds_versioned_project_truth_and_evidence(tmp_path) -> None:
     module = _load_script()
@@ -446,6 +792,42 @@ def test_agent_eval_requires_separate_subagent_caps_for_evidence_mode() -> None:
     assert args.subagent_mode == "evidence-review"
     assert args.max_subagent_steps == 50
     assert args.max_subagent_tokens == 30_000
+
+
+def test_agent_eval_accepts_only_capped_full_incubation_team_trials() -> None:
+    module = _load_script()
+    common = [
+        "--case",
+        "M01",
+        "--max-paid-trials",
+        "1",
+        "--max-agent-steps",
+        "100",
+        "--max-model-calls",
+        "8",
+        "--subagent-mode",
+        "incubation-team",
+        "--max-subagent-steps",
+        "40",
+        "--max-subagent-tokens",
+        "12000",
+        "--execute",
+    ]
+
+    args = module._parse_args(common)
+    assert args.subagent_mode == "incubation-team"
+    assert args.task_mode == "full_incubation"
+
+    with pytest.raises(SystemExit):
+        module._parse_args([*common, "--task-mode", "content_world"])
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                *common,
+                "--method-context-mode",
+                "distilled_user_reasoning",
+            ]
+        )
 
 
 def test_agent_eval_model_call_budget_is_hard_and_per_run() -> None:
@@ -805,3 +1187,148 @@ def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
     trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
     task_calls = [event for event in trace["events"] if event["tool_name"] == "task" and event["event_type"] == "tool_call"]
     assert task_calls[0]["arguments"]["subagent_type"] == module.INCUBATION_EVIDENCE_RESEARCHER_NAME
+
+
+def test_agent_eval_main_seals_five_specialist_team_and_exact_delegations(
+    monkeypatch,
+    tmp_path,
+) -> None:
+    module = _load_script()
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            assert kwargs["subagent_enabled"] is True
+            config = kwargs["app_config"]
+            assert config.subagents.allowed_agents == list(module.INCUBATION_TEAM_SPECIALIST_NAMES)
+            assert config.subagents.max_total_per_run == 5
+
+        def list_models(self):
+            return {"models": [{"name": "fake-model"}]}
+
+        @staticmethod
+        def _get_tools(*, model_name, subagent_enabled):
+            assert model_name == "fake-model"
+            assert subagent_enabled is True
+            from deerflow.tools.builtins import (
+                incubation_context_tool,
+                incubation_project_context_tool,
+                incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
+                task_tool,
+            )
+
+            return [
+                incubation_context_tool,
+                incubation_project_context_tool,
+                incubation_project_evidence_tool,
+                incubation_record_subject_answer_tool,
+                task_tool,
+            ]
+
+        def stream(self, prompt, *, thread_id, **kwargs):
+            assert "每个专业子 Agent 恰好委派一次" in prompt
+            assert kwargs["recursion_limit"] == 100
+            assert kwargs["max_concurrent_subagents"] == 3
+            assert kwargs["max_total_subagents"] == 5
+            names = module.INCUBATION_TEAM_SPECIALIST_NAMES
+            batches = ((names[1], names[0], names[2]), (names[4], names[3]))
+            call_number = 0
+            for batch_number, names in enumerate(batches, start=1):
+                calls = []
+                for name in names:
+                    call_number += 1
+                    calls.append(
+                        {
+                            "name": "task",
+                            "id": f"task-{call_number}",
+                            "args": {
+                                "description": f"review {name} board",
+                                "prompt": "Read project agent-eval-offline-incubation-team-M01 and return only your bounded board brief.",
+                                "subagent_type": name,
+                            },
+                        }
+                    )
+                yield SimpleNamespace(
+                    type="messages-tuple",
+                    data={
+                        "type": "ai",
+                        "id": f"delegate-{batch_number}",
+                        "content": "",
+                        "tool_calls": calls,
+                    },
+                )
+                for call in calls:
+                    yield SimpleNamespace(
+                        type="custom",
+                        data={
+                            "type": "task_completed",
+                            "task_id": call["id"],
+                            "usage": {
+                                "input_tokens": 20,
+                                "output_tokens": 10,
+                                "total_tokens": 30,
+                            },
+                        },
+                    )
+                    yield SimpleNamespace(
+                        type="messages-tuple",
+                        data={
+                            "type": "tool",
+                            "name": "task",
+                            "tool_call_id": call["id"],
+                            "content": f"Task completed. Result: {call['args']['subagent_type']} brief",
+                        },
+                    )
+            yield SimpleNamespace(
+                type="messages-tuple",
+                data={"type": "ai", "id": "final", "content": "Lead综合后的单一孵化判断"},
+            )
+            yield SimpleNamespace(
+                type="end",
+                data={"usage": {"input_tokens": 300, "output_tokens": 100, "total_tokens": 400}},
+            )
+
+    monkeypatch.setattr(module, "DeerFlowClient", FakeClient)
+    output_root = tmp_path / "incubation-team-output"
+
+    result = module.main(
+        [
+            "--case",
+            "M01",
+            "--max-paid-trials",
+            "1",
+            "--max-agent-steps",
+            "100",
+            "--max-model-calls",
+            "8",
+            "--subagent-mode",
+            "incubation-team",
+            "--max-subagent-steps",
+            "40",
+            "--max-subagent-tokens",
+            "12000",
+            "--model",
+            "fake-model",
+            "--run-id",
+            "offline-incubation-team",
+            "--output-root",
+            str(output_root),
+            "--execute",
+        ]
+    )
+
+    assert result == 0
+    run_dir = output_root / "offline-incubation-team"
+    experiment = json.loads((run_dir / "experiment.json").read_text(encoding="utf-8"))
+    assert experiment["subagent_mode"] == "incubation-team"
+    assert experiment["decision_authority"] == "lead-agent"
+    assert experiment["allowed_subagents"] == list(module.INCUBATION_TEAM_SPECIALIST_NAMES)
+    assert experiment["max_total_delegations"] == 5
+    assert experiment["max_concurrent_subagents"] == 3
+    assert experiment["max_subagent_steps"] == 40
+    assert experiment["max_subagent_tokens"] == 12_000
+    trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
+    task_calls = [event for event in trace["events"] if event["tool_name"] == "task" and event["event_type"] == "tool_call"]
+    called_roles = [event["arguments"]["subagent_type"] for event in task_calls]
+    assert set(called_roles) == set(module.INCUBATION_TEAM_SPECIALIST_NAMES)
+    assert len(called_roles) == len(set(called_roles)) == 5

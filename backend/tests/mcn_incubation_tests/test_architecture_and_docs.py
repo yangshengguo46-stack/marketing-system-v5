@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a49_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a50_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 50)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 51)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -141,6 +141,27 @@ def test_multiagent_decision_keeps_one_incubation_authority() -> None:
     assert "只读" in decision
     assert "唯一孵化决策权" in product_contract
     assert "子 Agent" in product_contract
+
+
+def test_five_board_incubation_team_is_an_isolated_collaboration_trial() -> None:
+    audit = (AUDIT_ROOT / "A50-five-board-incubation-team-trial.md").read_text(encoding="utf-8")
+    runner = (REPO_ROOT / "backend" / "scripts" / "run_incubation_agent_eval.py").read_text(encoding="utf-8")
+    production_config = (REPO_ROOT / "config.example.yaml").read_text(encoding="utf-8")
+
+    for board in ("定位", "受众", "内容世界", "表现形式", "商业化"):
+        assert board in audit
+    assert "incubation-team" in audit
+    assert "评测专用" in audit
+    assert "不是线性阶段" in audit
+    assert "不得投票" in audit
+    assert "唯一最终决策权" in audit
+    assert "历史故事不是表现形式" in audit
+    assert "口播不得作为默认答案" in audit
+    assert "incubation-team" in runner
+    assert "incubation-positioning-specialist" in runner
+    assert "incubation-commercial-specialist" in runner
+    assert "incubation-positioning-specialist" not in production_config
+    assert "incubation-commercial-specialist" not in production_config
 
 
 def test_subject_answers_are_versioned_facts_without_becoming_an_intake_gate() -> None:

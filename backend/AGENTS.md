@@ -227,6 +227,21 @@ content-world-only, and subagent-incompatible. It is not a production winner
 and does not justify deleting downstream MCN capabilities. The next repair is
 offline semantic-head counterfactual testing, claim-level verification marking,
 and held-out personal/brand/product/service cases before any new paid run.
+Audit A50 records the user's replacement hypothesis: an evaluation-only
+five-board incubation team for positioning, audience, content world, expression
+form, and commercialization. It reuses DeerFlow `task`; every specialist is
+read-only, non-recursive, memoryless, and unable to address the user, while the
+Lead keeps the only final decision. A50 supersedes A37's no-department and
+no-forced-route rule only inside the sealed `incubation-team` evaluator: exact
+role coverage is an experimental manipulation, not a production workflow.
+Production config and the production Lead remain unchanged. A technically
+successful trial must prove five unique completed tasks, current-project
+binding, result pairing, and explicit concurrency and budget limits. Do not
+claim multi-agent causality without a matched single-Lead control carrying the
+same business guidance. The first M01 team run completed all five roles with
+43,667 tokens and improved talking-head/content-form concerns, but invented
+prices, volume, cadence, and production time; it is business-rejected and must
+not enter production.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

@@ -250,6 +250,9 @@ class DeerFlowClient:
             "is_plan_mode": overrides.get("plan_mode", self._plan_mode),
             "subagent_enabled": overrides.get("subagent_enabled", self._subagent_enabled),
         }
+        for key in ("max_concurrent_subagents", "max_total_subagents"):
+            if key in overrides:
+                configurable[key] = overrides[key]
         return RunnableConfig(
             configurable=configurable,
             recursion_limit=overrides.get("recursion_limit", 100),
@@ -806,9 +809,11 @@ class DeerFlowClient:
             message: User message text.
             thread_id: Thread ID for conversation context. Auto-generated if None.
             **kwargs: Override client defaults (model_name, thinking_enabled,
-                plan_mode, subagent_enabled, recursion_limit). Trusted embedded
-                callers may also provide user_id, user_role, oauth_provider,
-                oauth_id, channel_user_id, is_internal, and authz_attributes.
+                plan_mode, subagent_enabled, recursion_limit,
+                max_concurrent_subagents, max_total_subagents). Trusted
+                embedded callers may also provide user_id, user_role,
+                oauth_provider, oauth_id, channel_user_id, is_internal, and
+                authz_attributes.
 
         Yields:
             StreamEvent with one of:

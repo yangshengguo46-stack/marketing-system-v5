@@ -1437,6 +1437,17 @@ class TestEnsureAgent:
 
         assert mock_create_agent.call_count == 2
 
+    def test_runnable_config_accepts_explicit_subagent_limits(self, client):
+        """Embedded evaluation callers can seal effective subagent concurrency and total limits."""
+        config = client._get_runnable_config(
+            "t1",
+            max_concurrent_subagents=3,
+            max_total_subagents=5,
+        )
+
+        assert config["configurable"]["max_concurrent_subagents"] == 3
+        assert config["configurable"]["max_total_subagents"] == 5
+
     def test_deferred_skill_discovery_wired_when_enabled(self, client, mock_app_config):
         """When skills.deferred_discovery=True, skill_names reaches apply_prompt_template
         (parity with agent.py — config flag must not be a silent no-op on the embedded path)."""

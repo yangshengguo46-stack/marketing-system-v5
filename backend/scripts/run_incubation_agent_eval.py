@@ -9,6 +9,7 @@ import json
 import os
 import re
 import threading
+from collections import Counter
 from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -75,7 +76,7 @@ _MIN_SUBAGENT_GRAPH_STEPS = 40
 _MAX_SUBAGENT_GRAPH_STEPS = 80
 _MIN_SUBAGENT_TOKENS = 1_000
 _MAX_SUBAGENT_TOKENS = 100_000
-_SUBAGENT_MODES = ("disabled", "evidence-review")
+_SUBAGENT_MODES = ("disabled", "evidence-review", "incubation-team")
 INCUBATION_EVIDENCE_RESEARCHER_NAME = "incubation-evidence-researcher"
 _EVIDENCE_RESEARCHER_TIMEOUT_SECONDS = 120
 _EVIDENCE_RESEARCHER_DESCRIPTION = "Use only when an incubation judgment needs a bounded, read-only reconciliation of project truths, source evidence, and reviewed methods; returns an evidence brief, never a final strategy."
@@ -98,6 +99,60 @@ _EVIDENCE_RESEARCHER_SYSTEM_PROMPT = """你是总控 Lead Agent 的只读孵化�
 5. 冲突与局限：记录证据冲突、过期、适用范围和仍不可判断之处。
 
 只返回这份研究简报，不写最终孵化判断。"""
+
+INCUBATION_TEAM_SPECIALIST_NAMES = (
+    "incubation-positioning-specialist",
+    "incubation-audience-specialist",
+    "incubation-content-specialist",
+    "incubation-expression-specialist",
+    "incubation-commercial-specialist",
+)
+_INCUBATION_TEAM_TIMEOUT_SECONDS = 120
+_INCUBATION_TEAM_MAX_CONCURRENT = 3
+_INCUBATION_TEAM_READ_TOOLS = (
+    "incubation_project_context",
+    "incubation_project_evidence",
+)
+_INCUBATION_TEAM_ROLE_CONTRACTS: dict[str, tuple[str, str]] = {
+    "incubation-positioning-specialist": (
+        "负责 IP 主体、赛道、人设、业务对象与账号价值承诺的定位板块；识别商品名、品类和用户真正关心的问题是否处于不同语义层，不替其他板块拍板。",
+        "定位板块判断：给出当前最值得保留的一至三个定位假设，说明每个假设中的 IP 主体、赛道、人设、记忆点和业务回路，并指出什么证据会使它失效。",
+    ),
+    "incubation-audience-specialist": (
+        "负责粉丝与购买者的受众板块；严格区分目标受众假设、实际受众证据、使用或决策情境以及仍未知的信息，不用人口标签代替动机。",
+        "受众板块判断：描述受众在什么情境下遇到什么问题、为什么愿意看和为什么可能行动；明确标注受众假设与实际受众证据，避免刻板推断。",
+    ),
+    "incubation-content-specialist": (
+        "负责可持续内容世界与内容发动机；研究母题、栏目、事件、人物、冲突和可展开的内容素材，但不选择镜头前的表现形式。",
+        "内容板块判断：提出可持续的内容世界、母题和系列发动机。真实案例、历史故事、现实事件、神话或未来想象都属于内容候选，不得把它们写成表现形式。",
+    ),
+    "incubation-expression-specialist": (
+        "负责内容如何被呈现的表现形式板块；比较口播、对话、采访、微短剧、情景剧、纪录跟拍、演示、纯素材视频和图文等形式，并服从已知表现力、资源、隐私和产能。",
+        "表现形式板块判断：给出条件化形式组合和最小验证办法。口播不得作为默认答案；历史故事不是表现形式，历史故事可以分别用口播、情景剧、动画、纯素材或图文来表达。",
+    ),
+    "incubation-commercial-specialist": (
+        "负责变现、转化和履约板块；检查内容如何形成信任、触发行动、承接线索或成交，并让商业路线与真实产品、服务和交付能力相连。",
+        "商业板块判断：提出可验证的变现路径和内容到信任、行动、成交、复购的连接；不得补造价格、渠道、客户、预算、转化率或履约能力。",
+    ),
+}
+
+
+def _incubation_team_system_prompt(name: str) -> str:
+    role_summary, board_contract = _INCUBATION_TEAM_ROLE_CONTRACTS[name]
+    return f"""你是总控 Lead Agent 的 MCN 孵化专业子 Agent，{role_summary}
+
+你不直接面向用户，也不是第二个总控。你对自己的专业板块提出有判断力的方案、备选和反证；跨板块冲突与最终整合只属于 Lead Agent。
+
+共同边界：
+- 先读取委派项目的事实账本和证据，再区分已知事实、外部观察、专业推断、创意假设与未知事项。
+- 信息不完整也要继续完成有条件的板块判断，不得把缺失信息变成流程硬门或固定问卷。
+- 不得补造主体身份、表现力、资源、资产、案例、效果、客户、渠道、产能、价格、预算、频率或指标阈值。
+- 不得修改项目状态，不得向用户提问，不得再次委派，不得投票、打分或替 Lead 输出完整孵化方案。
+- 不用角色共识冒充市场证据；必须主动寻找最强反证，并指出与相邻板块的依赖或冲突。
+
+{board_contract}
+
+只返回一份有界板块简报，包含：板块判断、依据与事实边界、备选方案、最强反证、关键未知、跨板块依赖或冲突。不要写面向用户的最终整合答案。"""
 
 
 class AgentEvalTaskMode(StrEnum):
@@ -178,41 +233,63 @@ def build_agent_eval_app_config(
             raise ValueError("subagent caps require an enabled subagent mode")
         return host_config.model_copy(update={"memory": evaluation_memory})
     if max_subagent_steps is None or max_subagent_tokens is None:
-        raise ValueError("evidence-review mode requires explicit subagent step and token caps")
+        raise ValueError("enabled subagent modes require explicit subagent step and token caps")
     if not _MIN_SUBAGENT_GRAPH_STEPS <= max_subagent_steps <= _MAX_SUBAGENT_GRAPH_STEPS:
         raise ValueError("subagent step cap is outside the evaluation range")
     if not _MIN_SUBAGENT_TOKENS <= max_subagent_tokens <= _MAX_SUBAGENT_TOKENS:
         raise ValueError("subagent token cap is outside the evaluation range")
 
-    specialist = CustomSubagentConfig(
-        description=_EVIDENCE_RESEARCHER_DESCRIPTION,
-        system_prompt=_EVIDENCE_RESEARCHER_SYSTEM_PROMPT,
-        tools=sorted(_REQUIRED_INCUBATION_READ_TOOLS),
-        disallowed_tools=[
-            "task",
-            "ask_clarification",
-            "present_files",
-            "incubation_record_subject_answer",
-        ],
-        skills=[],
-        model="inherit",
-        max_turns=max_subagent_steps,
-        timeout_seconds=_EVIDENCE_RESEARCHER_TIMEOUT_SECONDS,
-    )
-    specialist_override = SubagentOverrideConfig(
-        token_budget=TokenBudgetConfig(
-            enabled=True,
-            max_tokens=max_subagent_tokens,
-            warn_threshold=0.7,
-            hard_stop_threshold=1.0,
+    denied_tools = [
+        "task",
+        "ask_clarification",
+        "present_files",
+        "incubation_record_subject_answer",
+    ]
+
+    def specialist_override() -> SubagentOverrideConfig:
+        return SubagentOverrideConfig(
+            token_budget=TokenBudgetConfig(
+                enabled=True,
+                max_tokens=max_subagent_tokens,
+                warn_threshold=0.7,
+                hard_stop_threshold=1.0,
+            )
         )
-    )
+
+    if subagent_mode == "evidence-review":
+        custom_agents = {
+            INCUBATION_EVIDENCE_RESEARCHER_NAME: CustomSubagentConfig(
+                description=_EVIDENCE_RESEARCHER_DESCRIPTION,
+                system_prompt=_EVIDENCE_RESEARCHER_SYSTEM_PROMPT,
+                tools=sorted(_REQUIRED_INCUBATION_READ_TOOLS),
+                disallowed_tools=denied_tools,
+                skills=[],
+                model="inherit",
+                max_turns=max_subagent_steps,
+                timeout_seconds=_EVIDENCE_RESEARCHER_TIMEOUT_SECONDS,
+            )
+        }
+    else:
+        custom_agents = {
+            name: CustomSubagentConfig(
+                description=_INCUBATION_TEAM_ROLE_CONTRACTS[name][0],
+                system_prompt=_incubation_team_system_prompt(name),
+                tools=list(_INCUBATION_TEAM_READ_TOOLS),
+                disallowed_tools=denied_tools,
+                skills=[],
+                model="inherit",
+                max_turns=max_subagent_steps,
+                timeout_seconds=_INCUBATION_TEAM_TIMEOUT_SECONDS,
+            )
+            for name in INCUBATION_TEAM_SPECIALIST_NAMES
+        }
+    allowed_agents = list(custom_agents)
     evaluation_subagents = host_config.subagents.model_copy(
         update={
-            "allowed_agents": [INCUBATION_EVIDENCE_RESEARCHER_NAME],
-            "max_total_per_run": 1,
-            "agents": {INCUBATION_EVIDENCE_RESEARCHER_NAME: specialist_override},
-            "custom_agents": {INCUBATION_EVIDENCE_RESEARCHER_NAME: specialist},
+            "allowed_agents": allowed_agents,
+            "max_total_per_run": len(allowed_agents),
+            "agents": {name: specialist_override() for name in allowed_agents},
+            "custom_agents": custom_agents,
         }
     )
     return host_config.model_copy(
@@ -340,7 +417,12 @@ def build_agent_eval_prompt(
     trial: AgentEvalTrialSpec,
     *,
     task_mode: AgentEvalTaskMode = AgentEvalTaskMode.FULL_INCUBATION,
+    subagent_mode: str = "disabled",
 ) -> str:
+    if subagent_mode not in _SUBAGENT_MODES:
+        raise ValueError(f"unknown subagent mode: {subagent_mode}")
+    if subagent_mode == "incubation-team" and task_mode is not AgentEvalTaskMode.FULL_INCUBATION:
+        raise ValueError("incubation-team evaluation requires full_incubation task mode")
     sections = [
         "请处理系统中已经存在的 MCN 孵化项目。",
         f"项目 ID：{trial.project_id}",
@@ -360,6 +442,19 @@ def build_agent_eval_prompt(
                 "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时先说明目前能确定什么，指出会改变结论的最少主体信息，并只给条件化备选或最小试验，不要无依据宣布一种表现形式最适合。资料足够时才给完整路线，且不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
                 "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
             )
+        )
+    if subagent_mode == "incubation-team":
+        team_lines = "\n".join(f"- {name}" for name in INCUBATION_TEAM_SPECIALIST_NAMES)
+        sections.append(
+            f"""本轮是隔离的多 Agent 孵化团队架构评测。请把以下每个专业子 Agent 恰好委派一次：
+{team_lines}
+
+这些是同时审视同一项目的专业板块，不是线性阶段，也不存在某一板块完成后才能继续的语义硬门。
+请让独立板块尽量并行，每批最多委派三个，角色可以按任意组合分批；分批只是技术并发限制，不代表业务先后。
+给每个子 Agent 传入同一项目 ID 和它自己的板块问题，让它读取项目事实与证据后返回板块简报。
+
+内容与表现形式是两个不同板块：历史故事、真实案例、现实事件属于内容候选；口播、情景剧、微短剧、纯素材视频和图文属于表现形式。
+收到全部简报后，只有 Lead 可以处理板块冲突并给用户一个统一判断；不得投票、不得打分、不得直接拼接五份简报，也不得把内部一致意见冒充市场证据。"""
         )
     if trial.include_mutation:
         sections.append("这是同一项目的新增证据轮次；请结合上一轮实际回答与当前项目账本，指出哪些判断应当改变、保留或继续未知，不得虚构上一轮观点。")
@@ -566,14 +661,16 @@ def _evaluation_system_contract_sha256(
 ) -> str:
     if subagent_mode == "disabled":
         return sha256(SYSTEM_PROMPT_TEMPLATE.encode("utf-8")).hexdigest()
-    specialist = app_config.subagents.custom_agents[INCUBATION_EVIDENCE_RESEARCHER_NAME]
+    allowed_agents = list(app_config.subagents.allowed_agents or [])
+    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode == "incubation-team" else 1
     contract = {
         "lead_system_prompt_template": SYSTEM_PROMPT_TEMPLATE,
         "subagent_mode": subagent_mode,
-        "allowed_agents": app_config.subagents.allowed_agents,
+        "allowed_agents": allowed_agents,
+        "max_concurrent_subagents": max_concurrent_subagents,
         "max_total_per_run": app_config.subagents.max_total_per_run,
-        "specialist": specialist.model_dump(mode="json"),
-        "specialist_override": app_config.subagents.agents[INCUBATION_EVIDENCE_RESEARCHER_NAME].model_dump(mode="json"),
+        "specialists": {name: app_config.subagents.custom_agents[name].model_dump(mode="json") for name in allowed_agents},
+        "specialist_overrides": {name: app_config.subagents.agents[name].model_dump(mode="json") for name in allowed_agents},
     }
     encoded = json.dumps(
         contract,
@@ -598,11 +695,13 @@ def _write_experiment_manifest(
     created_at: datetime,
 ) -> None:
     subagent_enabled = subagent_mode != "disabled"
+    max_concurrent_subagents = _INCUBATION_TEAM_MAX_CONCURRENT if subagent_mode == "incubation-team" else (1 if subagent_enabled else 0)
     payload = {
         "schema_version": "mcn-incubation-agent-eval-experiment-v1",
         "subagent_mode": subagent_mode,
         "decision_authority": "lead-agent",
         "allowed_subagents": (list(app_config.subagents.allowed_agents or []) if subagent_enabled else []),
+        "max_concurrent_subagents": max_concurrent_subagents,
         "max_total_delegations": (app_config.subagents.max_total_per_run if subagent_enabled else 0),
         "max_agent_steps": max_agent_steps,
         "max_lead_model_calls": max_model_calls,
@@ -677,6 +776,68 @@ def _error_code(error: Exception) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
+def _capture_terminal_task_status(
+    task_statuses: dict[str, str],
+    event: Any,
+) -> None:
+    if getattr(event, "type", None) != "custom":
+        return
+    data = getattr(event, "data", None)
+    if not isinstance(data, Mapping):
+        return
+    status_by_event_type = {
+        "task_completed": "completed",
+        "task_failed": "failed",
+        "task_cancelled": "cancelled",
+        "task_timed_out": "timed_out",
+    }
+    status = status_by_event_type.get(str(data.get("type") or ""))
+    task_id = str(data.get("task_id") or "").strip()
+    if status is not None and task_id:
+        task_statuses[task_id] = status
+
+
+def _incubation_team_protocol_error(
+    events: Sequence[Any],
+    *,
+    task_statuses: Mapping[str, str],
+    project_id: str,
+) -> str | None:
+    task_calls = [event for event in events if getattr(event, "event_type", None) == "tool_call" and getattr(event, "tool_name", None) == "task"]
+    called_names = []
+    for event in task_calls:
+        arguments = getattr(event, "arguments", None)
+        name = arguments.get("subagent_type") if isinstance(arguments, Mapping) else None
+        called_names.append(str(name or ""))
+
+    expected = set(INCUBATION_TEAM_SPECIALIST_NAMES)
+    if any(name not in expected for name in called_names):
+        return "incubation_team_unknown_specialist"
+    counts = Counter(called_names)
+    if any(count > 1 for count in counts.values()):
+        return "incubation_team_duplicate_specialist"
+    if set(called_names) != expected:
+        return "incubation_team_missing_specialist"
+
+    call_ids: set[str] = set()
+    for event in task_calls:
+        call_id = str(getattr(event, "tool_call_id", None) or "").strip()
+        arguments = getattr(event, "arguments", None)
+        prompt = arguments.get("prompt") if isinstance(arguments, Mapping) else None
+        if not isinstance(prompt, str) or project_id not in prompt:
+            return "incubation_team_unbound_project"
+        if not call_id:
+            return "incubation_team_missing_task_result"
+        call_ids.add(call_id)
+
+    result_ids = {str(getattr(event, "tool_call_id", None) or "").strip() for event in events if getattr(event, "event_type", None) == "tool_result" and getattr(event, "tool_name", None) == "task"}
+    if not call_ids.issubset(result_ids):
+        return "incubation_team_missing_task_result"
+    if any(task_statuses.get(call_id) != "completed" for call_id in call_ids):
+        return "incubation_team_task_not_completed"
+    return None
+
+
 def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -713,7 +874,7 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         "--subagent-mode",
         choices=_SUBAGENT_MODES,
         default="disabled",
-        help="Evaluation architecture variant; evidence-review enables one read-only specialist",
+        help="Evaluation architecture variant; enables either one evidence reviewer or the five-board incubation team",
     )
     parser.add_argument(
         "--task-mode",
@@ -730,12 +891,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--max-subagent-steps",
         type=int,
-        help="Required graph-step cap for the enabled evidence specialist",
+        help="Required per-specialist graph-step cap for an enabled subagent mode",
     )
     parser.add_argument(
         "--max-subagent-tokens",
         type=int,
-        help="Required total-token backstop for the enabled evidence specialist",
+        help="Required per-specialist total-token backstop for an enabled subagent mode",
     )
     parser.add_argument(
         "--model",
@@ -770,12 +931,14 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error("evaluation method-context variants are only valid with --task-mode content_world")
     if args.method_context_mode != MethodContextMode.AVAILABLE.value and args.subagent_mode != "disabled":
         parser.error("evaluation method-context variants cannot be combined with a method-capable subagent")
+    if args.subagent_mode == "incubation-team" and args.task_mode != AgentEvalTaskMode.FULL_INCUBATION.value:
+        parser.error("incubation-team is only valid with --task-mode full_incubation")
     if args.subagent_mode == "disabled":
         if args.max_subagent_steps is not None or args.max_subagent_tokens is not None:
             parser.error("subagent caps can only be used with an enabled --subagent-mode")
     else:
         if args.max_subagent_steps is None or args.max_subagent_tokens is None:
-            parser.error("evidence-review requires --max-subagent-steps and --max-subagent-tokens")
+            parser.error("enabled subagent modes require --max-subagent-steps and --max-subagent-tokens")
         if not _MIN_SUBAGENT_GRAPH_STEPS <= args.max_subagent_steps <= _MAX_SUBAGENT_GRAPH_STEPS:
             parser.error(f"--max-subagent-steps must be between {_MIN_SUBAGENT_GRAPH_STEPS} and {_MAX_SUBAGENT_GRAPH_STEPS}")
         if not _MIN_SUBAGENT_TOKENS <= args.max_subagent_tokens <= _MAX_SUBAGENT_TOKENS:
@@ -822,6 +985,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_subagent_steps=args.max_subagent_steps,
         max_subagent_tokens=args.max_subagent_tokens,
     )
+    subagent_runtime_limits: dict[str, int] = {}
+    if subagent_enabled:
+        subagent_runtime_limits = {
+            "max_concurrent_subagents": (_INCUBATION_TEAM_MAX_CONCURRENT if args.subagent_mode == "incubation-team" else 1),
+            "max_total_subagents": evaluation_app_config.subagents.max_total_per_run,
+        }
     client = build_agent_eval_client(
         method_context_mode=method_context_mode,
         checkpointer=InMemorySaver(),
@@ -917,12 +1086,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 prompt = build_agent_eval_prompt(
                     trial,
                     task_mode=task_mode,
+                    subagent_mode=args.subagent_mode,
                 )
                 thread_id = build_trial_thread_id(
                     run_id=run_id,
                     case_id=trial.case.case_id,
                 )
                 collector = AgentEventCollector()
+                task_statuses: dict[str, str] = {}
                 started_at = datetime.now(UTC)
                 terminal_error_code: str | None = None
                 try:
@@ -931,11 +1102,19 @@ def main(argv: Sequence[str] | None = None) -> int:
                         thread_id=thread_id,
                         user_id=actor_id,
                         recursion_limit=args.max_agent_steps,
+                        **subagent_runtime_limits,
                     ):
+                        _capture_terminal_task_status(task_statuses, event)
                         collector.consume(event)
                 except Exception as error:
                     terminal_error_code = _error_code(error)
                 observation = collector.finish()
+                if terminal_error_code is None and args.subagent_mode == "incubation-team":
+                    terminal_error_code = _incubation_team_protocol_error(
+                        observation.events,
+                        task_statuses=task_statuses,
+                        project_id=trial.project_id,
+                    )
                 if terminal_error_code is None:
                     terminal_error_code = observation.fallback_error_code
                 if terminal_error_code is None and not observation.output:

@@ -274,6 +274,21 @@ These apply repo-wide; module guides own the module-specific detail.
   production method library, claim a business pass, or delete downstream MCN
   capabilities; refine semantic-head counterfactual checks and held-out cases
   offline before another paid run.
+  Audit A50 records the user's replacement hypothesis: an evaluation-only
+  five-board incubation team for positioning, audience, content world,
+  expression form, and commercialization. It reuses DeerFlow `task`; every
+  specialist is read-only, non-recursive, memoryless, and unable to address the
+  user, while the Lead keeps the only final decision. A50 supersedes A37's
+  no-department/no-forced-route rule only inside the sealed `incubation-team`
+  evaluator: exact role coverage is an experimental manipulation, not a
+  production workflow. Production config and the production Lead remain
+  unchanged. A technically successful trial must prove five unique completed
+  tasks, current-project binding, result pairing, and explicit concurrency and
+  budget limits. Do not claim that multi-agent caused a quality change without
+  a matched single-Lead control carrying the same business guidance. The first
+  M01 team run completed all five roles with 43,667 tokens and improved
+  talking-head/content-form concerns, but invented prices, volume, cadence, and
+  production time; it is business-rejected and must not enter production.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts
