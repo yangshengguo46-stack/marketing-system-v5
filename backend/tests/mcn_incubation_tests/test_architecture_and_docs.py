@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a47_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a48_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 48)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 49)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -439,3 +439,31 @@ def test_a47_records_the_real_production_lead_trial_as_business_rejected() -> No
     assert "方法检索重新引入完整孵化压力" in audit
     assert "待验证推断" in audit
     assert "水果存在局部进步" in evidence
+
+
+def test_a48_records_method_context_as_a_material_but_not_sole_failure_contributor() -> None:
+    audit = (AUDIT_ROOT / "A48-method-context-ablation.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-method-context-ablation.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "agent-eval-content-world-production-v2-20260811",
+        "agent-eval-content-world-no-method-v1-20260811",
+        "method_context_mode",
+        "disabled",
+        "59,967",
+        "4,038",
+        "d46d944c6c15305ae07cce13b2259002ab05849b0f54bcad8a2606e13569a043",
+        "27fcdbccf06b2127f7c3bc0ded04270494c105859ee08a17a035067eab9cfed1",
+        "黄金只是载体",
+        "杨贵妃",
+        "糖尿病",
+        "business-rejected",
+        "重要干扰源",
+        "不是唯一病根",
+        "不从生产环境全局删除方法系统",
+    ):
+        assert marker in audit
+        assert marker in evidence
+
+    assert "8261b541b737422f147d90f68515a6ed8bcffb0bc90606c2c49dfc88c974a9c8" in evidence
+    assert "9db90f6541045b97714451afdcbc32513380484b32e22b364a058e5460ea82a8" in evidence

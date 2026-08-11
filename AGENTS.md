@@ -259,6 +259,13 @@ These apply repo-wide; module guides own the module-specific detail.
   retrieved the broad `content-engine-v1` and `incubation-model-v1` cards, but
   renewed full-incubation pressure remains an inference for offline audit. Do
   not force a route or start another paid run without fresh user approval.
+  Audit A48 confirms broad method context as a material but non-exclusive
+  interferer: a matched no-method evaluation improved both expert anchors but
+  still produced templates, invented facts, and out-of-scope delivery. Its
+  `method_context_mode=disabled` switch belongs only to the content-world
+  evaluator and cannot run with subagents. Do not turn it into a production
+  keyword route or globally delete methods; redesign compact task-relevant
+  projection and the remaining mother-contract boundary offline first.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

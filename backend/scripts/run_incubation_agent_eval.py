@@ -103,6 +103,34 @@ class AgentEvalTaskMode(StrEnum):
     CONTENT_WORLD = "content_world"
 
 
+class MethodContextMode(StrEnum):
+    AVAILABLE = "available"
+    DISABLED = "disabled"
+
+
+def build_agent_eval_client(
+    *,
+    method_context_mode: MethodContextMode,
+    **client_kwargs: Any,
+) -> DeerFlowClient:
+    """Build an evaluation client with an explicitly sealed tool ablation."""
+
+    base_client_type = DeerFlowClient
+    if method_context_mode is MethodContextMode.AVAILABLE:
+        return base_client_type(**client_kwargs)
+
+    class MethodContextFilteredClient(base_client_type):
+        @staticmethod
+        def _get_tools(*, model_name: str | None, subagent_enabled: bool):
+            tools = base_client_type._get_tools(
+                model_name=model_name,
+                subagent_enabled=subagent_enabled,
+            )
+            return [tool for tool in tools if tool.name != "incubation_context"]
+
+    return MethodContextFilteredClient(**client_kwargs)
+
+
 def build_agent_eval_app_config(
     host_config: AppConfig,
     *,
@@ -486,6 +514,7 @@ def _tool_surface(
     *,
     model_name: str,
     subagent_enabled: bool,
+    method_context_mode: MethodContextMode,
 ) -> list[dict[str, Any]]:
     tools = client._get_tools(
         model_name=model_name,
@@ -493,6 +522,10 @@ def _tool_surface(
     )
     schemas_by_name = {tool.name: convert_to_openai_tool(tool) for tool in tools}
     required_tools = set(_REQUIRED_INCUBATION_LEAD_TOOLS)
+    if method_context_mode is MethodContextMode.DISABLED:
+        required_tools.remove("incubation_context")
+        if "incubation_context" in schemas_by_name:
+            raise RuntimeError("method-context ablation did not remove incubation_context")
     if subagent_enabled:
         required_tools.add("task")
     missing = required_tools - schemas_by_name.keys()
@@ -536,6 +569,7 @@ def _write_experiment_manifest(
     max_subagent_steps: int | None,
     max_subagent_tokens: int | None,
     task_mode: AgentEvalTaskMode,
+    method_context_mode: MethodContextMode,
     created_at: datetime,
 ) -> None:
     subagent_enabled = subagent_mode != "disabled"
@@ -550,6 +584,7 @@ def _write_experiment_manifest(
         "max_subagent_steps": max_subagent_steps,
         "max_subagent_tokens": max_subagent_tokens,
         "task_mode": task_mode.value,
+        "method_context_mode": method_context_mode.value,
         "system_contract_sha256": _evaluation_system_contract_sha256(
             app_config=app_config,
             subagent_mode=subagent_mode,
@@ -662,6 +697,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="User-task boundary to seal in the evaluation prompt",
     )
     parser.add_argument(
+        "--method-context-mode",
+        choices=tuple(mode.value for mode in MethodContextMode),
+        default=MethodContextMode.AVAILABLE.value,
+        help="Evaluation-only incubation_context availability; disabled is a content-world ablation",
+    )
+    parser.add_argument(
         "--max-subagent-steps",
         type=int,
         help="Required graph-step cap for the enabled evidence specialist",
@@ -700,6 +741,10 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         parser.error(f"--max-agent-steps must be between {_MIN_AGENT_GRAPH_STEPS} and {_MAX_AGENT_GRAPH_STEPS}")
     if not 1 <= args.max_model_calls <= _MAX_EVALUATION_MODEL_CALLS:
         parser.error(f"--max-model-calls must be between 1 and {_MAX_EVALUATION_MODEL_CALLS}")
+    if args.method_context_mode == MethodContextMode.DISABLED.value and args.task_mode != AgentEvalTaskMode.CONTENT_WORLD.value:
+        parser.error("--method-context-mode disabled is only valid with --task-mode content_world")
+    if args.method_context_mode == MethodContextMode.DISABLED.value and args.subagent_mode != "disabled":
+        parser.error("--method-context-mode disabled cannot be combined with a method-capable subagent")
     if args.subagent_mode == "disabled":
         if args.max_subagent_steps is not None or args.max_subagent_tokens is not None:
             parser.error("subagent caps can only be used with an enabled --subagent-mode")
@@ -744,13 +789,16 @@ def main(argv: Sequence[str] | None = None) -> int:
     actor_id = f"agent-eval-owner-{_safe_component(run_id)}"
     actor_sha256 = sha256(actor_id.encode("utf-8")).hexdigest()
     subagent_enabled = args.subagent_mode != "disabled"
+    task_mode = AgentEvalTaskMode(args.task_mode)
+    method_context_mode = MethodContextMode(args.method_context_mode)
     evaluation_app_config = build_agent_eval_app_config(
         get_app_config(),
         subagent_mode=args.subagent_mode,
         max_subagent_steps=args.max_subagent_steps,
         max_subagent_tokens=args.max_subagent_tokens,
     )
-    client = DeerFlowClient(
+    client = build_agent_eval_client(
+        method_context_mode=method_context_mode,
         checkpointer=InMemorySaver(),
         model_name=args.model,
         thinking_enabled=args.thinking,
@@ -769,6 +817,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         client,
         model_name=model_id,
         subagent_enabled=subagent_enabled,
+        method_context_mode=method_context_mode,
     )
     trial_ids = tuple(trial.trial_id for trial in trials)
     preflight_ledger = PreflightLedger(args.output_root)
@@ -801,7 +850,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_model_calls=args.max_model_calls,
         max_subagent_steps=args.max_subagent_steps,
         max_subagent_tokens=args.max_subagent_tokens,
-        task_mode=AgentEvalTaskMode(args.task_mode),
+        task_mode=task_mode,
+        method_context_mode=method_context_mode,
         created_at=created_at,
     )
     database_path = run_dir / "agent-state.db"
@@ -841,7 +891,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                     )
                 prompt = build_agent_eval_prompt(
                     trial,
-                    task_mode=AgentEvalTaskMode(args.task_mode),
+                    task_mode=task_mode,
                 )
                 thread_id = build_trial_thread_id(
                     run_id=run_id,

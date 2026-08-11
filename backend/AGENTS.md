@@ -209,6 +209,15 @@ than gift-giving and human relations; fruit lifecycle was only a partial signal.
 Both cases retrieved `content-engine-v1` and `incubation-model-v1`. Treat renewed
 full-incubation pressure as a hypothesis for offline audit, not a proven cause,
 and require fresh approval before another paid run.
+Audit A48 records the matched method-context ablation. With the same model,
+system-contract hash, corpus, and task mode, removing `incubation_context` only
+from the evaluation tool surface improved both gold and fruit anchors while the
+answers still failed business review. Broad method context is therefore a
+supported material interferer, not the sole cause. Keep
+`method_context_mode=disabled` evaluation-only, content-world-only, and
+subagent-incompatible; do not globally remove production methods or implement a
+keyword route. The next design target is compact task-relevant projection plus
+the remaining mother-contract boundary conflict.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

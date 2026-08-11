@@ -8,7 +8,7 @@
 - `current/DEVELOPMENT_PLAYBOOK.md`：测试先行的执行规则。
 - `current/EXECUTION_LEDGER.md`：已经验证和仍待真人验证的状态。
 - `current/PREFLIGHT_PROTOCOL.md`：少量真实模型调用的付费确认、密封证据和失败口径。
-- `audits/A20-A47`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测、模板答案提示词溯源、最小生产思路接入和生产 Lead 真实试验。
+- `audits/A20-A48`：MCN 能力、第四版失败、上下文记忆、评测集、架构竞赛、标准 Agent、知识来源/检索、项目证据、完整 Agent 评测、账号拆解证据层、第四版 97-Skill 复用、M01 检索修正、账号拆解领域合同、三轮 M01 付费复测、主体适配/记忆隔离、连续修订评测、开源垂直营销 Agent、单一决策权多 Agent 协作、主体问答来源与版本链、访谈过度修正、营销脑与内容领地、跨行业营销脑架构、真实营销领地对照、对话版内容世界算子实测、模板答案提示词溯源、最小生产思路接入、生产 Lead 真实试验和方法上下文消融。
 - `decisions/ADR-006-incubation-core-architecture.md`：尚待真实模型竞赛确认的架构候选。
 - `decisions/ADR-007-augmented-agent-knowledge-layer.md`：增强型单 Agent 与四类外挂知识的待验证决定。
 - `decisions/ADR-008-account-decomposition-evidence-layer.md`：账号拆解作为下游证据能力的待验证决定。
@@ -33,6 +33,7 @@
 - `evidence/2026-08-11-content-world-prompt-provenance.md`：B/C/行业号模板的实际请求载荷、已排除来源、任务边界混杂与模型先验推断。
 - `evidence/content-world-production-eval-cases.jsonl`：只含原始请求和稀疏事实的生产 Lead 内容世界试验语料；专家答案不进入模型输入。
 - `evidence/2026-08-11-production-lead-content-world-trial.md`：首轮超长线程 ID 零调用故障、修复后 2/2 技术完成、64,005 Token 和人工业务拒绝证据。
+- `evidence/2026-08-11-method-context-ablation.md`：同模型、同合同、同语料下移除方法工具的 2/2 匹配消融；内容世界明显改善但仍业务拒绝。
 - `evidence/2026-08-11-local-runtime-relocation-repair.md`：仓库迁移后 Python 入口路径、Tailwind 解析根、统一入口恢复与前端回归证据。
 - `evidence/account-decomposition-eval-cases.jsonl`：10 条跨六平台账号拆解失败案例。
 - `evidence/v4-skill-reuse-matrix.json`：第四版 97 个 Skill 的逐项复用、蒸馏、重写与排除决定。
@@ -43,6 +44,6 @@
 
 `--response-mode content_world_exploration` 是 A45 后新增的纯探索隔离候选；它只允许 `baseline` 与 `content_world_operators`，不携带生产 Lead 孵化合同或最终客户交付合同。它目前只有离线合同测试，没有付费模型结果，也不是生产能力。
 
-A46 按用户最新纠偏，将一段不含黄金礼品、水果等答案示例的极薄营销内容世界思路直接加入现有 Lead。A47 随后完成生产 Lead 真实试验：黄金礼品与水果技术 `2/2` 完成，但人工业务复核均拒绝；水果生命周期只有局部正信号，黄金仍未把“礼品”识别为语义中心。两例都读取了宽泛孵化方法卡，这只是下一离线消融假设，不是已证明根因。
+A46 按用户最新纠偏，将一段不含黄金礼品、水果等答案示例的极薄营销内容世界思路直接加入现有 Lead。A47 的首次生产试验技术完成但业务拒绝；A48 移除方法上下文后，黄金与水果均朝专家锚点明显改善，但仍有三模板、事实补造和越界交付。宽泛方法上下文因此是重要干扰源而非唯一病根，生产方法系统暂不全局删除。
 
 审计的 `reviewed` 表示证据和迁移结论已经复核，不代表功能已获真实业务结果。架构决定只有真实模型竞赛和人工校准完成后才能从 `proposed` 转为 `accepted`。

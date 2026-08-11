@@ -117,7 +117,28 @@ uv run python scripts/run_incubation_agent_eval.py \
 
 `task_mode` 会进入不可变 experiment manifest。运行器把长 run/case 组合压成可读前缀加稳定哈希，生成不超过 64 字符且跨 case 不碰撞的线程 ID。`agent-eval-content-world-production-v1-20260811` 是修复前的零调用故障：两例均 `0 events`、`0 Token`，不得计为业务结果。
 
-修复后的 `agent-eval-content-world-production-v2-20260811` 技术 `2/2` 完成，共使用 64,005 Token，但黄金礼品与水果都被人工判为 `business-rejected`。两例均读取 `content-engine-v1` 和 `incubation-model-v1`；方法检索是否重新引入完整孵化压力只作为离线审计假设。未经新的用户确认，不再执行付费复测。
+修复后的 `agent-eval-content-world-production-v2-20260811` 技术 `2/2` 完成，共使用 64,005 Token，但黄金礼品与水果都被人工判为 `business-rejected`。两例均读取 `content-engine-v1` 和 `incubation-model-v1`；A48 随后用方法上下文消融验证该轨迹。
+
+### 方法上下文消融
+
+`--method-context-mode disabled` 只从评测副本的 Lead 工具面移除 `incubation_context`，不修改生产注册、方法卡或系统提示词。它只允许与 `--task-mode content_world`、关闭子 Agent 的配置组合，防止“无方法”被误用成完整孵化架构：
+
+```bash
+cd backend
+uv run python scripts/run_incubation_agent_eval.py \
+  --case CW01-gold-gift \
+  --case CW02-fruit-world \
+  --task-mode content_world \
+  --method-context-mode disabled \
+  --corpus ../docs/mcn-incubation-v5/evidence/content-world-production-eval-cases.jsonl \
+  --max-paid-trials 2 \
+  --max-agent-steps 100 \
+  --max-model-calls 4 \
+  --run-id agent-eval-NEW-UNIQUE-ID \
+  --execute
+```
+
+`agent-eval-content-world-no-method-v1-20260811` 与 A47 基线使用相同模型、系统合同和语料，技术 `2/2` 完成，共 59,967 Token。黄金与水果的内容世界均明显改善，但仍因模板化、事实补造和越界交付被判 `business-rejected`。方法上下文是重要干扰源，不是唯一病根；未经新的用户确认，不继续付费比较。
 
 ### 主体问答连续会话
 

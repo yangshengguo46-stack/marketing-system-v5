@@ -12,7 +12,7 @@
 | 真实模型预检 | business-rejected | 自动 DNS 恢复；真实模型 1.44 秒返回 `OK`；三轮 M01/B01/G01 均 3/3 技术成功且完整性通过；B01 thinking 技术成功 | 方法卡 v2 与原生 thinking 均未解决无依据事实、资产、效果和指标 |
 | 孵化领域合同 | tested | 简报、事实、外部证据快照、决策、实验、结果、学习和案例对象 | 真实 Agent 输出 |
 | 项目事实与证据账本 | tested | 独立 V2 metadata、Owner 隔离、不可变追加、幂等、替代链、来源/哈希/范围/局限/过期合同，事实与证据两个只读工具，以及当前人类回答的受控事实写入 | 受控外部证据采集和当前决策投影 |
-| 方法上下文 | tested | 十类来源化方法卡、九条已复核来源和 13 条有界检索基线；真实 M01 宽查询可召回六项任务能力且不再混入小红书来源 | 修正后的真实模型遵循效果与重复调用成本 |
+| 方法上下文 | task-mismatch-confirmed / production-unchanged | 十类来源化方法卡、九条已复核来源和 13 条检索基线仍有效；A48 同模型消融证明宽泛完整孵化/内容发动机上下文会压制纯内容世界探索 | 设计任务相关紧凑投影，把完整来源留在 artifact/审计层；跨个人、品牌、服务验证后再改生产 |
 | 受控案例记忆 | tested | 项目内隔离、状态过滤、支持与反例分离 | 长期真实案例 |
 | 36 案例评测集 | tested | 八类业务场景、每例包含新证据变体 | 专家标注和评分标定 |
 | 五架构竞赛 | micro-business-rejected | `B01` 四候选真实模型对照 4/4 技术成功、证据完整；固定流程、长手册、按需方法、方法加两条事实均未通过业务评审 | 该运行无工具且宪法与生产存在漂移；180-trial 真实模型竞赛未完成；第五候选缺真实案例 |
@@ -30,20 +30,20 @@
 | 稀疏首问决策边界 | live-business-rejected / secondary-audit-reviewed | A39；真实回答确有事实补造和提问边界问题，但用户复核后确认这不是本轮核心根因；原证据保留并链接 A40 | 作为交互回归保留；不能再用“信息不足”替代营销脑评测，也禁止恢复访谈状态机、关键词拦截和 Writer Brain |
 | 营销脑与内容领地 | live-business-rejected / audit-reviewed / eval-scaffolded | A40；黄金礼品专家锚点确认“黄金是修饰、礼品是中心”，应保留送礼品类行为并经营人情、关系、仪式与购买情境；第四版从正确语义拆解过度修正为最大远联、固定故事和商品/品类一并 absent 的证据已追溯 | 其余跨个人、品牌、产品和服务案例待 MCN 人工复核；先对比基线、方法卡、来源知识和 Lead 内发散收敛，再决定是否接入方法，不改核心提示词 |
 | 跨行业营销脑架构 | domain-tested / paid-bakeoff-business-rejected / ADR-proposed | A41/A42、ADR-010；轻量 `TerritoryCandidate` 已在现有决策 JSON 内向后兼容落地且无生产入口；24 个密封试验、26 次调用比较结构化/自然回答、方法、来源机制和两遍法，技术 24/24 成功 | 没有候选通过业务验收；两遍法仅在黄金锚点部分命中且仍补造事实，六个对照均待 MCN 人工复核，方法/机制/两遍上下文不接生产 |
-| 内容世界扩展算子 | paid-production-business-rejected / prompt-origin-audited / ADR-proposed | A43-A47、ADR-011；A46 将极薄 `MARKETING_WORLD_THINKING_CONTRACT` 接入唯一 Lead；A47 生产试验技术 `2/2` 完成、共 64,005 Token，但黄金仍以黄金为中心，水果生命周期只有局部正信号，两例均业务拒绝且都读取宽泛方法卡 | 离线审计任务相关方法检索与完整孵化压力；conversation-v2 explorer 尚无付费结果；品牌、产品、个人和服务留出锚点待复核；不建向量库、不引入固定流程或第二运行时 |
+| 内容世界扩展算子 | paid-ablation-business-rejected / method-interference-confirmed / ADR-proposed | A43-A48、ADR-011；A47 方法开启组 64,005 Token，A48 无方法组 59,967 Token；黄金首次明确“黄金只是载体”，水果进入历史/流行文化/未来，但两例仍模板化、补造事实并越界交付 | 离线设计紧凑任务相关方法投影并消除母合同边界冲突；无方法模式不接生产；品牌、产品、个人和服务留出锚点待复核 |
 | 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
 | 单一决策权多 Agent 候选 | offline-repaired / paid-untriggered / business-rejected | A37、ADR-009；运行级角色白名单、只读证据研究员、独立步数/Token/超时/总委派上限和密封实验 manifest 已离线通过；试后发现并测试先行修复嵌入式配置传播缺口 | Lead 实际未调用 `task`，因此真实运行既未证明专业子 Agent 可执行，也未测其质量；最终答案仍补造路线与数字，ADR 保持 proposed |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。A41-A43 确认这不能靠行业模板、完整 JSON 或单张知识卡补齐。A44 拒绝了“完整最终交付上下文 + conversation-v1 算子卡”；A45 追溯出该评测的任务边界混杂。A46 根据用户明确指令，把重新蒸馏的最小内容世界思路接入现有 Lead。A47 的生产 Lead 真实试验技术成功但业务失败：黄金仍未识别礼品中心，水果只局部打开生命周期。两例自主读取宽泛完整孵化方法，因此下一步先离线审计任务相关方法检索；这只是待验证推断，仍不宣称架构胜者或业务质量通过。
+首选方向仍为“DeerFlow 唯一 Lead 孵化决策权 + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A40 重新定位首要缺口：Lead 尚未稳定把商业对象推演为品类行为、人类任务、购买情境、可持续内容领地和商业归因。A41-A46 证明这不能靠行业模板、完整 JSON、单张算子卡或继续堆核心提示词补齐。A47 的生产试验失败后，A48 用相同模型、合同和语料移除方法工具：两个锚点都明显改善，因此宽泛方法上下文已确认是重要干扰源；但无方法组仍模板化、补造事实并越过任务边界，所以它不是唯一病根，也不是生产胜者。下一步应缩小方法投影并修正母合同边界，不全局删方法、不新增关键词路由。
 
 ## 本轮验证
 
-- `uv run python -m pytest tests/mcn_incubation_tests/test_agent_surface_runner_script.py tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：`content_world` 任务隔离、64 字符线程 ID、manifest、A47 证据与文档连续性共 `29 passed`。
-- `uv run python -m pytest tests/mcn_incubation_tests -q`：孵化包领域、持久化、评测、A20-A47 文档连号、4000 字上下文预算与架构边界共 `103 passed`。
-- `uv run python -m pytest tests/test_lead_agent_prompt.py tests/test_lead_agent_model_resolution.py -q`：生产 Lead 提示词组装与模型解析回归共 `79 passed`；A46 极薄契约仍在生产，A47 没有把失败答案或评测专用 explorer 写回提示词。
+- `uv run python -m pytest tests/mcn_incubation_tests/test_agent_surface_runner_script.py tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：`content_world` 任务隔离、方法上下文消融、manifest、A47-A48 证据与文档连续性共 `31 passed`。
+- `uv run python -m pytest tests/mcn_incubation_tests -q`：孵化包领域、持久化、评测、A20-A48 文档连号、4000 字上下文预算与架构边界共 `105 passed`。
+- `uv run python -m pytest tests/test_lead_agent_prompt.py tests/test_lead_agent_model_resolution.py -q`：生产 Lead 提示词组装与模型解析回归共 `79 passed`；A48 消融开关未修改生产 Lead 提示词、方法卡或正常工具注册。
 - A46 先以缺少 `MARKETING_WORLD_THINKING_CONTRACT` 得到预期 `2 failed / 34 passed`，实现后 `tests/test_lead_agent_prompt.py` 为 `36 passed`；首次文本使 4000 字候选上下文挤出案例，压缩核心文本而不放宽预算后，受控方法、事实与案例回归恢复通过。
 - `uv run python -m pytest tests/mcn_incubation_tests ... tests/test_app_config_reload.py -q`：A20-A38、孵化合同、主体回答工具、方法/事实/证据、评测器、子 Agent 配置和 4000 字上下文预算共 `338 passed`。
 - `uv run python -m pytest tests/test_subagent_*.py tests/test_task_tool*.py tests/test_client.py tests/test_client_explicit_app_config.py -q`：子 Agent 权限、委派、Token/超时背压、检查点与客户端共 `511 passed`。
@@ -115,8 +115,9 @@
 - A45 对密封输入和 `PatchedChatDeepSeek` 客户端载荷做离线复核：`message_count=2`、`messages_exact=True`、`has_tools=False`、`has_previous_response_id=False`；没有记忆、Skill、V4 或完整母提示词。先写失败测试再新增 `content_world_exploration` 纯探索模式，本轮未新增付费调用。
 - A46 按用户当前指令把重新蒸馏的极薄营销内容世界思路接入生产 Lead；测试固定语义中心、四种可选扩展视角、定位/内容/表现形式边界和有界子任务隔离。没有复制黄金礼品或水果答案，没有新增付费调用，也没有把离线接线写成业务通过。
 - A47 在用户授权后完成生产 Lead 内容世界试验。v1 因线程 ID 超过 64 字符在模型前失败，两例均 `0 events`、`0 Token`；测试先行修复后，v2 技术 `2/2` 完成、合计 64,005 Token，但两例均 `business-rejected`。黄金仍以黄金为语义中心并补造客户订单；水果只有生命周期局部正信号，仍退回三方向和经营角色模板。两例都读取 `content-engine-v1` 与 `incubation-model-v1`，方法压力只记为待验证推断，本轮未追加付费复测。
+- A48 按用户确认增加评测专用 `method_context_mode=disabled`，只允许纯内容世界、无子 Agent 的消融。相同模型、系统合同和语料下技术 `2/2` 完成、合计 59,967 Token，比基线少 4,038；黄金首次明确“黄金只是载体”，水果首次进入历史、流行文化和未来世界。两例仍因三模板、虚构供给、任意数字和未经核验的健康/价格主张被拒绝，因此方法上下文是重要干扰源但不是唯一病根，生产方法系统未改。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
 
-下一孵化纵切先离线追踪为什么 `content_world` 子任务同时召回 `content-engine-v1` 与 `incubation-model-v1`，比较它们的内容、检索查询和工具描述是否把 Lead 拉回完整方案，不预设移除方法一定更好。黄金礼品和水果只作人工纠偏锚点，不进入生产答案；随后还需补个人、品牌、单品和服务留出案例，避免示例过拟合。当前不迁入旧评测卡，不引入行业路由、语义 Schema、评分门、向量数据库、输出改写或强制子 Agent。未经用户再次确认不执行新的付费 run。
+下一孵化纵切先离线设计“任务相关紧凑方法投影”：内容世界探索不再收到完整孵化和下游内容发动机压力，模型上下文只保留必要方法、反例和紧凑来源边界，完整来源记录留在 artifact/审计层；同时消除母合同中纯探索与完整交付的残余冲突。黄金礼品和水果只作人工纠偏锚点，还需补个人、品牌、单品和服务留出案例。当前不全局删除方法，不迁入旧评测卡，不引入行业关键词路由、固定阶段、评分门、向量数据库、输出改写或强制子 Agent。未经用户再次确认不执行新的付费 run。

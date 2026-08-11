@@ -290,6 +290,30 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
                 "--execute",
             ]
         )
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "100",
+                "--max-model-calls",
+                "4",
+                "--task-mode",
+                "content_world",
+                "--method-context-mode",
+                "disabled",
+                "--subagent-mode",
+                "evidence-review",
+                "--max-subagent-steps",
+                "50",
+                "--max-subagent-tokens",
+                "30000",
+                "--execute",
+            ]
+        )
 
     with pytest.raises(SystemExit):
         module._parse_args(
@@ -338,6 +362,7 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
     assert args.max_agent_steps == 100
     assert args.max_model_calls == 6
     assert args.task_mode == "full_incubation"
+    assert args.method_context_mode == "available"
     content_world_args = module._parse_args(
         [
             "--case",
@@ -350,10 +375,29 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
             "4",
             "--task-mode",
             "content_world",
+            "--method-context-mode",
+            "disabled",
             "--execute",
         ]
     )
     assert content_world_args.task_mode == "content_world"
+    assert content_world_args.method_context_mode == "disabled"
+    with pytest.raises(SystemExit):
+        module._parse_args(
+            [
+                "--case",
+                "M01",
+                "--max-paid-trials",
+                "1",
+                "--max-agent-steps",
+                "100",
+                "--max-model-calls",
+                "4",
+                "--method-context-mode",
+                "disabled",
+                "--execute",
+            ]
+        )
     module.enforce_paid_trial_cap(trial_count=1, max_paid_trials=1)
     with pytest.raises(ValueError, match="paid trial cap"):
         module.enforce_paid_trial_cap(trial_count=2, max_paid_trials=1)
@@ -429,7 +473,39 @@ def test_agent_eval_uses_existing_deerflow_lead_agent_runtime() -> None:
     assert "create_agent(" not in source
 
 
-def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
+def test_agent_eval_can_remove_method_context_from_only_the_evaluation_tool_surface(monkeypatch) -> None:
+    module = _load_script()
+
+    class FakeClient:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+
+        @staticmethod
+        def _get_tools(*, model_name, subagent_enabled):
+            assert model_name == "fake-model"
+            assert subagent_enabled is False
+            return [
+                SimpleNamespace(name="incubation_context"),
+                SimpleNamespace(name="incubation_project_context"),
+            ]
+
+    monkeypatch.setattr(module, "DeerFlowClient", FakeClient)
+
+    available = module.build_agent_eval_client(
+        method_context_mode=module.MethodContextMode.AVAILABLE,
+    )
+    disabled = module.build_agent_eval_client(
+        method_context_mode=module.MethodContextMode.DISABLED,
+    )
+
+    assert [tool.name for tool in available._get_tools(model_name="fake-model", subagent_enabled=False)] == [
+        "incubation_context",
+        "incubation_project_context",
+    ]
+    assert [tool.name for tool in disabled._get_tools(model_name="fake-model", subagent_enabled=False)] == ["incubation_project_context"]
+
+
+def test_agent_eval_main_seals_content_world_ablation_with_fake_stream(
     monkeypatch,
     tmp_path,
 ) -> None:
@@ -524,6 +600,10 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
             "100",
             "--max-model-calls",
             "6",
+            "--task-mode",
+            "content_world",
+            "--method-context-mode",
+            "disabled",
             "--model",
             "fake-model",
             "--run-id",
@@ -550,6 +630,11 @@ def test_agent_eval_main_seals_full_offline_run_with_fake_stream(
     assert "incubation_project_context" in json.dumps(initial_trace)
     assert initial_trace["project_id"] == mutation_trace["project_id"]
     assert initial_trace["thread_id"] == mutation_trace["thread_id"]
+    experiment = json.loads((run_dir / "experiment.json").read_text(encoding="utf-8"))
+    assert experiment["task_mode"] == "content_world"
+    assert experiment["method_context_mode"] == "disabled"
+    tool_surface = json.loads((run_dir / "tool-surface.json").read_text(encoding="utf-8"))
+    assert "incubation_context" not in {tool["function"]["name"] for tool in tool_surface}
 
 
 def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
@@ -666,6 +751,7 @@ def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
     assert experiment["max_subagent_steps"] == 50
     assert experiment["max_subagent_tokens"] == 30_000
     assert experiment["task_mode"] == "full_incubation"
+    assert experiment["method_context_mode"] == "available"
     assert (run_dir / "experiment.json.sha256").is_file()
     trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
     task_calls = [event for event in trace["events"] if event["tool_name"] == "task" and event["event_type"] == "tool_call"]
