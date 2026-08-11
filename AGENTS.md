@@ -252,6 +252,13 @@ These apply repo-wide; module guides own the module-specific detail.
   and full-plan delivery; complete incubation work still uses project facts.
   This is an offline-tested prompt hypothesis, not a business-quality pass, and
   it does not promote either rejected evaluator context.
+  Audit A47 updates that validation record: a zero-token overlong-thread failure
+  was preserved, the bounded-ID production rerun completed `2/2` with 64,005
+  tokens, and both answers failed business review. Gold still centered gold
+  rather than gift-giving; fruit lifecycle was only a partial signal. Both cases
+  retrieved the broad `content-engine-v1` and `incubation-model-v1` cards, but
+  renewed full-incubation pressure remains an inference for offline audit. Do
+  not force a route or start another paid run without fresh user approval.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

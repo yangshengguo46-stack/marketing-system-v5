@@ -201,6 +201,14 @@ form. When the current request is only to open the content world, subject fit
 and full-plan delivery are deferred for that bounded task; they are not removed
 from complete incubation decisions. This wiring is offline prompt-tested and
 must not be described as a paid or business-quality pass.
+Audit A47 supersedes that validation status without changing the architecture:
+the first production-Lead content-world run failed before any model call because
+its thread ID exceeded 64 characters, then the bounded-ID rerun completed `2/2`
+with 64,005 tokens and failed business review. Gold still centered gold rather
+than gift-giving and human relations; fruit lifecycle was only a partial signal.
+Both cases retrieved `content-engine-v1` and `incubation-model-v1`. Treat renewed
+full-incubation pressure as a hypothesis for offline audit, not a proven cause,
+and require fresh approval before another paid run.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

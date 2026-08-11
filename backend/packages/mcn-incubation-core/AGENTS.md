@@ -1,6 +1,6 @@
 # MCN Incubation Core Guide
 
-Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A46 audits before changing this package.
+Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A47 audits before changing this package.
 
 ## Ownership
 
@@ -25,6 +25,7 @@ Read `docs/mcn-incubation-v5/current/PRODUCT_CONTRACT.md` and the A20-A46 audits
 - Micro-bakeoff runs must explicitly name cases and candidates, enforce a paid-call ceiling, use the same configured model and context budget, and seal every input and output. A one-case run can reject a candidate but cannot establish an architecture winner.
 - A44-A45 preserve the business-rejected conversation-v1 content-world card and its exact prompt provenance. `ResponseMode.CONTENT_WORLD_EXPLORATION`, `CONTENT_WORLD_EXPLORATION_CONTEXT`, and the conversation-v2 operator card are evaluator-only task-isolation contracts; they must remain absent from the production Lead prompt, method library, and knowledge catalog. Their existence is not a passing model result, and another paid run requires fresh user authorization.
 - A46 adds a distinct compact `MARKETING_WORLD_THINKING_CONTRACT` to the canonical Lead contract at the user's explicit direction. It separates positioning, content, and expression form and scopes pure world-opening requests away from subject-fit and full-plan delivery. Do not copy the rejected evaluation cards or domain examples into it, turn its optional lenses into ordered steps, permanently ignore subject facts in full incubation work, or describe the offline prompt test as business validation.
+- A47 records the first real production-Lead trial of that compact contract. Preserve the zero-token overlong-thread failure and the repaired 64,005-token run separately. Technical completion was `2/2`, but both outputs were business-rejected; fruit lifecycle was only a partial signal and gold still centered gold instead of gift-giving. Both trials retrieved `content-engine-v1` and `incubation-model-v1`; method pressure is an unproven hypothesis for offline audit, not permission to force a tool route or rerun a paid model without fresh approval.
 - Full Agent evaluation runs must use the existing `DeerFlowClient`, an isolated evaluation database and in-memory checkpoint, explicit trial and recursion limits, and a redacted tamper-evident tool trace. Do not describe either limit as an exact currency cap, require a fixed tool route, or run paid trials without `--execute` and user confirmation.
 - Do not test `thin_prompt_methods_truth_cases` with synthetic or merely authored examples. It requires observed outcomes plus human review under the case-memory contract.
 - Add a failing behavior test before implementation and keep the public product name outside this internal package.

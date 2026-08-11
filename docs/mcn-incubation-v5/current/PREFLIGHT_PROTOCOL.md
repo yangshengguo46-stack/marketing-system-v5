@@ -97,6 +97,28 @@ uv run python scripts/run_incubation_agent_eval.py \
 
 `agent-eval-m01-v4` 与带 initial/mutation 的 `agent-eval-m01-v5` 均技术成功、业务不通过。v5 还证明旧 mutation 编排使用独立项目和线程时不能评价真实修订能力；当前运行器已改为同项目同线程并在第二轮前追加证据。该修复只有离线回归，新的真实连续修订仍需单独确认付费调用。
 
+### 内容世界任务模式
+
+生产 Lead 的内容世界子任务使用原始请求和稀疏项目事实，不把专家答案、成功项或失败项送入模型，也不要求完整定位、表现形式、变现与实验交付：
+
+```bash
+cd backend
+uv run python scripts/run_incubation_agent_eval.py \
+  --case CW01-gold-gift \
+  --case CW02-fruit-world \
+  --task-mode content_world \
+  --corpus ../docs/mcn-incubation-v5/evidence/content-world-production-eval-cases.jsonl \
+  --max-paid-trials 2 \
+  --max-agent-steps 100 \
+  --max-model-calls 4 \
+  --run-id agent-eval-NEW-UNIQUE-ID \
+  --execute
+```
+
+`task_mode` 会进入不可变 experiment manifest。运行器把长 run/case 组合压成可读前缀加稳定哈希，生成不超过 64 字符且跨 case 不碰撞的线程 ID。`agent-eval-content-world-production-v1-20260811` 是修复前的零调用故障：两例均 `0 events`、`0 Token`，不得计为业务结果。
+
+修复后的 `agent-eval-content-world-production-v2-20260811` 技术 `2/2` 完成，共使用 64,005 Token，但黄金礼品与水果都被人工判为 `business-rejected`。两例均读取 `content-engine-v1` 和 `incubation-model-v1`；方法检索是否重新引入完整孵化压力只作为离线审计假设。未经新的用户确认，不再执行付费复测。
+
 ### 主体问答连续会话
 
 A38 已离线验证 `incubation_record_subject_answer` 的来源、Owner、幂等、版本链和审批排除合同，但没有发起新模型调用。现有 `--include-mutations` 只负责在两轮之间追加评测证据，不会伪造右侧界面的结构化用户回答，所以不能用它冒充主体问答验收。

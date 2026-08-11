@@ -13,6 +13,7 @@ from collections.abc import Awaitable, Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import StrEnum
 from hashlib import sha256
 from pathlib import Path
 from typing import Any, override
@@ -47,6 +48,7 @@ from deerflow.client import DeerFlowClient
 from deerflow.config.app_config import AppConfig, get_app_config
 from deerflow.config.subagents_config import CustomSubagentConfig, SubagentOverrideConfig
 from deerflow.config.token_budget_config import TokenBudgetConfig
+from deerflow.utils.thread_id import validate_thread_id
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CORPUS = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
@@ -94,6 +96,11 @@ _EVIDENCE_RESEARCHER_SYSTEM_PROMPT = """你是总控 Lead Agent 的只读孵化�
 5. 冲突与局限：记录证据冲突、过期、适用范围和仍不可判断之处。
 
 只返回这份研究简报，不写最终孵化判断。"""
+
+
+class AgentEvalTaskMode(StrEnum):
+    FULL_INCUBATION = "full_incubation"
+    CONTENT_WORLD = "content_world"
 
 
 def build_agent_eval_app_config(
@@ -239,6 +246,16 @@ def _safe_component(value: str) -> str:
     return normalized
 
 
+def build_trial_thread_id(*, run_id: str, case_id: str) -> str:
+    raw = f"incubation-{_safe_component(run_id)}-{_safe_component(case_id)}"
+    thread_safe = raw.replace(".", "-")
+    if thread_safe == raw and len(thread_safe) <= 64:
+        return validate_thread_id(thread_safe)
+    digest = sha256(raw.encode("ascii")).hexdigest()[:16]
+    prefix = thread_safe[: 64 - len(digest) - 1].rstrip("-_")
+    return validate_thread_id(f"{prefix}-{digest}")
+
+
 def prepare_trial_specs(
     *,
     cases: Sequence[EvalCase],
@@ -266,14 +283,31 @@ def prepare_trial_specs(
     return trials
 
 
-def build_agent_eval_prompt(trial: AgentEvalTrialSpec) -> str:
+def build_agent_eval_prompt(
+    trial: AgentEvalTrialSpec,
+    *,
+    task_mode: AgentEvalTaskMode = AgentEvalTaskMode.FULL_INCUBATION,
+) -> str:
     sections = [
         "请处理系统中已经存在的 MCN 孵化项目。",
         f"项目 ID：{trial.project_id}",
-        "请从系统保存的项目资料开始处理起号、表现形式、持续内容、变现与转化问题，不要为了本轮看起来完整而假定主体信息。",
-        "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时先说明目前能确定什么，指出会改变结论的最少主体信息，并只给条件化备选或最小试验，不要无依据宣布一种表现形式最适合。资料足够时才给完整路线，且不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
-        "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
     ]
+    if task_mode is AgentEvalTaskMode.CONTENT_WORLD:
+        sections.extend(
+            (
+                f"用户原始请求：{trial.case.scenario}",
+                "用户本轮只要求先打开这个商业对象的起号思路。请保持当前任务边界，不要扩写成完整孵化交付。",
+                "本次评测请直接在对话中回答，不要创建或呈现文件。",
+            )
+        )
+    else:
+        sections.extend(
+            (
+                "请从系统保存的项目资料开始处理起号、表现形式、持续内容、变现与转化问题，不要为了本轮看起来完整而假定主体信息。",
+                "区分已知事实、外部证据、暂定选择、关键未知和替代方案；信息不足时先说明目前能确定什么，指出会改变结论的最少主体信息，并只给条件化备选或最小试验，不要无依据宣布一种表现形式最适合。资料足够时才给完整路线，且不得补造身份、资产、效果、客户、渠道、产能、价格、预算或指标阈值。",
+                "本次评测请直接在对话中给出简洁判断，不要创建或呈现文件。",
+            )
+        )
     if trial.include_mutation:
         sections.append("这是同一项目的新增证据轮次；请结合上一轮实际回答与当前项目账本，指出哪些判断应当改变、保留或继续未知，不得虚构上一轮观点。")
     return "\n".join(sections)
@@ -501,6 +535,7 @@ def _write_experiment_manifest(
     max_model_calls: int,
     max_subagent_steps: int | None,
     max_subagent_tokens: int | None,
+    task_mode: AgentEvalTaskMode,
     created_at: datetime,
 ) -> None:
     subagent_enabled = subagent_mode != "disabled"
@@ -514,6 +549,7 @@ def _write_experiment_manifest(
         "max_lead_model_calls": max_model_calls,
         "max_subagent_steps": max_subagent_steps,
         "max_subagent_tokens": max_subagent_tokens,
+        "task_mode": task_mode.value,
         "system_contract_sha256": _evaluation_system_contract_sha256(
             app_config=app_config,
             subagent_mode=subagent_mode,
@@ -618,6 +654,12 @@ def _parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         choices=_SUBAGENT_MODES,
         default="disabled",
         help="Evaluation architecture variant; evidence-review enables one read-only specialist",
+    )
+    parser.add_argument(
+        "--task-mode",
+        choices=tuple(mode.value for mode in AgentEvalTaskMode),
+        default=AgentEvalTaskMode.FULL_INCUBATION.value,
+        help="User-task boundary to seal in the evaluation prompt",
     )
     parser.add_argument(
         "--max-subagent-steps",
@@ -759,6 +801,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         max_model_calls=args.max_model_calls,
         max_subagent_steps=args.max_subagent_steps,
         max_subagent_tokens=args.max_subagent_tokens,
+        task_mode=AgentEvalTaskMode(args.task_mode),
         created_at=created_at,
     )
     database_path = run_dir / "agent-state.db"
@@ -796,8 +839,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                             created_at=datetime.now(UTC),
                         )
                     )
-                prompt = build_agent_eval_prompt(trial)
-                thread_id = f"incubation-{_safe_component(run_id)}-{_safe_component(trial.case.case_id)}"
+                prompt = build_agent_eval_prompt(
+                    trial,
+                    task_mode=AgentEvalTaskMode(args.task_mode),
+                )
+                thread_id = build_trial_thread_id(
+                    run_id=run_id,
+                    case_id=trial.case.case_id,
+                )
                 collector = AgentEventCollector()
                 started_at = datetime.now(UTC)
                 terminal_error_code: str | None = None

@@ -12,10 +12,10 @@ AUDIT_ROOT = DOC_ROOT / "audits"
 PACKAGE_ROOT = REPO_ROOT / "backend" / "packages" / "mcn-incubation-core" / "mcn_incubation"
 
 
-def test_a20_to_a46_are_reviewed_and_source_backed() -> None:
+def test_a20_to_a47_are_reviewed_and_source_backed() -> None:
     audit_paths = sorted(AUDIT_ROOT.glob("A*.md"))
 
-    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 47)]
+    assert [path.name[:3] for path in audit_paths] == [f"A{index:02d}" for index in range(20, 48)]
     for path in audit_paths:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^status: reviewed$", text, re.MULTILINE), path
@@ -411,3 +411,31 @@ def test_a46_wires_only_the_user_corrected_marketing_world_thinking_into_the_lea
     assert "不是必须依次执行的流程" in agent_contract
     assert "CONTENT_WORLD_EXPLORATION_CONTEXT" not in agent_contract
     assert "CONTENT_WORLD_EXPLORATION_OPERATOR_CARD" not in agent_contract
+
+
+def test_a47_records_the_real_production_lead_trial_as_business_rejected() -> None:
+    audit = (AUDIT_ROOT / "A47-production-lead-content-world-trial.md").read_text(encoding="utf-8")
+    evidence = (DOC_ROOT / "evidence" / "2026-08-11-production-lead-content-world-trial.md").read_text(encoding="utf-8")
+
+    for marker in (
+        "agent-eval-content-world-production-v1-20260811",
+        "0 events",
+        "0 Token",
+        "agent-eval-content-world-production-v2-20260811",
+        "2/2",
+        "64,005",
+        "business-rejected",
+        "af0a38290e219b6c6bb6c89d9d8453f737b7c5957fb8d84cfaf8b5baaf69b942",
+        "a496f1a4f0a38ea652fdecd27f977ff236feea215cc7f15a3b4ff5153083541c",
+        "content-engine-v1",
+        "incubation-model-v1",
+        "黄金仍是语义中心",
+        "三年以上",
+        "未新增第二轮付费复测",
+    ):
+        assert marker in audit
+        assert marker in evidence
+
+    assert "方法检索重新引入完整孵化压力" in audit
+    assert "待验证推断" in audit
+    assert "水果存在局部进步" in evidence

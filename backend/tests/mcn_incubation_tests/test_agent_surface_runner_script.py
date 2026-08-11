@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 from datetime import UTC, datetime
 from hashlib import sha256
@@ -22,6 +23,7 @@ from deerflow.config.app_config import AppConfig
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SCRIPT_PATH = REPO_ROOT / "backend" / "scripts" / "run_incubation_agent_eval.py"
 CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "incubation-eval-cases.jsonl"
+CONTENT_WORLD_CASE_PATH = REPO_ROOT / "docs" / "mcn-incubation-v5" / "evidence" / "content-world-production-eval-cases.jsonl"
 NOW = datetime(2026, 8, 11, 15, 0, tzinfo=UTC)
 
 
@@ -61,6 +63,49 @@ def test_agent_eval_prepares_isolated_trials_without_embedding_case_answers() ->
     assert "不要创建或呈现文件" in initial_prompt
     assert "独立修订轮次" not in mutation_prompt
     assert "结合上一轮实际回答" in mutation_prompt
+
+
+def test_agent_eval_content_world_mode_uses_the_original_request_without_full_delivery_pressure() -> None:
+    module = _load_script()
+    cases = load_eval_cases(CONTENT_WORLD_CASE_PATH)
+    trials = module.prepare_trial_specs(
+        cases=cases,
+        include_mutations=False,
+        run_id="content-world-production",
+    )
+
+    assert [case.case_id for case in cases] == ["CW01-gold-gift", "CW02-fruit-world"]
+    for case, trial in zip(cases, trials, strict=True):
+        prompt = module.build_agent_eval_prompt(
+            trial,
+            task_mode=module.AgentEvalTaskMode.CONTENT_WORLD,
+        )
+        assert trial.project_id in prompt
+        assert case.scenario in prompt
+        assert "只要求先打开这个商业对象的起号思路" in prompt
+        assert "表现形式、持续内容、变现与转化问题" not in prompt
+        assert "会改变结论的最少主体信息" not in prompt
+        assert "不要无依据宣布一种表现形式最适合" not in prompt
+        for leaked_answer in ("礼品是品类中心", "人情世界", "水果本身是", "榴莲"):
+            assert leaked_answer not in prompt
+
+
+def test_agent_eval_bounds_generated_thread_ids_without_merging_cases() -> None:
+    module = _load_script()
+    run_id = "agent-eval-content-world-production-v2-20260811"
+
+    gold = module.build_trial_thread_id(run_id=run_id, case_id="CW01-gold-gift")
+    fruit = module.build_trial_thread_id(run_id=run_id, case_id="CW02-fruit-world")
+
+    assert len(gold) <= 64
+    assert len(fruit) <= 64
+    assert re.fullmatch(r"[A-Za-z0-9_-]+", gold)
+    assert re.fullmatch(r"[A-Za-z0-9_-]+", fruit)
+    assert gold != fruit
+    assert gold == module.build_trial_thread_id(run_id=run_id, case_id="CW01-gold-gift")
+
+    dotted = module.build_trial_thread_id(run_id="agent.eval.v2", case_id="CW.01")
+    assert re.fullmatch(r"[A-Za-z0-9_-]+", dotted)
 
 
 def test_agent_eval_disables_general_memory_without_mutating_host_config() -> None:
@@ -292,6 +337,23 @@ def test_agent_eval_requires_explicit_trial_and_step_caps() -> None:
     assert args.max_paid_trials == 1
     assert args.max_agent_steps == 100
     assert args.max_model_calls == 6
+    assert args.task_mode == "full_incubation"
+    content_world_args = module._parse_args(
+        [
+            "--case",
+            "CW01-gold-gift",
+            "--max-paid-trials",
+            "1",
+            "--max-agent-steps",
+            "100",
+            "--max-model-calls",
+            "4",
+            "--task-mode",
+            "content_world",
+            "--execute",
+        ]
+    )
+    assert content_world_args.task_mode == "content_world"
     module.enforce_paid_trial_cap(trial_count=1, max_paid_trials=1)
     with pytest.raises(ValueError, match="paid trial cap"):
         module.enforce_paid_trial_cap(trial_count=2, max_paid_trials=1)
@@ -603,6 +665,7 @@ def test_agent_eval_main_can_seal_bounded_evidence_subagent_trial(
     assert experiment["max_total_delegations"] == 1
     assert experiment["max_subagent_steps"] == 50
     assert experiment["max_subagent_tokens"] == 30_000
+    assert experiment["task_mode"] == "full_incubation"
     assert (run_dir / "experiment.json.sha256").is_file()
     trace = json.loads((run_dir / "traces" / "M01_initial.json").read_text(encoding="utf-8"))
     task_calls = [event for event in trace["events"] if event["tool_name"] == "task" and event["event_type"] == "tool_call"]
