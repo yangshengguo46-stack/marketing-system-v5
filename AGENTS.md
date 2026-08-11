@@ -195,6 +195,11 @@ These apply repo-wide; module guides own the module-specific detail.
   and resume the same thread. Do not claim revision ability from v5 or run
   another paid trial before the sequential harness and subject-discovery
   expectations pass offline.
+  Audit A36 governs public vertical-agent reuse: keep DeerFlow as the only
+  runtime, distill isolated context/evidence/feedback patterns only after
+  focused evaluation, and treat fixed-stage marketing agencies or large
+  persona/skill teams as architecture counterexamples rather than migration
+  targets.
   Audit A32 owns the host-independent account-decomposition evidence objects.
   Missing identity, coverage, metrics, media atoms, or counterexamples remain
   explicit warnings; cross-account references and unconsented cloud receipts

@@ -130,6 +130,14 @@ initial answer and is invalid evidence of revision ability. `--include-mutations
 must now append the mutation immediately before the second turn on the same
 project and checkpointed thread. Do not spend another paid trial until this
 sequential harness and subject-discovery expectations pass offline.
+Audit A36 records the bounded public scan of major-company and community
+vertical marketing agents. Keep DeerFlow as the sole runtime. Shared project
+context, sourced signal snapshots, outcome events, and durable human approval
+may be distilled and rewritten into existing incubation contracts only after
+focused evaluation. Do not import a second framework, fixed marketing stages,
+persona teams, shared vector memory, or bulk skill packs; Google ADK's fixed
+marketing-agency flow and AdClaw's many-role topology are explicit V4-style
+counterexamples, not adoption targets.
 The host-independent account evidence types live in
 `mcn_incubation.account_decomposition` under audit A32. They preserve canonical
 identity, sampling coverage, per-metric capture time, media rights/receipts,

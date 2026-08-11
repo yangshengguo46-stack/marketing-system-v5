@@ -25,14 +25,16 @@
 | M01 事实边界修正 | paid-retest-business-rejected | A31/A33；离线检索合同通过，但 v4 未调用方法工具并再次补造路线、资产、价格和阈值 | 离线比较逐主张依据等轻量认识结构；通过前不再付费重跑 |
 | M01 主体适配与记忆隔离 | paid-retest-business-rejected | A34/A35；泛记忆已隔离，但 v5 初始与 mutation 均继续补造形式、平台、供给、价格和阈值 | 用有效连续对话评测主体信息获取与修订 |
 | 连续修订评测 | offline-harness-tested | A35；同案例现共享项目/线程，mutation 只在第二轮前追加，两个 trace 分别密封 | 修正后的真实连续对话尚未付费验证 |
+| 开源同类与垂直改造审计 | audit-reviewed | A36；大公司官方样例、主流 Agent 框架和社区营销项目已按完整孵化闭环逐项比较 | 候选方法、信号账本和结果反馈模式仍须聚焦评测后才能采用 |
 | 真实孵化闭环 | designed | 验收定义已存在 | 个人、品牌、产品各一例真实结果 |
 
 ## 当前判断
 
-首选方向仍为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。`M01 v3/v5` 证明方法进入上下文仍可被违反，`v4` 证明模型也可能完全不读方法；A35 还证明独立 mutation 不能冒充连续修订。当前先把主体信息获取与真实修订的评测做对，不增加提示词规则或第二 Agent，尚未产生架构胜者。
+首选方向仍为“DeerFlow 唯一 Lead Agent + 薄宪法 + 按需方法与外部证据 + 项目事实账本 + 受控案例 + 执行工具”。A36 记录了多个通用 Agent 改造成垂直营销 Agent 的官方与社区实例，但本次公开搜索没有发现覆盖主体、定位、表现形式、变现、实验、真实结果和版本修订的完整 MCN 孵化实现；因此只吸收局部模式，不迁移第二运行时。`M01 v3/v5` 证明方法进入上下文仍可被违反，`v4` 证明模型也可能完全不读方法；A35 还证明独立 mutation 不能冒充连续修订。当前先把主体信息获取与真实修订的评测做对，不增加提示词规则或第二 Agent，尚未产生架构胜者。
 
 ## 本轮验证
 
+- `uv run python -m pytest tests/mcn_incubation_tests/test_architecture_and_docs.py -q`：A20-A36 连续编号、`reviewed` 状态、来源、结论和第五版决定合同共 `6 passed`；对应 Ruff 检查和格式检查通过。
 - `uv run python -m pytest tests/mcn_incubation_tests tests/test_incubation_context_tool.py tests/test_incubation_project_context_tool.py tests/test_incubation_project_evidence_tool.py tests/test_lead_agent_prompt.py tests/test_input_sanitization_middleware.py tests/test_create_deerflow_agent.py tests/test_lead_agent_model_resolution.py tests/test_tool_search.py tests/test_client_explicit_app_config.py -q`：孵化合同、持久化、方法/项目事实/项目证据工具、M01 主体适配与记忆隔离、账号拆解对象与引用校验、完整 Agent 脱敏轨迹与离线端到端运行器、账号拆解失败语料、V4 Skill 复用矩阵、Lead Agent、输入防伪、工具注册和 DeerFlow 创建共 `374 passed`。
 - `uv run python -m pytest tests/test_client.py tests/test_client_explicit_app_config.py -q`：DeerFlowClient 流式消息、终态工具参数补全、显式配置隔离和既有嵌入式客户端合同共 `173 passed`。
 - 后端全量套件因耗时在 8% 人工停止，当时为 `955 passed / 6 failed / 6 skipped`，不能记为全量通过。六个失败均来自本地 `.env` 启用免登录后与认证/CSRF 测试预期冲突；使用 `DEER_FLOW_AUTH_DISABLED=0` 隔离复跑同一测试文件为 `71 passed`，本轮也未修改认证代码。
@@ -72,6 +74,7 @@
 - 用户再次授权后完成 `agent-eval-m01-v5`：initial 与 mutation 技术 `2/2` 成功，总计 `86,053` Token。两轮均读取事实、证据和方法，仍补造形式、平台、题目、渠道、价格、产能与阈值，人工业务评审不通过。
 - A35 发现旧 mutation 运行在独立项目/线程中，无法看见初始回答，却被要求解释“原判断”，因此其虚构修订不能用于评价连续能力。运行器现已离线修为同项目、同线程和时序追加证据；没有再次付费。
 - M01 当前正式状态为 `business-rejected`，不是“通过”。A31 只能证明检索合同修正通过；在新的离线修正假设通过前不再自动发起付费 trial。
+- A36 完成公开同类扫描：Google 与 Microsoft 已证明通用框架可以直接改成营销业务 Agent；OpenCMO、Orallexa、AiToEarn、`marketingskills` 和 `personal-brand` 分别覆盖外部信号、结果反馈、执行/交易、项目上下文和主体信息，但没有一个公开项目覆盖第五版完整孵化闭环。Google 固定四阶段和 AdClaw 多角色/大量 Skill 被记录为第四版式反例。
 - 未运行 180 次真实模型输出，未完成 MCN 专家校准，未进行个人、品牌、产品的真实业务闭环。
 
 ## 下一纵切
