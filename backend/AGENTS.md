@@ -83,6 +83,16 @@ separately reviewed experiment. Freeze alternatives on their own branch or tag;
 never stack rejected prompt candidates into the active prompt. The compact
 history and archive refs live in `docs/mcn-incubation-v5/LEDGER.md`.
 
+E13-style cognitive-focus experiments must remain direct-model, evaluation-only
+comparisons on a frozen branch. They reproduce the current full Lead prompt but
+disable memory, registered Skills, tools, MCP, and subagents; require an exact
+paid-call cap; persist only visible focus frames/answers and usage in the
+gitignored `.deer-flow/cognitive-focus-eval/` tree; and never save provider
+reasoning fields. A static lens, focus-frame pass, or retrieved contrast case
+does not enter the production prompt, Skill catalog, or middleware chain unless
+the ledger records a cross-type business win. A same-model focus pass is not an
+independent authority and its text is never project fact or evidence.
+
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**
 

@@ -1231,6 +1231,15 @@ suite with `cd backend && make test-live` after providing a valid root
 sandboxes, artifacts, or files. Direct pytest runs additionally require
 `DEER_FLOW_RUN_LIVE_TESTS=1`.
 
+Experimental fifth-version incubation comparisons are kept off the production
+runtime. The E13 cognitive-focus runner lives only on its frozen experiment
+branch, requires an explicit `--execute` flag and an exact `--max-calls` cap,
+and writes visible answers, hashes, usage, and completion receipts under the
+gitignored `.deer-flow/cognitive-focus-eval/` directory. It does not persist
+provider reasoning fields, credentials, or production state. Adopt or reject
+its results through `docs/mcn-incubation-v5/LEDGER.md`; do not register an
+evaluation candidate as a runtime Skill or middleware directly.
+
 Regression coverage includes Docker sandbox mode detection and provisioner kubeconfig-path handling tests in `backend/tests/`.
 Backend blocking-IO diagnostics are available from the repository root with
 `make detect-blocking-io`: it statically scans backend business code for
