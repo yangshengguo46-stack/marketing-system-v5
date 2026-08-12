@@ -83,6 +83,31 @@ separately reviewed experiment. Freeze alternatives on their own branch or tag;
 never stack rejected prompt candidates into the active prompt. The compact
 history and archive refs live in `docs/mcn-incubation-v5/LEDGER.md`.
 
+The retained E16 research utilities are deliberately offline:
+
+- `scripts/run_marketing_brain_eval.py` measures visible Lead answers against
+  the sealed business rubric.
+- `scripts/run_content_world_map_eval.py` generates a bounded candidate map
+  without choosing a final route.
+- `scripts/run_business_semantic_backbone_eval.py` explicates the business
+  object, semantic head, qualifiers, seller actions, constitutive functions,
+  buyer progress, and ambiguity without producing an incubation plan.
+
+All three require explicit `--execute`, enforce a sealed call count, persist
+only visible output plus hashes/usage under the gitignored `.deer-flow/`, and
+must stay unregistered from the runtime. Provider reasoning is hashed rather
+than persisted. The rejected full-adviser, Lead-handoff, and content-world
+selector experiments remain ledger evidence only; do not restore or stack
+them without a separately preregistered evaluation. Run the focused offline
+tests with:
+
+```bash
+PYTHONPATH=. uv run pytest \
+  tests/test_marketing_brain_eval.py \
+  tests/test_content_world_map_eval.py \
+  tests/test_business_semantic_backbone_eval.py -q
+```
+
 `experiments/e15_account_evidence/` is the only current exception in the form
 of an isolated research package. It is not imported or registered by the
 runtime. Keep its source-rights manifest, dynamic MediaKit schema/version

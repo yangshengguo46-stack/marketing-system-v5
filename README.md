@@ -19,6 +19,9 @@ https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 > [!IMPORTANT]
 > This local fifth-version branch keeps DeerFlow's runtime intact and targets a usable 80-point **marketing brain** for incubation: marketing subject, positioning, content world, presentation format, monetization, and fact boundaries. Media and account extraction are supporting evidence capabilities, not the product target. The E15 implementation remains an isolated experiment; see [`ADR-007`](docs/mcn-incubation-v5/decisions/ADR-007-80-point-learning-loop.md) and the [`ledger`](docs/mcn-incubation-v5/LEDGER.md).
 
+> [!NOTE]
+> The current marketing-brain research checkpoint keeps three offline evaluation utilities under `backend/scripts/`: the visible-answer baseline, a bounded content-world mapper, and a business-semantic backbone parser. They require explicit `--execute`, write redacted artifacts under `.deer-flow/`, and are not registered as runtime tools, Skills, middleware, or mandatory incubation stages. Selector and multi-adviser experiments were rejected; their evidence remains in the ledger rather than in production code.
+
 ## Official Website
 
 Learn more and see **real demos** on our [**official website**](https://deerflow.tech).
