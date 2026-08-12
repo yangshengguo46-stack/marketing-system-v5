@@ -613,6 +613,7 @@ def test_system_prompt_template_preserves_placeholders():
         "{soul}",
         "{self_update_section}",
         "{business_semantics_section}",
+        "{content_world_explorer_section}",
         "{subagent_thinking}",
         "{skills_section}",
         "{deferred_tools_section}",
@@ -656,6 +657,7 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
         assert leaked_case_answer not in template
 
     assert "analyze_business_semantics" not in template
+    assert "explore_content_worlds" not in template
 
 
 def test_business_semantics_guidance_is_capability_gated():
@@ -665,6 +667,71 @@ def test_business_semantics_guidance_is_capability_gated():
     assert "语义材料，不替你选择账号主语" in section
     assert "每轮调用 `analyze_business_semantics`" not in section
     assert "必须调用 `analyze_business_semantics`" not in section
+
+
+def test_content_world_guidance_is_capability_gated_and_narrowly_triggered():
+    section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
+
+    assert "调用 `explore_content_worlds`" in section
+    assert "起号、账号定位、长期讲什么或内容方向" in section
+    assert "只问一个能确定商业对象的问题" in section
+    assert "不要先用 B/C、平台、表现形式或变现方式" in section
+    assert "不是每轮必经步骤" in section
+    assert "最终营销判断仍由你负责" in section
+
+
+def test_content_world_trigger_does_not_confuse_a_clear_object_with_downstream_ambiguity():
+    section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
+
+    assert "能识别主体实际提供、销售、加工或服务的产品/服务对象" in section
+    assert "经营方式、生产方式、客户简称" in section
+    assert "不等于商业对象不明确" in section
+    assert "不得因此先调用 `ask_clarification`" in section
+    assert "不得为澄清而补造选项" in section
+    assert "不再解释下游未知" in section
+
+
+def test_content_world_guidance_selects_the_largest_effective_world_without_sales_collapse():
+    section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
+
+    assert "最大有效内容世界" in section
+    assert "离成交最近" in section
+    assert "宽品类本身" in section
+    assert "向下的种类" in section
+    assert "历史、地域、文化" in section
+    assert "别人也能讲" in section
+    assert "B/C" in section
+    assert "生产方式" in section
+    assert "不得擅自建议拆号" in section
+    assert "不接收模型改写的业务事实" in section
+    assert "`content_world_map.root_subject`" in section
+    assert "`root_world` 的各轴属于同一张地图" in section
+    assert "一手经验更少" in section
+    assert "不能因此从内容世界删除" in section
+    assert "所有有结构关系的非空轴" in section
+    assert "B/C 等简称" in section
+    assert "不得自行展开为具体客户类型或成交渠道" in section
+    assert "只有 `fact_boundary.allowed_subject_claims`" in section
+    assert "`coverage_contract` 中的每个非空轴" in section
+    assert "明确说出轴的名称和它为何属于这个世界" in section
+    assert "不能用相邻轴代替" in section
+    assert "`fact_boundary.do_not_infer`" in section
+    assert "一般知识和待研究方向" in section
+    assert "不得改写成主体已经拥有" in section
+    assert "地图只能证明可讲范围" in section
+    assert "不能证明主体亲历、掌握或拥有" in section
+    assert "当前内容世界回答不提及 B/C" in section
+    assert "具体对象、需求与渠道" in section
+    assert "不得举例补全" in section
+    assert "源头、生产者或专业身份" in section
+    assert "只能形成条件化的可信视角" in section
+    assert "不得推成具体场地、一手经历、供应能力" in section
+    assert "回答前最后读取 `response_contract`" in section
+    assert "本轮回答范围" in section
+    assert "不得擅自扩成完整起号方案" in section
+    assert "不再解释下游未知" in section
+    assert "不追问" in section
+    assert "完成 `output_shape` 后立即停止" in section
 
 
 def test_incubation_core_does_not_default_an_expression_form_when_subject_capability_is_unknown():
@@ -686,7 +753,8 @@ def test_incubation_core_separates_content_theme_from_evidence_and_available_mat
 
     assert "区分内容母题与能力证明、可拍素材" in template
     assert "有视觉冲击不等于应当成为账号主语" in template
-    assert "先由长期需求和关系命题决定讲什么" in template
+    assert "先由内容世界的结构与容量决定讲什么" in template
+    assert "不把向上抽象当成唯一正确方向" in template
 
 
 def _make_minimal_app_config():

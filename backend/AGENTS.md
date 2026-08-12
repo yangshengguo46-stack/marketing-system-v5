@@ -76,9 +76,11 @@ deer-flow/
 ### Local Fifth-Version Incubation Boundary
 
 The active fifth-version customization is intentionally limited to the existing
-Lead Agent prompt in `packages/harness/deerflow/agents/lead_agent/prompt.py` and
-the bounded `analyze_business_semantics` tool in
-`packages/harness/deerflow/tools/builtins/business_semantics_tool.py`.
+Lead Agent prompt in `packages/harness/deerflow/agents/lead_agent/prompt.py`, the
+bounded `analyze_business_semantics` tool in
+`packages/harness/deerflow/tools/builtins/business_semantics_tool.py`, and the
+bounded `explore_content_worlds` tool in
+`packages/harness/deerflow/tools/builtins/content_world_explorer_tool.py`.
 Do not add an incubation runtime, domain package, middleware, method library,
 fixed workflow, score gate, or specialist roster to the active branch without a
 separately reviewed experiment. Freeze alternatives on their own branch or tag;
@@ -97,20 +99,25 @@ The retained E16 research utilities are deliberately offline:
 
 All three require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
-Provider reasoning is hashed rather than persisted. Only the bounded semantic
-contract has a separately authorized runtime tool: it is available to the
-default Lead on demand, never as middleware or a mandatory stage, and it cannot
-produce the final marketing decision. The other evaluation utilities remain
-unregistered. The rejected full-adviser, Lead-handoff, and content-world
-selector experiments remain ledger evidence only; do not restore or stack
-them without a separately preregistered evaluation. Run the focused offline
-tests with:
+Provider reasoning is hashed rather than persisted. The runtime tools are
+available only to the default Lead on demand, never as middleware or mandatory
+stages, and cannot produce the final marketing decision. `explore_content_worlds`
+has no model-supplied fact argument: it reads recent real-user messages, runs
+semantic explication and one rooted expansion privately, validates both
+contracts (with at most one schema-only repair), then exposes only the bounded
+map and handoff contract. The offline evaluators remain unregistered. The
+rejected full-adviser, Lead-handoff, and content-world selector experiments
+remain ledger evidence only; do not restore or stack them without a separately
+preregistered evaluation. A34 owns the production boundary and live acceptance.
+Run the focused tests with:
 
 ```bash
 PYTHONPATH=. uv run pytest \
   tests/test_marketing_brain_eval.py \
   tests/test_content_world_map_eval.py \
-  tests/test_business_semantic_backbone_eval.py -q
+  tests/test_business_semantic_backbone_eval.py \
+  tests/test_business_semantics_tool.py \
+  tests/test_content_world_explorer_tool.py -q
 ```
 
 `experiments/e15_account_evidence/` is the only current exception in the form
@@ -856,6 +863,7 @@ that cannot tell sibling branches apart.
    - `present_files` - Make output files visible to user (only `/mnt/user-data/outputs`); virtual paths use `resolve_runtime_user_id(runtime)` so validation resolves the same user-scoped outputs directory established by `ThreadDataMiddleware`
    - `ask_clarification` - Request clarification (intercepted by ClarificationMiddleware, which preserves text fallback and adds `artifact.human_input` for Web UI Human Input Cards). Beyond free text and single choice, the request-side v2 protocol supports `fields` (structured form card collecting several values at once; field types: text/textarea/number/select/multi_select/checkbox/date, validated and normalized server-side in the middleware — invalid entries are dropped, unknown types degrade to `text`; a standalone multi-select question is a one-field form). Replies stay on the v1 response protocol (`text`/`option`): the form card submits a readable text summary
    - `analyze_business_semantics` - Default-Lead-only, on-demand explication of a business expression into a validated semantic structure; it does not choose positioning, content, format, monetization, or an incubation route
+   - `explore_content_worlds` - Default-Lead-only, on-demand rooted content-world expansion for account-start, positioning, or long-term-content questions; it reads real user messages directly, returns a fact-bounded map, and leaves the final judgment to the Lead
    - `view_image` - Read image as base64 (added only if model supports vision)
    - `setup_agent` - Bootstrap-only: persist a brand-new custom agent's `SOUL.md` and `config.yaml`. Bound only when `is_bootstrap=True`.
    - `update_agent` - Custom-agent-only: persist self-updates to the current agent's `SOUL.md` / `config.yaml` from inside a normal chat (partial update + atomic write). Bound when `agent_name` is set and `is_bootstrap=False`.

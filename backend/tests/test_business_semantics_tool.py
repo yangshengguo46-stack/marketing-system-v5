@@ -108,6 +108,10 @@ def test_semantic_contract_is_generic_and_only_explicitates_business_language():
         assert required in prompt
     assert "不是内容世界选择器" in prompt
     assert "不得输出人设、受众、平台、表现形式" in prompt
+    assert "斜杠、顿号或“或”连接" in prompt
+    assert "不得改写成主体同时具备" in prompt
+    assert "B 端、C 端或其他简称只支持其简称本身" in prompt
+    assert "助手的提问选项、工具参数、总结、举例或改写" in prompt
     for leaked_answer in ("黄金", "礼品", "水果", "宝妈", "脐橙"):
         assert leaked_answer not in prompt
 

@@ -87,11 +87,21 @@ def test_default_cases_cover_distinct_business_shapes_without_one_universal_answ
     assert all(case.failure_modes for case in cases)
 
 
-def test_only_user_reviewed_anchor_is_marked_reviewed():
+def test_user_reviewed_anchors_are_marked_reviewed():
     cases = {case.case_id: case for case in default_cases()}
 
     assert cases["gold-gift"].review_status == "reviewed"
-    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id != "gold-gift")
+    assert cases["seafood-source"].review_status == "reviewed"
+    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id not in {"gold-gift", "seafood-source"})
+
+
+def test_seafood_anchor_records_the_reviewed_broad_category_boundary():
+    seafood = {case.case_id: case for case in default_cases()}["seafood-source"]
+
+    assert "种类、历史、地域、各地饮食习惯与文化" in " ".join(seafood.success_criteria)
+    assert "不因题目提到两类客户就擅自拆成两个账号" in " ".join(seafood.success_criteria)
+    assert "养殖和捕捞是尚未确认的选项" in " ".join(seafood.known_facts)
+    assert "只围绕品质、新鲜度、挑选避坑或供应链流转起号" in seafood.failure_modes
 
 
 def test_candidate_messages_preserve_the_real_user_input_boundary():

@@ -19,6 +19,9 @@ https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 > [!IMPORTANT]
 > 当前本地第五版保持 DeerFlow 运行时边界，首要目标是将孵化**营销脑**做到稳定可用的 80 分：能判断营销主语、账号定位、内容世界、表现形式、变现承接和事实边界。视频与账号拆解只是证据能力，不是 80 分的对象；E15 仍是隔离实验。详见 [`ADR-007`](docs/mcn-incubation-v5/decisions/ADR-007-80-point-learning-loop.md) 与 [`台账`](docs/mcn-incubation-v5/LEDGER.md)。
 
+> [!NOTE]
+> 默认 Lead 现在有两个按需的有界能力：`analyze_business_semantics` 显化用户到底在做什么，`explore_content_worlds` 把该业务能够长期讲什么展开成一张有事实边界的根地图。两者都不是中间件、固定孵化阶段或最终判断者。海鲜、黄金礼品、水果店和工业设备防护包装的真实 Gateway 验收见 [`A34`](docs/mcn-incubation-v5/audits/A34-production-content-world-exploration.md)。当前通过的是“长期讲什么”这一层，不冒充整个营销脑已经完成。
+
 ## 官网
 
 想了解更多，或者直接看**真实演示**，可以访问[**官网**](https://deerflow.tech)。

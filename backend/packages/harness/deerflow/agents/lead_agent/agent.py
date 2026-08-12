@@ -875,9 +875,18 @@ def _make_lead_agent(config: RunnableConfig, *, app_config: AppConfig):
     raw_tools = get_available_tools(model_name=model_name, groups=agent_config.tool_groups if agent_config else None, subagent_enabled=subagent_enabled, app_config=resolved_app_config)
     if agent_name is None:
         from deerflow.tools.builtins.business_semantics_tool import build_business_semantics_tool
+        from deerflow.tools.builtins.content_world_explorer_tool import build_content_world_explorer_tool
 
         raw_tools.append(
             build_business_semantics_tool(
+                model_name=model_name,
+                thinking_enabled=thinking_enabled,
+                reasoning_effort=reasoning_effort,
+                app_config=resolved_app_config,
+            )
+        )
+        raw_tools.append(
+            build_content_world_explorer_tool(
                 model_name=model_name,
                 thinking_enabled=thinking_enabled,
                 reasoning_effort=reasoning_effort,
@@ -937,6 +946,7 @@ def _make_lead_agent(config: RunnableConfig, *, app_config: AppConfig):
             user_id=resolved_user_id,
             skill_names=skill_setup.skill_names or None,
             business_semantics_enabled=any(tool.name == "analyze_business_semantics" for tool in final_tools),
+            content_world_explorer_enabled=any(tool.name == "explore_content_worlds" for tool in final_tools),
         ),
         state_schema=get_thread_state_schema(mode),
     )

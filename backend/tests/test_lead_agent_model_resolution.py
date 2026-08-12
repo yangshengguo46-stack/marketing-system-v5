@@ -294,7 +294,9 @@ def test_internal_make_lead_agent_selects_and_normalizes_delta_state(monkeypatch
     assert middleware.state_schema is original_schema
     tool_names = {tool.name for tool in result["tools"]}
     assert ("analyze_business_semantics" in tool_names) is (not is_bootstrap)
+    assert ("explore_content_worlds" in tool_names) is (not is_bootstrap)
     assert ("analyze_business_semantics" in result["system_prompt"]) is (not is_bootstrap)
+    assert ("explore_content_worlds" in result["system_prompt"]) is (not is_bootstrap)
 
 
 def test_internal_make_lead_agent_does_not_take_mode_from_runtime_context(monkeypatch):
@@ -551,7 +553,11 @@ def test_make_lead_agent_filters_clarification_tool_for_non_interactive_runs(mon
         }
     )
 
-    assert [tool.name for tool in result["tools"]] == ["bash", "analyze_business_semantics"]
+    assert [tool.name for tool in result["tools"]] == [
+        "bash",
+        "analyze_business_semantics",
+        "explore_content_worlds",
+    ]
 
 
 def test_make_lead_agent_rejects_invalid_bootstrap_agent_name(monkeypatch):
@@ -1262,6 +1268,8 @@ def test_make_lead_agent_applies_agent_model_settings(monkeypatch):
     assert captured["reasoning_effort"] == "high"  # from agent config
     assert "analyze_business_semantics" not in {tool.name for tool in result["tools"]}
     assert "analyze_business_semantics" not in result["system_prompt"]
+    assert "explore_content_worlds" not in {tool.name for tool in result["tools"]}
+    assert "explore_content_worlds" not in result["system_prompt"]
 
 
 def test_request_thinking_overrides_agent_default(monkeypatch):

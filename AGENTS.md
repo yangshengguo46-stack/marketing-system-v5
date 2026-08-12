@@ -167,7 +167,11 @@ These apply repo-wide; module guides own the module-specific detail.
   `backend/experiments/` is isolated and must not be registered as a Lead tool,
   MCP server, or Skill before real-account acceptance is recorded.
   The default Lead may call the bounded `analyze_business_semantics` tool when
-  a user's business expression needs semantic explication; this tool is not a
-  workflow stage and never owns the final incubation decision.
+  a user's business expression needs semantic explication. For requests about
+  starting or positioning an account or choosing a long-term content territory,
+  it may call `explore_content_worlds`, which reads user-authored thread text,
+  expands one rooted map, and returns a fact/response contract. Neither tool is
+  middleware or a workflow stage, and neither owns the final incubation
+  decision. The accepted boundary and live cases are recorded in A34.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

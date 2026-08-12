@@ -11,11 +11,15 @@ from typing import Any
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool, tool
-from langgraph.constants import TAG_NOSTREAM
 
 from deerflow.agents.middlewares.input_sanitization_middleware import neutralize_untrusted_tags
 from deerflow.config.app_config import AppConfig
 from deerflow.models.factory import create_chat_model
+from deerflow.tools.builtins._bounded_model_support import (
+    build_private_invoke_config,
+    record_private_model_usage,
+    serialize_tool_payload,
+)
 from deerflow.tools.types import Runtime
 from deerflow.utils.llm_text import extract_response_text
 from deerflow.utils.messages import ORIGINAL_USER_CONTENT_KEY
@@ -54,6 +58,9 @@ BUSINESS_SEMANTIC_BACKBONE_SYSTEM_PROMPT = """你是离线架构评测中的商�
 - `explicit` 只用于用户原话明确支持的信息；常识性的品类功能、复合表达关系或通用买方进展只能用 `lexical_semantics`。
 - 语法主词与商业对象可能不同；经营载体、身份和卖方动作均不得自动取代商业对象。
 - 如果输入只有身份、做号意图或其他无法解析出商业对象的线索，`offer_object` 返回 null，并说明信息不足。
+- 斜杠、顿号或“或”连接的动作、模式与身份默认表示未决选项，不得改写成主体同时具备；只有用户明确说“都做”“同时做”才可并列为已知事实。
+- B 端、C 端或其他简称只支持其简称本身；用户没有亲自说明时，不得把餐饮、经销、零售、直销等常见例子扩写成 `explicit` 客户、渠道或动作。
+- 只把用户本人消息中的陈述视为用户事实。助手的提问选项、工具参数、总结、举例或改写不能提升为 `explicit`。
 
 禁止事项：
 - 不得生成内容世界、选择主语、向上抽象、设计定位或判断变现路径。
@@ -288,64 +295,6 @@ def build_semantic_messages(business_expression: str) -> list[object]:
     ]
 
 
-def _tool_json(payload: Mapping[str, Any]) -> str:
-    return neutralize_untrusted_tags(json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
-
-
-def _invoke_config(runtime: Runtime) -> dict[str, Any]:
-    config = dict(runtime.config or {})
-    tags = list(config.get("tags") or [])
-    for tag in (
-        "tool:business-semantics",
-        "incubation:business-semantics",
-        TAG_NOSTREAM,
-    ):
-        if tag not in tags:
-            tags.append(tag)
-    config["tags"] = tags
-    config["run_name"] = "business_semantic_backbone"
-    # The validated structure is returned through the tool result. Keeping the
-    # provider callback chain here would also persist private reasoning in the
-    # parent RunJournal, so this bounded internal call owns no callbacks.
-    config["callbacks"] = []
-    return config
-
-
-def _record_usage(
-    runtime: Runtime,
-    response: AIMessage,
-    *,
-    fallback_model_name: str,
-) -> None:
-    context = runtime.context if isinstance(runtime.context, dict) else {}
-    journal = context.get("__run_journal")
-    recorder = getattr(journal, "record_external_llm_usage_records", None)
-    usage = dict(response.usage_metadata or {})
-    if not callable(recorder) or not usage:
-        return
-    input_tokens = int(usage.get("input_tokens") or 0)
-    output_tokens = int(usage.get("output_tokens") or 0)
-    total_tokens = int(usage.get("total_tokens") or input_tokens + output_tokens)
-    input_details = usage.get("input_token_details") or {}
-    cache_read_tokens = int(input_details.get("cache_read") or 0) if isinstance(input_details, Mapping) else 0
-    response_metadata = response.response_metadata or {}
-    provider_model = response_metadata.get("model_name") or response_metadata.get("model") if isinstance(response_metadata, Mapping) else None
-    source_suffix = runtime.tool_call_id or str(id(response))
-    recorder(
-        [
-            {
-                "source_run_id": f"business-semantics:{source_suffix}",
-                "caller": "tool:business-semantics",
-                "model_name": provider_model or fallback_model_name,
-                "input_tokens": input_tokens,
-                "output_tokens": output_tokens,
-                "total_tokens": total_tokens,
-                "cache_read_tokens": cache_read_tokens,
-            }
-        ]
-    )
-
-
 def build_business_semantics_tool(
     *,
     model_name: str,
@@ -377,7 +326,7 @@ def build_business_semantics_tool(
         """
         expression = business_expression.strip()
         if not expression:
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "invalid_input",
@@ -385,7 +334,7 @@ def build_business_semantics_tool(
                 }
             )
         if len(expression) > MAX_BUSINESS_EXPRESSION_CHARS:
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "invalid_input",
@@ -404,13 +353,17 @@ def build_business_semantics_tool(
             response = await asyncio.wait_for(
                 model.ainvoke(
                     build_semantic_messages(expression),
-                    config=_invoke_config(runtime),
+                    config=build_private_invoke_config(
+                        runtime,
+                        run_name="business_semantic_backbone",
+                        tags=("tool:business-semantics", "incubation:business-semantics"),
+                    ),
                 ),
                 timeout=timeout_seconds,
             )
         except TimeoutError:
             logger.warning("Business semantic model timed out")
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "timeout",
@@ -419,7 +372,7 @@ def build_business_semantics_tool(
             )
         except Exception as exc:
             logger.warning("Business semantic provider call failed (%s)", type(exc).__name__)
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "provider_error",
@@ -429,7 +382,7 @@ def build_business_semantics_tool(
 
         if not isinstance(response, AIMessage):
             logger.warning("Business semantic model returned %s", type(response).__name__)
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "invalid_model_output",
@@ -437,12 +390,18 @@ def build_business_semantics_tool(
                 }
             )
 
-        _record_usage(runtime, response, fallback_model_name=model_name)
+        record_private_model_usage(
+            runtime,
+            response,
+            fallback_model_name=model_name,
+            caller="tool:business-semantics",
+            source_prefix="business-semantics",
+        )
         try:
             semantics = parse_business_semantics(extract_response_text(response.content))
         except (TypeError, ValueError):
             logger.warning("Business semantic model returned an invalid contract")
-            return _tool_json(
+            return serialize_tool_payload(
                 {
                     "status": "error",
                     "error_code": "invalid_model_output",
@@ -450,6 +409,6 @@ def build_business_semantics_tool(
                 }
             )
 
-        return _tool_json({"status": "ok", "business_semantics": semantics})
+        return serialize_tool_payload({"status": "ok", "business_semantics": semantics})
 
     return analyze_business_semantics

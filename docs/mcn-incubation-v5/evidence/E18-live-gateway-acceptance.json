@@ -1,0 +1,108 @@
+{
+  "evidence_id": "E18-live-gateway-acceptance",
+  "recorded_at": "2026-08-13",
+  "branch": "codex/marketing-brain-80",
+  "parent_commit": "03248dfb25eebe0a652866d3a5ff642845d81cf7",
+  "model": "glm-5-2-260617",
+  "thinking_enabled": true,
+  "reasoning_effort": "low",
+  "privacy": {
+    "final_answer_body_persisted": false,
+    "private_reasoning_persisted": false,
+    "api_credentials_persisted": false,
+    "hash_algorithm": "sha256"
+  },
+  "runs": [
+    {
+      "case": "seafood-contract-failure",
+      "thread_id": "eval_seafood_20260813_11",
+      "run_id": "818cd2ed-5588-4cfc-a717-a932f4b7cb22",
+      "thread_retained_after_review": false,
+      "tool_status": "error",
+      "tool_error_code": "invalid_model_output",
+      "root_subject": null,
+      "final_answer_chars": 1630,
+      "final_answer_sha256": "c3f5e64a03eebe40099ff5619da17af6d93a6113664d09489b66040a5ffd101a",
+      "verdict": "rejected",
+      "reason": "The final prose looked partly correct, but the content-world tool failed its contract."
+    },
+    {
+      "case": "seafood-handoff-failure",
+      "thread_id": "eval_seafood_20260813_13",
+      "run_id": "ad692083-3535-47cd-aeb1-43314fc84870",
+      "thread_retained_after_review": false,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "海鲜",
+      "final_answer_chars": 1424,
+      "final_answer_sha256": "3e943ae547cb48e42ee2c96a64cc4b16381fd3c81208cd3fdc7d0bfa1333a8f0",
+      "verdict": "rejected",
+      "reason": "The rooted map passed, but the Lead invented concrete B/C roles and channels."
+    },
+    {
+      "case": "seafood-acceptance-1",
+      "thread_id": "eval_seafood_20260813_14",
+      "run_id": "44ce55f5-5e41-410a-873d-9d509abcbd5f",
+      "thread_retained_after_review": false,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "海鲜",
+      "final_answer_chars": 1055,
+      "final_answer_sha256": "bdc0b078fcbd7736aa4cd6fed716fa9a3588efec1bd8fff8778429f05f72ffe0",
+      "verdict": "accepted",
+      "reason": "The complete seafood world was preserved without concrete B/C invention."
+    },
+    {
+      "case": "seafood-acceptance-2",
+      "thread_id": "eval_seafood_20260813_15",
+      "run_id": "ebbbbf99-7e94-4fc1-8234-f1507ecf7a05",
+      "thread_retained_after_review": true,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "海鲜",
+      "final_answer_chars": 1082,
+      "final_answer_sha256": "d21d9786c67f57df179bb8b7eeb6c4c3e731f8d1d8a0ee9f5693c4ed4eecdeb6",
+      "verdict": "accepted",
+      "reason": "The consecutive stability run preserved all required axes and the fact boundary."
+    },
+    {
+      "case": "gold-gift",
+      "thread_id": "eval_gold_gift_20260813_01",
+      "run_id": "74ff8efa-3920-41ec-ac8d-66cffa916d1c",
+      "thread_retained_after_review": true,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "礼品",
+      "final_answer_chars": 1081,
+      "final_answer_sha256": "51bc7db1d1597c8051f80943ab530788922de1291de0728385a7bb6a2ad7e98b",
+      "verdict": "accepted",
+      "reason": "Gold remained a material/carrier while gift-giving and relationships became the content world."
+    },
+    {
+      "case": "fruit-store",
+      "thread_id": "eval_fruit_store_20260813_01",
+      "run_id": "cafe314e-f66b-46b1-8f28-c5d2abea4f89",
+      "thread_retained_after_review": true,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "水果",
+      "final_answer_chars": 1164,
+      "final_answer_sha256": "ed010a8e2aebdc46e99519b06610fff0d3b00d83b9ecd06de64e497805a92f12",
+      "verdict": "accepted",
+      "reason": "The store remained an operating container and the complete fruit world was preserved."
+    },
+    {
+      "case": "industrial-protective-packaging",
+      "thread_id": "eval_industrial_packaging_20260813_01",
+      "run_id": "4fbf1035-a164-4acc-8c33-8915abeee24f",
+      "thread_retained_after_review": true,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "root_subject": "包装",
+      "final_answer_chars": 1292,
+      "final_answer_sha256": "08fe425ce73eb61b1c747fc20f84f69dc881876f1c8d6a06be4936990f7b1d26",
+      "verdict": "accepted",
+      "reason": "The world connected packaging to industrial transport risk control and safe precision-preserving delivery."
+    }
+  ]
+}

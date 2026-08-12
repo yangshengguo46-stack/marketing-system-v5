@@ -155,6 +155,29 @@ DEFAULT_CASES = (
         review_status="draft",
     ),
     BrainEvalCase(
+        case_id="seafood-source",
+        business_shape="broad-category",
+        question="我是做海鲜源头养殖或者捕捞的，B和C都做，我要怎么起号？",
+        known_facts=(
+            "主体从事海鲜源头业务",
+            "养殖和捕捞是尚未确认的选项，不是已知同时具备",
+            "主体同时面向B端和C端",
+        ),
+        material_unknowns=("具体海鲜品类", "实际生产方式", "产地与资源", "主体表现与制作条件"),
+        success_criteria=(
+            "意识到海鲜本身已是宽内容世界，能沿种类、历史、地域、各地饮食习惯与文化继续展开",
+            "将源头身份与实际生产方式用于定位、证据和素材适配，而不是把生产过程或供应链自动选成内容母题",
+            "B端与C端影响表达和承接，但不因题目提到两类客户就擅自拆成两个账号",
+            "具体历史、地域习惯与产业事实保持待研究，不伪装成已经核验的事实",
+        ),
+        failure_modes=(
+            "只围绕品质、新鲜度、挑选避坑或供应链流转起号",
+            "把养殖和捕捞写成主体同时拥有的现场、能力或素材",
+            "先按B端/C端或养殖/捕捞拆账号，而没有建立海鲜内容世界",
+        ),
+        review_status="reviewed",
+    ),
+    BrainEvalCase(
         case_id="industrial-packaging",
         business_shape="professional-product",
         question="我是做工业设备防护包装的，有什么起号建议？",

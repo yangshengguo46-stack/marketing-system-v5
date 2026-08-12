@@ -1,5 +1,6 @@
 from .business_semantics_tool import build_business_semantics_tool
 from .clarification_tool import ask_clarification_tool
+from .content_world_explorer_tool import build_content_world_explorer_tool
 from .list_uploaded_files_tool import list_uploaded_files
 from .present_file_tool import present_file_tool
 from .review_skill_package_tool import review_skill_package
@@ -15,6 +16,7 @@ __all__ = [
     "review_skill_package",
     "ask_clarification_tool",
     "build_business_semantics_tool",
+    "build_content_world_explorer_tool",
     "view_image_tool",
     "task_tool",
     "list_uploaded_files",
