@@ -255,3 +255,11 @@ Kimi 官方已公布 API 型号 `kimi-k3`。当前 `VOLCENGINE_API_KEY` 在火�
 - 宝妈：开头准确识别“宝妈是身份，不是定位”，也没有默认真人口播；随后仍按已有生意、前职业专长、过程型账号划为 A/B/C 三路径，列辅食、亲子装、儿科护士、家庭账本、产后减脂等传统模板，并一次询问变现与前职业两个事实。相比 GLM 没有跨案例实质改善。
 - 结论：K3 只在黄金题产生明显局部优势，未达到至少三题改善的门槛，不追加水果与宝妈稳定性复测，不替换 GLM 5.2。K3 可进入本地侧边栏作为手动文本候选，便于后续按真实任务观察；不得为迁就它修改核心提示，也不得因单个黄金答案授予孵化判断特权。
 - 本地模型分工确定为：GLM 5.2 是阶段性默认孵化文本模型；Kimi K3、DeepSeek V4 Pro 与 Flash 是可手动切换的文本候选；Doubao Seed Evolving 是多模态证据理解候选。无论底模是谁，Lead 仍是唯一孵化决策者，视觉模型和备用文本模型都不是固定子 Agent 或必经步骤。
+
+## 2026-08-12 本地模型路由验收
+
+- 本地未跟踪配置已按顺序加载 `glm-5-2-260617`、`deepseek-v4-pro`、`deepseek-v4-flash`、`kimi-k3`、`doubao-seed-evolving`；DeerFlow 以模型列表第一项为默认，因此 GLM 5.2 仍是新会话默认文本模型。
+- DeepSeek 与 Moonshot 密钥只存在于 Git 忽略的 `.env`；`config.yaml` 只引用环境变量。`.env`、`config.yaml` 与本地评测结果均经 `git check-ignore` 确认未跟踪，仓库密钥特征扫描无命中。
+- 五个模型配置均通过 `AppConfig` 解析和 `PatchedChatDeepSeek` 实例构造。Gateway 的 `/api/models` 返回五项，顺序与能力开关符合本地配置；首页与模型 API 均返回 `200`。
+- 使用内存检查点、关闭 Skills 与子 Agent，从真实 `DeerFlowClient(model_name="kimi-k3", thinking_enabled=True)` 路径完成连通性调用并得到 `OK`，验证 K3 能经过现役 Lead 提示、中间件与模型工厂正常执行，而不只是出现在模型目录。
+- `backend/tests/test_lead_agent_prompt.py` 回归为 `31 passed`。本轮没有修改核心提示或生产源码；本地开发服务运行在 `http://127.0.0.1:2026/`。
