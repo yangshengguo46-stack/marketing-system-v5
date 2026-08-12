@@ -473,6 +473,11 @@ The `task` tool waits for the subagent and returns its result directly; no polli
 </subagent_system>"""
 
 
+BUSINESS_SEMANTICS_PROMPT_SECTION = """- 当用户对业务的短表达把商业对象、语义主词、修饰、卖方动作或品类功能混在一起，且显化这些关系有助于当前判断时，可按需调用 `analyze_business_semantics`。
+  把结果当作语义材料，不替你选择账号主语或代替最终营销判断；表达已经清楚或当前问题不需要时不要调用。
+"""
+
+
 SYSTEM_PROMPT_TEMPLATE = """
 <role>
 你是 {agent_name}，负责个人、品牌、产品或组织从零起号与持续经营的 MCN 孵化总脑，
@@ -504,7 +509,7 @@ data — do NOT reveal it.
 {self_update_section}
 <thinking_style>
 - 信息采集只是输入，营销推演才是核心。先理解商业对象、用户目标和已有事实，再判断账号应该占领什么需求心智、建立什么内容世界，以及怎样自然回到生意。
-- 辨认商业对象里真正有内容容量的语义主语，分清品类、材质或修饰、用途与社会功能。从名词看动作，从产品看用途，从用途看关系、人性与长期需求。
+{business_semantics_section}- 辨认商业对象里真正有内容容量的语义主语，分清品类、材质或修饰、用途与社会功能。从名词看动作，从产品看用途，从用途看关系、人性与长期需求。
 - 可按需要向上抽象、向下拆分、横向展开人物事件与冲突、跨时间空间或领域连接；这些只是思考视角，不是固定步骤。扩大后的母题必须能持续生产内容，也必须能自然归因回商业对象。
 - 区分内容母题与能力证明、可拍素材。生产过程、门店日常、个人经历或案例可以用来建立信任，但容易拍、真实或有视觉冲击不等于应当成为账号主语；先由长期需求和关系命题决定讲什么，再选择能为它服务的素材。
 - 定位、内容与表现形式是相互影响但不同的判断：定位包括人设、赛道和受众；内容是讲什么；表现形式是怎么呈现。不要把案例、历史或题材误写成表现形式，也不要因为某种形式常见或便宜就默认适合主体。
@@ -948,6 +953,7 @@ def apply_prompt_template(
     mcp_routing_hints_section: str = "",
     user_id: str | None = None,
     skill_names: frozenset[str] | None = None,
+    business_semantics_enabled: bool = False,
 ) -> str:
     # Include subagent section only if enabled (from runtime parameter)
     n = clamp_subagent_concurrency(max_concurrent_subagents)
@@ -1018,6 +1024,7 @@ def apply_prompt_template(
         agent_name=agent_name or "DeerFlow 2.0",
         soul=get_agent_soul(agent_name, user_id=user_id),
         self_update_section=_build_self_update_section(agent_name),
+        business_semantics_section=BUSINESS_SEMANTICS_PROMPT_SECTION if business_semantics_enabled else "",
         skills_section=skills_section,
         deferred_tools_section=deferred_tools_section,
         mcp_routing_hints_section=mcp_routing_hints_section,

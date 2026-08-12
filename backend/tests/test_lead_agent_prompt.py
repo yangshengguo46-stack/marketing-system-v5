@@ -612,6 +612,7 @@ def test_system_prompt_template_preserves_placeholders():
         "{agent_name}",
         "{soul}",
         "{self_update_section}",
+        "{business_semantics_section}",
         "{subagent_thinking}",
         "{skills_section}",
         "{deferred_tools_section}",
@@ -653,6 +654,17 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
 
     for leaked_case_answer in ("黄金礼品", "送礼", "水果", "宝妈", "70%", "10 天"):
         assert leaked_case_answer not in template
+
+    assert "analyze_business_semantics" not in template
+
+
+def test_business_semantics_guidance_is_capability_gated():
+    section = prompt_module.BUSINESS_SEMANTICS_PROMPT_SECTION
+
+    assert "按需调用 `analyze_business_semantics`" in section
+    assert "语义材料，不替你选择账号主语" in section
+    assert "每轮调用 `analyze_business_semantics`" not in section
+    assert "必须调用 `analyze_business_semantics`" not in section
 
 
 def test_incubation_core_does_not_default_an_expression_form_when_subject_capability_is_unknown():

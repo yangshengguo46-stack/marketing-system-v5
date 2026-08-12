@@ -292,6 +292,9 @@ def test_internal_make_lead_agent_selects_and_normalizes_delta_state(monkeypatch
     assert result["state_schema"] is DeltaThreadState
     assert result["middleware"][0] is not middleware
     assert middleware.state_schema is original_schema
+    tool_names = {tool.name for tool in result["tools"]}
+    assert ("analyze_business_semantics" in tool_names) is (not is_bootstrap)
+    assert ("analyze_business_semantics" in result["system_prompt"]) is (not is_bootstrap)
 
 
 def test_internal_make_lead_agent_does_not_take_mode_from_runtime_context(monkeypatch):
@@ -548,7 +551,7 @@ def test_make_lead_agent_filters_clarification_tool_for_non_interactive_runs(mon
         }
     )
 
-    assert [tool.name for tool in result["tools"]] == ["bash"]
+    assert [tool.name for tool in result["tools"]] == ["bash", "analyze_business_semantics"]
 
 
 def test_make_lead_agent_rejects_invalid_bootstrap_agent_name(monkeypatch):
@@ -1252,11 +1255,13 @@ def test_make_lead_agent_applies_agent_model_settings(monkeypatch):
     monkeypatch.setattr(lead_agent_module, "create_chat_model", _fake_create_chat_model)
     monkeypatch.setattr(lead_agent_module, "create_agent", lambda **kwargs: kwargs)
 
-    lead_agent_module._make_lead_agent({"context": {"agent_name": "researcher"}}, app_config=app_config)
+    result = lead_agent_module._make_lead_agent({"context": {"agent_name": "researcher"}}, app_config=app_config)
 
     assert captured["model_overrides"] == {"temperature": 0.2, "max_tokens": 12000}
     assert captured["thinking_enabled"] is False  # from agent config
     assert captured["reasoning_effort"] == "high"  # from agent config
+    assert "analyze_business_semantics" not in {tool.name for tool in result["tools"]}
+    assert "analyze_business_semantics" not in result["system_prompt"]
 
 
 def test_request_thinking_overrides_agent_default(monkeypatch):

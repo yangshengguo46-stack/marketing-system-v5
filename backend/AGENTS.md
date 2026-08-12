@@ -76,7 +76,9 @@ deer-flow/
 ### Local Fifth-Version Incubation Boundary
 
 The active fifth-version customization is intentionally limited to the existing
-Lead Agent prompt in `packages/harness/deerflow/agents/lead_agent/prompt.py`.
+Lead Agent prompt in `packages/harness/deerflow/agents/lead_agent/prompt.py` and
+the bounded `analyze_business_semantics` tool in
+`packages/harness/deerflow/tools/builtins/business_semantics_tool.py`.
 Do not add an incubation runtime, domain package, middleware, method library,
 fixed workflow, score gate, or specialist roster to the active branch without a
 separately reviewed experiment. Freeze alternatives on their own branch or tag;
@@ -89,14 +91,17 @@ The retained E16 research utilities are deliberately offline:
   the sealed business rubric.
 - `scripts/run_content_world_map_eval.py` generates a bounded candidate map
   without choosing a final route.
-- `scripts/run_business_semantic_backbone_eval.py` explicates the business
-  object, semantic head, qualifiers, seller actions, constitutive functions,
-  buyer progress, and ambiguity without producing an incubation plan.
+- `scripts/run_business_semantic_backbone_eval.py` exercises the same prompt
+  and parser used by the runtime `analyze_business_semantics` tool while keeping
+  the Lead, memory, skills, MCP, and subagents out of the offline evaluation.
 
-All three require explicit `--execute`, enforce a sealed call count, persist
-only visible output plus hashes/usage under the gitignored `.deer-flow/`, and
-must stay unregistered from the runtime. Provider reasoning is hashed rather
-than persisted. The rejected full-adviser, Lead-handoff, and content-world
+All three require explicit `--execute`, enforce a sealed call count, and persist
+only visible output plus hashes/usage under the gitignored `.deer-flow/`.
+Provider reasoning is hashed rather than persisted. Only the bounded semantic
+contract has a separately authorized runtime tool: it is available to the
+default Lead on demand, never as middleware or a mandatory stage, and it cannot
+produce the final marketing decision. The other evaluation utilities remain
+unregistered. The rejected full-adviser, Lead-handoff, and content-world
 selector experiments remain ledger evidence only; do not restore or stack
 them without a separately preregistered evaluation. Run the focused offline
 tests with:
@@ -850,6 +855,7 @@ that cannot tell sibling branches apart.
 3. **Built-in tools**:
    - `present_files` - Make output files visible to user (only `/mnt/user-data/outputs`); virtual paths use `resolve_runtime_user_id(runtime)` so validation resolves the same user-scoped outputs directory established by `ThreadDataMiddleware`
    - `ask_clarification` - Request clarification (intercepted by ClarificationMiddleware, which preserves text fallback and adds `artifact.human_input` for Web UI Human Input Cards). Beyond free text and single choice, the request-side v2 protocol supports `fields` (structured form card collecting several values at once; field types: text/textarea/number/select/multi_select/checkbox/date, validated and normalized server-side in the middleware — invalid entries are dropped, unknown types degrade to `text`; a standalone multi-select question is a one-field form). Replies stay on the v1 response protocol (`text`/`option`): the form card submits a readable text summary
+   - `analyze_business_semantics` - Default-Lead-only, on-demand explication of a business expression into a validated semantic structure; it does not choose positioning, content, format, monetization, or an incubation route
    - `view_image` - Read image as base64 (added only if model supports vision)
    - `setup_agent` - Bootstrap-only: persist a brand-new custom agent's `SOUL.md` and `config.yaml`. Bound only when `is_bootstrap=True`.
    - `update_agent` - Custom-agent-only: persist self-updates to the current agent's `SOUL.md` / `config.yaml` from inside a normal chat (partial update + atomic write). Bound when `agent_name` is set and `is_bootstrap=False`.

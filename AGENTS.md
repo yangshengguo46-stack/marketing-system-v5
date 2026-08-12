@@ -166,5 +166,8 @@ These apply repo-wide; module guides own the module-specific detail.
   supporting evidence capabilities. The E15 implementation under
   `backend/experiments/` is isolated and must not be registered as a Lead tool,
   MCP server, or Skill before real-account acceptance is recorded.
+  The default Lead may call the bounded `analyze_business_semantics` tool when
+  a user's business expression needs semantic explication; this tool is not a
+  workflow stage and never owns the final incubation decision.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

@@ -13,12 +13,13 @@ middleware reachable from this graph (e.g. ``TitleMiddleware``) — MUST pass
 Forgetting that flag emits duplicate spans (one rooted at the graph, one at
 the model) AND prevents the Langfuse handler's ``propagate_attributes``
 path from firing, so ``session_id`` / ``user_id`` never reach the trace.
-The five current sites are: bootstrap agent, default agent, summarization
+The six current sites are: bootstrap agent, default agent, summarization
 middleware, the async path inside ``TitleMiddleware``, and the skill security
 scanner reached from the ``skill_manage`` tool (``skills/security_scanner.py``'s
 ``scan_skill_content``, which is dual-use: ``_scan_or_raise`` in
 ``tools/skill_manage_tool.py`` is the in-graph choke point and passes the flag,
-while its standalone callers keep the default). Any new in-graph
+while its standalone callers keep the default), plus the default Lead's bounded
+``analyze_business_semantics`` tool. Any new in-graph
 ``create_chat_model`` call must add to this list and pass the flag.
 """
 
@@ -872,6 +873,17 @@ def _make_lead_agent(config: RunnableConfig, *, app_config: AppConfig):
     extra_tools = [update_agent] if agent_name and not is_webhook_channel else []
     # Default lead agent (unchanged behavior)
     raw_tools = get_available_tools(model_name=model_name, groups=agent_config.tool_groups if agent_config else None, subagent_enabled=subagent_enabled, app_config=resolved_app_config)
+    if agent_name is None:
+        from deerflow.tools.builtins.business_semantics_tool import build_business_semantics_tool
+
+        raw_tools.append(
+            build_business_semantics_tool(
+                model_name=model_name,
+                thinking_enabled=thinking_enabled,
+                reasoning_effort=reasoning_effort,
+                app_config=resolved_app_config,
+            )
+        )
     configured_tools = raw_tools + extra_tools
     if non_interactive:
         configured_tools = [tool for tool in configured_tools if tool.name not in _NON_INTERACTIVE_DISABLED_TOOL_NAMES]
@@ -924,6 +936,7 @@ def _make_lead_agent(config: RunnableConfig, *, app_config: AppConfig):
             mcp_routing_hints_section=mcp_routing_hints_section,
             user_id=resolved_user_id,
             skill_names=skill_setup.skill_names or None,
+            business_semantics_enabled=any(tool.name == "analyze_business_semantics" for tool in final_tools),
         ),
         state_schema=get_thread_state_schema(mode),
     )
