@@ -59,6 +59,7 @@ deer-flow/
 │   ├── Makefile                    # Per-module backend commands (dev, gateway, test, lint, migrate-rev)
 │   ├── packages/extension-api/     # deerflow-extension-api package (import: deerflow_extension_api.*) — public extension contract
 │   ├── packages/harness/           # deerflow-harness package (import: deerflow.*) — agent framework
+│   ├── experiments/                # isolated experiments, never runtime by default
 │   └── app/                        # FastAPI Gateway + IM channels (import: app.*)
 ├── frontend/                       # Next.js frontend (pnpm) — see frontend/AGENTS.md
 ├── docker/                         # docker-compose files, nginx config, provisioner
@@ -158,5 +159,12 @@ These apply repo-wide; module guides own the module-specific detail.
 - **Test-driven development** — features and bug fixes ship with tests. Backend tests live
   in `backend/tests/` (TDD is mandatory there; see [backend/AGENTS.md](backend/AGENTS.md));
   frontend tests live in `frontend/tests/`.
+- **Fifth-version marketing brain** — ADR-007 targets a usable 80-point
+  incubation judgment across marketing subject, positioning, content world,
+  presentation format, monetization, and fact boundaries. This is not an
+  80-percent video-understanding target. MediaKit and account extraction remain
+  supporting evidence capabilities. The E15 implementation under
+  `backend/experiments/` is isolated and must not be registered as a Lead tool,
+  MCP server, or Skill before real-account acceptance is recorded.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
