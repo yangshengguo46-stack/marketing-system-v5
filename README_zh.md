@@ -17,7 +17,7 @@ https://github.com/user-attachments/assets/a8bcadc4-e040-4cf2-8fda-dd768b999c18
 > **DeerFlow 2.0 是一次彻底重写。** 它和 v1 没有共用代码。如果你要找的是最初的 Deep Research 框架，可以前往 [`1.x` 分支](https://github.com/bytedance/deer-flow/tree/main-1.x)。那里仍然欢迎贡献；当前的主要开发已经转向 2.0。
 
 > [!IMPORTANT]
-> 当前本地第五版保持 DeerFlow 运行时原样，只修改 Lead Agent 的 MCN 孵化核心角色与思考提示。此前累积的孵化包和评测器已经移出当前分支并单独归档，详见 [`docs/mcn-incubation-v5/LEDGER.md`](docs/mcn-incubation-v5/LEDGER.md)。
+> 当前本地第五版保持 DeerFlow 运行时边界，首要目标是将孵化**营销脑**做到稳定可用的 80 分：能判断营销主语、账号定位、内容世界、表现形式、变现承接和事实边界。视频与账号拆解只是证据能力，不是 80 分的对象；E15 仍是隔离实验。详见 [`ADR-007`](docs/mcn-incubation-v5/decisions/ADR-007-80-point-learning-loop.md) 与 [`台账`](docs/mcn-incubation-v5/LEDGER.md)。
 
 ## 官网
 

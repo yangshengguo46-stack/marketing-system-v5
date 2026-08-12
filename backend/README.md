@@ -227,6 +227,8 @@ Sessions opened in the TUI appear in the Web UI sidebar (it writes the shared
 
 ```
 backend/
+├── experiments/                  # Isolated, non-runtime evaluation packages
+│   └── e15_account_evidence/  # Authorized-video evidence/data-flywheel prototype
 ├── packages/harness/           # deerflow-harness package (import: deerflow.*)
 │   └── deerflow/
 │       ├── agents/             # Agent system
@@ -269,6 +271,13 @@ backend/
 ├── Makefile                    # Development commands
 └── Dockerfile                  # Container build
 ```
+
+`experiments/e15_account_evidence/` is deliberately not registered with the
+Lead Agent, Gateway, MCP, or Skill loader. It converts authorized local videos
+into hashed media evidence, bounded semantic candidates, deterministic
+cross-video support summaries, and separate evidence/signal review queues. It
+must remain isolated until a real authorized multi-video evaluation passes; see
+[`experiments/e15_account_evidence/README.md`](experiments/e15_account_evidence/README.md).
 
 `langgraph.json` is not the default service entrypoint.  The scripts and Docker
 deployments run the Gateway embedded runtime; the file is kept for LangGraph

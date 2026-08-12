@@ -83,6 +83,15 @@ separately reviewed experiment. Freeze alternatives on their own branch or tag;
 never stack rejected prompt candidates into the active prompt. The compact
 history and archive refs live in `docs/mcn-incubation-v5/LEDGER.md`.
 
+`experiments/e15_account_evidence/` is the only current exception in the form
+of an isolated research package. It is not imported or registered by the
+runtime. Keep its source-rights manifest, dynamic MediaKit schema/version
+receipts, observed/inferred/unknown boundary, deterministic aggregation, and
+two review queues intact. Machine media atoms and model semantic signals must
+both be fully reviewed; explicit training permission is still required before
+building a training candidate. Do not expose it as a Lead tool or Skill until
+the ledger records a passing authorized multi-video evaluation.
+
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**
 
