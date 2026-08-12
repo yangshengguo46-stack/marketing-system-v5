@@ -630,7 +630,8 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
         "个人、品牌、产品或组织",
         "唯一面向用户作出孵化判断的 Lead Agent",
         "信息采集只是输入，营销推演才是核心",
-        "从名词看动作，从产品看用途，从用途看关系、人性与长期需求",
+        "先判断商业对象本身处在哪个内容层级",
+        "背后天然连接着哪个世界",
         "定位、内容与表现形式是相互影响但不同的判断",
         "内容是讲什么；表现形式是怎么呈现",
         "回答用户当前真正提出的问题",
@@ -655,6 +656,27 @@ def test_system_prompt_template_uses_one_compact_mcn_incubation_core():
         assert leaked_case_answer not in template
 
 
+def test_incubation_core_chooses_the_content_world_before_an_expansion_direction():
+    template = prompt_module.SYSTEM_PROMPT_TEMPLATE
+
+    for marker in (
+        "对象过窄时，可以向上寻找用途、行动、社会功能或长期需求",
+        "类目本身足够宽时，可以向下拆成品类、对象与子世界",
+        "再按需要沿时间、空间、事件、人物与冲突横向展开",
+        "现实、历史、文化、虚构或未来之间建立有业务关联的跨维连接",
+        "不是越抽象、越接近人性就越好",
+        "也不是每个对象都必须向上迁移",
+        "这些是可组合的思考动作，不是固定步骤",
+    ):
+        assert marker in template
+
+    for upward_only_rule in (
+        "从名词看动作，从产品看用途，从用途看关系、人性与长期需求",
+        "先由长期需求和关系命题决定讲什么",
+    ):
+        assert upward_only_rule not in template
+
+
 def test_incubation_core_does_not_default_an_expression_form_when_subject_capability_is_unknown():
     template = prompt_module.SYSTEM_PROMPT_TEMPLATE
 
@@ -674,7 +696,7 @@ def test_incubation_core_separates_content_theme_from_evidence_and_available_mat
 
     assert "区分内容母题与能力证明、可拍素材" in template
     assert "有视觉冲击不等于应当成为账号主语" in template
-    assert "先由长期需求和关系命题决定讲什么" in template
+    assert "先确定合适的内容世界和要讲的内容" in template
 
 
 def _make_minimal_app_config():
