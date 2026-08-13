@@ -407,6 +407,29 @@
       "final_answer_sha256": "cd76310b26e4242c60f84984e11ea5798bfc4a891b5967d37052a28573b3027e",
       "verdict": "content_root_accepted_full_answer_rejected",
       "reason": "The unseen case independently kept watch as a complete object root and avoided generic lifestyle abstraction, but the broad account-starting request received only a content-world map and the final prose stated unverified named geographic and historical examples."
+    },
+    {
+      "case": "medical-aesthetics-unseen-user-supplied-probe",
+      "thread_id": "eval_medical_aesthetics_unseen_20260813_01",
+      "run_id": "cf89535d-d9cb-4a22-bcbc-dd4bf292fb57",
+      "code_commit": "60533699",
+      "review_status": "draft",
+      "user_gold_label": false,
+      "thread_retained_after_review": true,
+      "tool_status": "ok",
+      "tool_error_code": null,
+      "commercial_object": "医美",
+      "lexical_head": "医美",
+      "root_subject": "医美",
+      "comparative_scopes": [
+        "countries",
+        "regions",
+        "ethnic_and_cultural_groups"
+      ],
+      "final_answer_chars": 1080,
+      "final_answer_sha256": "d0646cbfaa8a5239f5fb92621590bbfc804a2cbee0c9636f6e242a4932712614",
+      "verdict": "content_world_accepted_with_medical_fact_boundary_warning",
+      "reason": "The unseen case kept medical aesthetics as the complete root instead of collapsing into a procedure catalogue or diluting into generic beauty, and it covered all required content-world axes. Medical, anatomical, suitability, contraindication, recovery, and population-comparison directions remain research questions that require qualified sources before publication; the full incubation answer was not assessed in this probe."
     }
   ]
 }
