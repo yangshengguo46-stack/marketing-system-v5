@@ -188,7 +188,13 @@ These apply repo-wide; module guides own the module-specific detail.
   only actor-linked behavior sequences may enter HLLM. Creator post history or
   aggregate post performance cannot impersonate audience behavior. The pinned
   HLLM adapter is a model boundary, not a collector, and cannot claim a real
-  inference without a matching checkpoint receipt. A37 and A38 own these
+  inference without a matching checkpoint receipt. Audience-source routing is
+  official-first: authorized Douyin accounts use approved Open Platform data,
+  content-collaboration research uses authenticated Xingtu evidence, and
+  commerce matching uses authenticated Buyin/Selected Alliance evidence. Paid
+  third-party analytics are optional cross-checks, never runtime prerequisites.
+  Followers, content viewers, engagers, live viewers, and purchasers must retain
+  distinct population scopes. A37, A38, and A40 own these
   experimental boundaries. Source snapshots are content-addressed locally. Even when
   the local evidence pack is large, the Lead-facing projection has a hard UTF-8
   byte budget (16 KB by default), contains only bounded candidate patterns,

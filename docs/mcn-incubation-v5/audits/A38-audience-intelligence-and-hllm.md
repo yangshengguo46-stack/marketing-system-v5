@@ -4,6 +4,10 @@ status: reviewed
 reviewed_at: 2026-08-13
 decision: audience_intelligence_not_comment_collection_hllm_after_evidence
 sources:
+  - https://open.douyin.com/platform/resource/docs/openapi/data-open-service/fans-portrait-data/get-user-fans-data/
+  - https://open.douyin.com/platform/resource/docs/openapi/data-open-service/user-data/get-user-fans-count/
+  - https://www.xingtu.cn/help-center/author/109244
+  - https://school.jinritemai.com/doudian/web/home
   - https://ai.chanmama.com/product/findTarget
   - https://ai.chanmama.com/product/dyAnalysis
   - https://ai.chanmama.com/product/liveAnalysis
@@ -41,6 +45,12 @@ sources:
 
 代码中的八个数据集为：`account_scale`、`growth_history`、`follower_demographics`、`audience_interests`、`audience_activity`、`content_interactions`、`live_audience`、`commerce_affinity`。每次请求的每个数据集都要有 `collected/partial/needs_login/restricted/unavailable/failed/schema_drift` 状态，不允许用“结果完整”的排版需求补数。
 
+### 官方优先的数据源路由
+
+后续核实表明，抖音开放平台对授权账号提供 `fans.data`，包含年龄、性别、地域、兴趣、活跃天数和设备等分布；`data.external.user` 另可提供按日新增与总粉丝。巨量星图对星图任务提供作品观众画像，精选联盟/巨量百应承担带货达人与商品匹配场景。因此第五版先自建官方数据源适配，蝉妈妈等付费第三方工具不作运行时依赖。
+
+粉丝、作品观众、互动者、直播观众和购买者必须带各自的 `population_scope`，不因共享性别/年龄/地域字段就混合。完整能力、权限和实施顺序见 [A40](A40-douyin-official-audience-sources.md)。
+
 ## HLLM 在这里负责什么
 
 字节 HLLM 是层次化用户/物品建模和个性化创意生成模型，不是平台爬虫、账号搜索器或报表数据商。HLLM-Creator 公开合同使用 `user_profile`、内容目标、最长 50 条时序 `title_list/item_id_list` 等字段，再做用户表征、聚类和个性化生成。它必须在受众行为证据之后，不能替代采集。
@@ -58,7 +68,10 @@ sources:
 | 追加式内容寻址受众快照账本与粉丝净增长差分 | `implemented` |
 | 通用受众互动对象、伪名化和跨作品行为序列 | `implemented; Douyin two-post visible interaction sample accepted, cross-post repeated actor still absent` |
 | HLLM 请求适配、最近 50 条序列、输入哈希与检查点回执 | `implemented contract` |
-| 平台粉丝分布、活跃、直播和电商受众采集器 | `pending platform-by-platform implementation and acceptance` |
+| 抖音官方授权粉丝画像适配器 | `official API verified; implementation and live OAuth acceptance pending` |
+| 星图作品观众与达人前选适配器 | `official capability traced; authenticated field acceptance pending` |
+| 百应带货/电商受众适配器 | `official product traced; authenticated schema acceptance pending` |
+| 其他平台粉丝分布、活跃、直播和电商受众采集器 | `pending platform-by-platform implementation and acceptance` |
 | 真实 HLLM 权重推理 | `pending external GPU model service` |
 
 本机是 Intel MacBook Pro、32 GB 内存、AMD Radeon Pro 5300M 4 GB，与上游 CUDA/DeepSpeed/FAISS-GPU 环境不匹配，本地也没有 HLLM-Creator 权重。因此本轮不声称跑过真实 HLLM；该步骤必须使用独立 GPU 服务完成并返回真实检查点回执。
