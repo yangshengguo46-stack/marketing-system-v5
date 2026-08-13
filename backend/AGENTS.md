@@ -100,6 +100,14 @@ The retained E16 research utilities are deliberately offline:
   separation of source object, audience world, content engines, and attention
   entries against reviewed real-account evidence. It does not evaluate or emit
   positioning, presentation form, trust design, or business operations.
+- `scripts/run_semantic_concept_bottleneck_eval.py` is the isolated E31
+  evaluator preregistered in A46. Its first call exposes nullable semantic
+  roles, human-job/frame hypotheses, social-practice candidates, candidate
+  worlds, and contrastive probes; its second call may select or explicitly
+  correct those candidates and emits only source object plus audience world.
+  Hidden review labels run after both calls. Empty concept groups are valid and
+  count as missed recall rather than contract failure, so this evaluator must
+  not become a mandatory Lead workflow or required questionnaire.
 
 All four require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -142,6 +150,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_account_content_structure_eval.py \
   tests/test_layered_content_map_eval.py \
   tests/test_two_step_content_map_eval.py \
+  tests/test_semantic_concept_bottleneck_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```
