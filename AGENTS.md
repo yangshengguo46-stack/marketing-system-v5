@@ -222,6 +222,12 @@ These apply repo-wide; module guides own the module-specific detail.
   completeness, buyer-side constitutive function, and the return path to the
   commercial object; do not replace this with industry keyword rules. Neither tool is
   middleware or a workflow stage, and neither owns the final incubation
-  decision. The accepted boundary and live cases are recorded in A34.
+  decision. Semantic explication and content mapping must not design business
+  operations; the overall Lead may handle that responsibility separately. Use
+  positive contracts, not keyword gates: advertising or sales may themselves be
+  legitimate business objects. The offline E28 candidate separates source object,
+  audience world, content engines, and attention entries. It is not registered
+  because its production probes did not pass. A34 records the original object-map
+  acceptance; A42 and ADR-008 own the newer account-level boundary.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

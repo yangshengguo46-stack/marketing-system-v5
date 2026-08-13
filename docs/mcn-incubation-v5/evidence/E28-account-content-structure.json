@@ -1,0 +1,117 @@
+{
+  "audit_id": "A42",
+  "status": "reviewed_offline_candidate_runtime_promotion_deferred",
+  "recorded_at": "2026-08-14",
+  "repository": {
+    "branch": "codex/marketing-brain-80",
+    "parent_commit": "16899a7c5b0679bd9d105261f7e3f3ca305baab3"
+  },
+  "boundary": {
+    "semantic_module": "Explicate the user-authored business expression only.",
+    "content_module": "Map source object, audience world, content engines, and attention entries only.",
+    "business_operations_module": "Separate future responsibility; not part of the semantic or content contracts.",
+    "keyword_gate": false
+  },
+  "offline_live_model_run": {
+    "run_id": "e28-pure-content-final-20260814-06",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "system_prompt_sha256": "96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d",
+    "manifest_sha256": "49c4d9696f6a52cf6b27ec909a633806188afc2dc214902aa9c972cf48d4dc9b",
+    "results_sha256": "7608f337e936a475e32ae982db0ed566be81d5e42838f7f8c1de76d0a6d8188a",
+    "completion_sha256": "9ec0529d60399b5487cbe1c806968d26e2bdf99876b07d3513e9d3e5e57f92da",
+    "provider_call_budget": 3,
+    "completed_cases": 2,
+    "isolation": {
+      "memory": false,
+      "registered_skills": false,
+      "tools": false,
+      "mcp": false,
+      "subagents": false,
+      "llm_judge": false,
+      "positioning": false,
+      "presentation_form": false,
+      "trust_design": false,
+      "business_operations": false,
+      "production_state_writes": false,
+      "provider_reasoning_persisted": false
+    },
+    "cases": [
+      {
+        "case_id": "medical-aesthetics-account",
+        "review_status": "user_corrected_gold",
+        "source_object": "医美业务",
+        "audience_world": "变美",
+        "relation_to_source": "use_or_activity_world",
+        "content_engines": [
+          "面部年轻化与抗衰",
+          "日常保养与防晒",
+          "外貌形象与变美观念评价"
+        ],
+        "attention_entries": [
+          "公众熟悉人物是否做过医美",
+          "地域女性与知名女性形象"
+        ],
+        "provider_calls": 1,
+        "repair_calls": 0,
+        "visible_answer_sha256": "882c80dfc3fb1741ac4ad471ca273a7981b0831e8baa665488b5d0dd57dff1e2",
+        "provider_reasoning_present": true,
+        "provider_reasoning_sha256": "bc2eb3600d06c13a0e78a1ef6f33fde2573d32261f0c6df14f60ffdaed6340b8",
+        "usage": {
+          "input_tokens": 1736,
+          "output_tokens": 1193,
+          "total_tokens": 2929
+        },
+        "elapsed_seconds": 28.229
+      },
+      {
+        "case_id": "watch-account",
+        "review_status": "reviewed_real_account",
+        "source_object": "腕表相关业务",
+        "audience_world": "腕表",
+        "relation_to_source": "same_object_world",
+        "content_engines": [
+          "真实玩表与制表积累",
+          "腕表专业判断",
+          "腕表知识与故事"
+        ],
+        "attention_entries": [
+          "夜店、游戏、骑车、显摆、礼物和人际关系等生活场景与奇怪问题"
+        ],
+        "provider_calls": 1,
+        "repair_calls": 0,
+        "visible_answer_sha256": "d0e60cc4e9803087b55551341ce3a754f9c43fa64c216c6fa22bb31610849588",
+        "provider_reasoning_present": true,
+        "provider_reasoning_sha256": "de99d7f7f16f7ec4a449055221ea5d3806ee498cf7d0b3e562e0b54259fef24d",
+        "usage": {
+          "input_tokens": 1797,
+          "output_tokens": 1187,
+          "total_tokens": 2984
+        },
+        "elapsed_seconds": 23.721
+      }
+    ]
+  },
+  "production_probes": {
+    "input_sha256": "97960e3689fdc802ab6d801c84f22ac548d99b349a8b1ca78b256a533a75645a",
+    "model": "glm-5-2-260617",
+    "probe_count": 3,
+    "result_sha256": "f0e01b3b2b482864227da416bb54020a5c1ef769e9411ea1d6f499623b480fc1",
+    "public_result": {
+      "status": "error",
+      "error_code": "invalid_model_output"
+    },
+    "failure_classes": [
+      "retired top-level field drift persisted after repair",
+      "repair returned one nested node instead of the full contract",
+      "root contradicted the model's own purpose-world counterfactual"
+    ],
+    "verdict": "Do not promote the four-layer candidate into the production content-world runtime in this change."
+  },
+  "security": {
+    "api_keys_recorded": false,
+    "provider_reasoning_recorded": false,
+    "raw_browser_state_recorded": false
+  }
+}

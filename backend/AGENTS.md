@@ -96,8 +96,12 @@ The retained E16 research utilities are deliberately offline:
 - `scripts/run_business_semantic_backbone_eval.py` exercises the same prompt
   and parser used by the runtime `analyze_business_semantics` tool while keeping
   the Lead, memory, skills, MCP, and subagents out of the offline evaluation.
+- `scripts/run_account_content_structure_eval.py` evaluates the account-level
+  separation of source object, audience world, content engines, and attention
+  entries against reviewed real-account evidence. It does not evaluate or emit
+  positioning, presentation form, trust design, or business operations.
 
-All three require explicit `--execute`, enforce a sealed call count, and persist
+All four require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
 Provider reasoning is hashed rather than persisted. The runtime tools are
 available only to the default Lead on demand, never as middleware or mandatory
@@ -112,10 +116,18 @@ constitutive function, and a natural return path to the commercial object;
 cross-cultural axes are retained only when an explicit environmental, rule,
 ritual, tool, or historical-transmission mechanism can alter the root world.
 Unverified named standards, policies, cases, and historical claims remain
-category-level research questions. The offline evaluators remain unregistered. The
+category-level research questions. `seller_evidence` and `downstream_unknowns`
+are retired from the content-exploration model contract; the parser may discard
+only those two legacy top-level fields for compatibility. Do not replace this
+boundary with a sales or advertising keyword blacklist because those terms can
+be legitimate source objects. Business-operation design belongs to a separate
+Lead responsibility, not to semantic explication or content mapping. The E28
+four-layer candidate remains unregistered after three production probes failed.
+The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
-preregistered evaluation. A34 owns the production boundary and live acceptance.
+preregistered evaluation. A34 owns the original object-map acceptance; A42 and
+ADR-008 own the account-content boundary and current promotion decision.
 Run the focused tests with:
 
 ```bash
@@ -123,6 +135,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_marketing_brain_eval.py \
   tests/test_content_world_map_eval.py \
   tests/test_business_semantic_backbone_eval.py \
+  tests/test_account_content_structure_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```

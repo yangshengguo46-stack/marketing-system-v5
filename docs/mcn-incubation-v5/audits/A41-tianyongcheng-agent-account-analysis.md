@@ -3,10 +3,12 @@ id: A41
 status: reviewed
 reviewed_at: 2026-08-13
 decision: lead_marketing_judgment_accepted_after_fact_discipline_revision_runtime_tooling_pending
+superseded_for_account_content_structure_by: A42
 sources:
   - https://v.douyin.com/905Ox4MZ4fQ/
   - docs/mcn-incubation-v5/evidence/E27-tianyongcheng-agent-analysis.json
   - backend/experiments/e15_account_evidence/
+  - docs/mcn-incubation-v5/audits/A42-content-structure-and-commerce-boundary.md
 ---
 
 # A41 田永成医美账号 Agent 拆解审计
@@ -62,6 +64,19 @@ sources:
 
 田永成的长期履历、组织身份、明星关系、机构能力和 TBM 品牌不可复制；同行只能根据自己的真实能力重做“为什么由我来讲”的信任结构。高互动的地域、名人和医学内容只能作为待验证候选，发布前必须核验事实、权利、伦理和平台边界。
 
+## 2026-08-14 用户复核纠偏
+
+用户观看真实内容后指出，A41 把“医美”继续保留为账号级内容根仍不够准确。更合适的四层解释是：
+
+```text
+来源对象：医美
+-> 观众内容世界：变美
+-> 内容发动机：抗衰、日常保养、人物外貌与地域比较
+-> 注意力入口：公众熟悉人物、地域女性与知名女性形象
+```
+
+因此 A41 的采集事实、确定性统计和首次事实纪律问题继续有效；“医美品类根 -> 衰老编辑视角”只保留为当时 Lead 的历史判断，不再作为账号级内容结构金标。用户举出的后续经营可能性不属于本审计的语义或内容结构，已从新合同排除。最终边界与双案例真实模型验证见 A42、ADR-008 和 E28。
+
 ## 强变现证据缺口
 
 “粉丝十万级但变现极强”目前仍是用户提供的可信业务线索，不是平台验收事实。最小确认集包括：主页或私信承接入口、有效咨询/预约、到店、成交、客单与复购，以及内容/时间窗口与线索的归因。播放、点赞、分享和收藏不能替代这些业务结果。
@@ -73,4 +88,3 @@ sources:
 - 两次均使用当前生产 Lead、`glm-5-2-260617`、thinking 开启、`low` reasoning effort；没有新增提示、方法卡或中间件。
 - 当前流程是“隔离 E15 采集 -> 人工触发有界证据投影 -> 生产 Lead 判断”。E15 尚未注册为线上 Tool/MCP，因此不能宣称用户在产品里丢一个链接后 Agent 已能端到端自行采集。
 - 本轮未修改运行时代码。采集和推理链均真实执行；审计 JSON、工作区差异检查和 Git 钩子作为收口验证。
-

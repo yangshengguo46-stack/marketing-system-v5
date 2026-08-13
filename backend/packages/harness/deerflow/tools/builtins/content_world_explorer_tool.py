@@ -75,11 +75,11 @@ CONTENT_WORLD_EXPLORER_SYSTEM_PROMPT = """你是有界的内容世界探索器�
 - 只对可能改变根选择的用途对象或活动填写 `purpose_world_checks`，不要为了结构完整穷举所有词。候选可以来自已校验的 `purpose` / `served_object`，也可以来自品类构成功能或买方进展中明示的动作/对象；不得只评价当前商品世界“够不够讲”。
 - `intermediate_enabler` 只用于中间实现手段：商品是创造或完成候选对象/活动的配方、原料、部件、工具、媒介、中间载体，或买方直接购买候选专业结果的实现手段。
 - `complete_object_or_related` 用于已是完整终端对象的商品，或只与候选世界相关的商品。一个对象被选择、交换、消费或使用，不会因为参与了更大行为就变成该行为的中间件。
-- 完整对象若能沿种类、组成、时空、文化与人的关系形成完整世界，就保留对象为根，将行为放在向上连接。仅仅包装、保护、运输、售卖或展示一个外部对象时，外部对象也属于此类。
+- 完整对象若能沿种类、组成、时空、文化与人的关系形成完整世界，就保留对象为根，将行为放在向上连接。仅仅包装、保护、运输、保管或展示一个外部对象时，外部对象也属于此类。
 - 当已校验语义同时给出 `served_object` 与 `purpose`，且二者共同描述商品为谁完成什么专业任务时，必须把“被服务对象 + 专业目的/结果”组成一个候选任务世界参加 `purpose_world_checks`。
-- 只把外部对象本身升为根通常会偏离生意；只保留泛化商品主词则可能丢失买方真正购买的专业结果。是否升根仍只由商品角色、世界完整性、容量和商业回路决定。
+- 只把外部对象本身升为根通常会偏离原始业务；只保留泛化商品主词则可能丢失使用者真正需要的专业结果。是否升根仍只由商品角色、世界完整性、容量和来源关联决定。
 - 容量比较不是“两者是否都能讲”。若用途世界能包含商品的材料、工艺、种类与使用作为子分支，同时新增商品形态无法容纳的时空、参与者、事件、冲突、仪式或文化轴，就是 `broader`。
-- 当商品是 `intermediate_enabler`、用途世界完整、容量为 `broader` 且存在商业回路时，用途世界必须成为根；不能因为商品更近成交、更显专业或本身也能讲而压在商品形态下。
+- 当商品是 `intermediate_enabler`、用途世界完整、容量为 `broader` 且存在稳定来源关联时，用途世界必须成为根；不能因为商品更靠近原始对象、更显专业或本身也能讲而压在商品形态下。
 - 根主语采用“最小完整根”：它必须是完整、具体、有长期容量且能回到生意的世界，但不带不必要的修饰。
 - 对商业表达中每个修饰词做去词反事实：写出去词后的候选根，检查它是否仍是完整对象或活动世界、买方为什么需要这个品类的核心构成功能是否仍成立、是否有自然路径回到完整商业对象。
 - 三项都成立时只能是 `branch_lens`；至少一项不成立时才可是 `root_essential`。
@@ -102,12 +102,12 @@ CONTENT_WORLD_EXPLORER_SYSTEM_PROMPT = """你是有界的内容世界探索器�
   本工具不浏览或核验外部来源，因此跨领域连接全部只是待研究方向或创意假设，`research_needed` 必须为 `true`；不得编造具体事实或声称已经核验。
 
 内容世界要求：
-- 内容世界回答“长期讲什么”，不是“怎么拍”。不得设计人设、受众、平台、表现形式、栏目、脚本、执行计划、实验、成交渠道或 B/C 方案。
+- 内容世界回答“长期讲什么”，不是“怎么拍”。只输出内容根与展开地图，不扩展其他业务模块。
 - 先检查商业对象本身是否已经构成一个完整对象世界：若它能沿向下、横向和跨领域持续展开，必须把该完整对象世界保留为根地图，不能拆散后只留下靠近购买的碎片。
-- 完整对象世界不只包含参数、真假、挑选、避坑或购买教育，也可以整合种类与组成、自然与生产、流通与使用、时间变化、地域差异、历史文化及人与该对象的关系；只连接确实由对象生长出来的子世界，不机械凑全。
-- 地图各轴不按“离成交最近”、最容易拍或现有证明最强来排序。内容世界不要求主体独占，别人也能讲不构成否决；主体的经验、素材和视点用于决定定位、可信度与讲法。
+- 完整对象世界不只包含参数、真假、挑选、避坑或选购技巧，也可以整合种类与组成、自然与生产、流通与使用、时间变化、地域差异、历史文化及人与该对象的关系；只连接确实由对象生长出来的子世界，不机械凑全。
+- 地图各轴不按“离原始对象最近”、最容易拍或现有证明最强来排序。内容世界不要求主体独占，别人也能讲不构成否决；主体的经验、素材和视点用于决定定位、可信度与讲法。
 - 卖方身份、源头位置、门店、工厂、生产过程和容易拍到的现场首先属于能力证明或素材来源。不得把生产过程、真实日常或视觉冲击自动写成账号母题。
-- 卖方动作只有在它本身就是客户长期需要解决的专业任务或结果时，才可以进入内容世界；经营、生产或流通过程本身不因靠近成交就优先。
+- 卖方动作只有在它本身就是使用者长期需要解决的专业任务或结果时，才可以进入内容世界；经营、生产或流通过程本身不因靠近原始对象就优先。
 - 专业任务本身就是主体实际提供的服务或客户长期需要解决的结果时，可以通过向上连接进入地图；仍须说明它为何不只是展示工序。
 - 向下、时间与历史、地理与环境、文化与生活习惯、人物、事件、冲突和跨领域连接都是同一个根世界的展开轴，不是互斥路线。主体在某个轴上的一手经验较少，只改变研究与证明方式，不得因此删除该轴。
 - 地图节点只写类别级研究方向，不列具体命名实体、地点、组织、人物、作品、菜名、品种名、政策名、标准编号或案例；除非名称来自用户原话。
@@ -138,7 +138,7 @@ CONTENT_WORLD_EXPLORER_SYSTEM_PROMPT = """你是有界的内容世界探索器�
         "complete_without_modifier": true,
         "constitutive_function_preserved": true,
         "return_path": "从候选根自然回到完整商业对象的路径；没有则为 null",
-        "basis": "基于候选根的完整性、买方构成功能与商业回路说明；不得把修饰词专属工艺消失当成候选根功能消失"
+        "basis": "基于候选根的完整性、使用者构成功能与来源关联说明；不得把修饰词专属工艺消失当成候选根功能消失"
       }
     ]
   },
@@ -180,14 +180,6 @@ CONTENT_WORLD_EXPLORER_SYSTEM_PROMPT = """你是有界的内容世界探索器�
       "research_needed": true
     }
   ],
-  "seller_evidence": [
-    {
-      "item": "来自语义材料的卖方身份、动作或经营载体",
-      "support": "explicit | lexical_semantics | general_knowledge | research_hypothesis",
-      "role": "它能证明什么，以及为什么不自动等于内容母题"
-    }
-  ],
-  "downstream_unknowns": ["只会改变定位、证明、素材或承接，而不应被补造的信息"],
   "insufficiency": null
 }
 
@@ -257,7 +249,9 @@ def _canonical_world_term(value: str) -> str:
 
 
 def parse_content_world_exploration(value: str) -> dict[str, Any]:
-    payload = _extract_json_object(value)
+    payload = dict(_extract_json_object(value))
+    payload.pop("seller_evidence", None)
+    payload.pop("downstream_unknowns", None)
     expected = {
         "content_world_root",
         "downward_expansion",
@@ -265,12 +259,17 @@ def parse_content_world_exploration(value: str) -> dict[str, Any]:
         "horizontal_expansion",
         "comparative_scope_checks",
         "cross_domain_connections",
-        "seller_evidence",
-        "downstream_unknowns",
         "insufficiency",
     }
     if set(payload) != expected:
-        raise ValueError("content-world exploration must contain exactly the configured fields")
+        missing = sorted(expected - set(payload))
+        extra = sorted(set(payload) - expected)
+        details = []
+        if missing:
+            details.append(f"missing: {', '.join(missing)}")
+        if extra:
+            details.append(f"extra: {', '.join(extra)}")
+        raise ValueError("content-world exploration must contain exactly the configured fields" + (f" ({'; '.join(details)})" if details else ""))
 
     raw_root = payload["content_world_root"]
     root_fields = {
@@ -468,21 +467,6 @@ def parse_content_world_exploration(value: str) -> dict[str, Any]:
             }
         )
 
-    evidence: list[dict[str, str]] = []
-    raw_evidence = payload["seller_evidence"]
-    if not isinstance(raw_evidence, list):
-        raise ValueError("seller_evidence must be a list")
-    for index, raw in enumerate(raw_evidence):
-        if not isinstance(raw, dict) or set(raw) != {"item", "support", "role"}:
-            raise ValueError(f"seller_evidence[{index}] has invalid fields")
-        evidence.append(
-            {
-                "item": _required_text(raw, "item"),
-                "support": _support(raw, field=f"seller_evidence[{index}]"),
-                "role": _required_text(raw, "role"),
-            }
-        )
-
     insufficiency = payload["insufficiency"]
     if insufficiency is not None and (not isinstance(insufficiency, str) or not insufficiency.strip()):
         raise ValueError("insufficiency must be null or a non-empty string")
@@ -498,8 +482,6 @@ def parse_content_world_exploration(value: str) -> dict[str, Any]:
         "horizontal_expansion": horizontal,
         "comparative_scope_checks": comparative_checks,
         "cross_domain_connections": cross_domain,
-        "seller_evidence": evidence,
-        "downstream_unknowns": _string_list(payload["downstream_unknowns"], field="downstream_unknowns"),
         "insufficiency": normalized_insufficiency,
     }
 
@@ -688,8 +670,6 @@ def _empty_exploration(insufficiency: str) -> dict[str, Any]:
         "horizontal_expansion": {axis: [] for axis in HORIZONTAL_AXES},
         "comparative_scope_checks": [],
         "cross_domain_connections": [],
-        "seller_evidence": [],
-        "downstream_unknowns": [],
         "insufficiency": insufficiency,
     }
 
@@ -787,7 +767,7 @@ def project_content_world_map(
         "fact_boundary": {
             "allowed_subject_claims": list(grounded_user_statements),
             "do_not_infer": [
-                "不得把简称或大类补成具体客户、受众、需求、渠道、现场、素材或能力。",
+                "不得把简称或大类补成用户未陈述的具体事实、现场、素材或能力。",
                 "不得把‘或’连接的未决选项写成同时具备。",
                 "一般知识和待研究连接只说明这个世界可以研究什么，不证明主体亲历、掌握或拥有。",
             ],
@@ -813,19 +793,19 @@ def project_content_world_map(
                     "一句研究与主体事实边界",
                 ]
             ),
-            "stop_rule": ("只输出该聚焦问题后结束。" if insufficiency else "完成 output_shape 第三项后立即结束；不追加未知清单、下一步、追问、定位、形式或承接。"),
+            "stop_rule": ("只输出该聚焦问题后结束。" if insufficiency else "完成 output_shape 第三项后立即结束；不追加未知清单、下一步、追问、定位、形式或其他模块事项。"),
             "final_line_rule": ("聚焦问题是唯一输出。" if insufficiency else "研究与主体事实边界必须是最后一段；其后不得再有文字，不得以问句结尾。"),
             "required_axis_labels": [item["label"] for item in coverage_contract],
             "allowed_subject_claims": list(grounded_user_statements),
             "must_not": [
-                "本轮不讨论 B/C、客户、受众、需求、平台、表现形式、渠道、变现、执行计划或其他下游未知，不得举例补全。",
-                "本轮不询问追问问题；不得因下游未知转成问卷。",
-                "不得把 B/C 等简称补成任何具体客户、需求或成交渠道。",
+                "本轮不展开其他业务模块，也不借边界说明补写其内容。",
+                "本轮不询问追问问题；不得因模块外信息转成问卷。",
+                "不得把未定义简称补成用户没有陈述的具体事实。",
                 "不得把源头、生产者或专业身份补成具体场地、亲历、素材、能力或成果。",
                 "不得把‘或’连接的未决选项写成同时具备。",
                 "不得把地图中的一般知识或待研究方向写成主体事实或已核验事实。",
             ],
-            "unknown_wording": "本轮不提及下游未知；它们不影响当前内容世界边界。",
+            "unknown_wording": "本轮不提及模块外信息；它们不影响当前内容世界边界。",
         },
     }
 

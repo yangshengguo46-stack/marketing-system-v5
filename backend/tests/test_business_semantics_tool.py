@@ -110,13 +110,47 @@ def test_semantic_contract_is_generic_and_only_explicitates_business_language():
     assert "不得输出人设、受众、平台、表现形式" in prompt
     assert "斜杠、顿号或“或”连接" in prompt
     assert "不得改写成主体同时具备" in prompt
-    assert "B 端、C 端或其他简称只支持其简称本身" in prompt
+    assert "简称只支持用户原话本身" in prompt
     assert "助手的提问选项、工具参数、总结、举例或改写" in prompt
     assert "复合商品表达不得只留整体名称和句尾主词" in prompt
     assert "被用来创造或完成什么" in prompt
     assert "`purpose` 或 `served_object`" in prompt
     for leaked_answer in ("黄金", "礼品", "水果", "宝妈", "脐橙"):
         assert leaked_answer not in prompt
+
+
+def test_semantic_prompt_does_not_shift_attention_to_selling_or_monetization():
+    prompt = BUSINESS_SEMANTIC_BACKBONE_SYSTEM_PROMPT
+
+    for out_of_scope_term in (
+        "卖货",
+        "销售",
+        "广告",
+        "变现",
+        "成交",
+        "转化",
+        "客单",
+        "复购",
+        "带货",
+    ):
+        assert out_of_scope_term not in prompt
+    for distracting_term in ("B 端", "C 端", "餐饮", "经销", "零售", "直销"):
+        assert distracting_term not in prompt
+
+
+def test_semantic_parser_has_no_keyword_gate_for_a_legitimate_sales_business():
+    payload = _valid_semantics()
+    payload["commercial_expression"] = "销售培训"
+    payload["offer_object"] = {
+        "term": "销售培训",
+        "semantic_head": "培训",
+        "support": "explicit",
+        "basis": "用户明确陈述该业务对象",
+    }
+
+    parsed = parse_business_semantics(json.dumps(payload, ensure_ascii=False))
+
+    assert parsed["offer_object"]["term"] == "销售培训"
 
 
 def test_semantic_messages_keep_the_expression_inside_an_untrusted_data_boundary():

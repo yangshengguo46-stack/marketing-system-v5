@@ -5,6 +5,7 @@ import json
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+import pytest
 from langchain.tools import ToolRuntime
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -155,14 +156,6 @@ def _valid_exploration() -> dict[str, object]:
                 "research_needed": True,
             }
         ],
-        "seller_evidence": [
-            {
-                "item": "生产动作",
-                "support": "explicit",
-                "role": "证明主体真实参与该品类，不自动成为内容母题",
-            }
-        ],
-        "downstream_unknowns": ["主体可持续获得哪些观察和素材"],
         "insufficiency": None,
     }
 
@@ -203,9 +196,30 @@ def test_explorer_prompt_expands_a_content_world_without_selecting_the_account_r
     assert "不得把生产过程" in prompt
     assert "待研究方向" in prompt
     assert "research_needed` 必须为 `true`" in prompt
-    assert "不得设计人设、受众、平台、表现形式" in prompt
+    assert "只输出内容根与展开地图" in prompt
     for leaked_case in ("黄金", "礼品", "水果", "海鲜", "宝妈", "榴莲"):
         assert leaked_case not in prompt
+
+
+def test_explorer_prompt_does_not_shift_attention_to_selling_or_monetization():
+    prompt = CONTENT_WORLD_EXPLORER_SYSTEM_PROMPT
+
+    for out_of_scope_term in (
+        "卖货",
+        "售卖",
+        "销售",
+        "广告",
+        "变现",
+        "成交",
+        "转化",
+        "客单",
+        "复购",
+        "带货",
+    ):
+        assert out_of_scope_term not in prompt
+    assert "B/C" not in prompt
+    assert '"seller_evidence"' not in prompt
+    assert '"downstream_unknowns"' not in prompt
 
 
 def test_explorer_prompt_preserves_a_broad_object_world_instead_of_only_near_sale_topics():
@@ -213,8 +227,8 @@ def test_explorer_prompt_preserves_a_broad_object_world_instead_of_only_near_sal
 
     assert "完整对象世界" in prompt
     assert "向下、横向和跨领域" in prompt
-    assert "离成交最近" in prompt
-    assert "购买教育" in prompt
+    assert "离原始对象最近" in prompt
+    assert "选购技巧" in prompt
     assert "不要求主体独占" in prompt
     assert "卖方动作" in prompt
     assert "文化与生活习惯" in prompt
@@ -223,6 +237,39 @@ def test_explorer_prompt_preserves_a_broad_object_world_instead_of_only_near_sal
     assert "被服务对象 + 专业目的/结果" in prompt
     assert "候选路线" not in prompt
     assert '"candidate_worlds"' not in prompt
+
+
+def test_parser_does_not_use_a_keyword_gate_for_a_legitimate_content_subject():
+    payload = _valid_exploration()
+    payload["content_world_root"]["selection_basis"] = "这个业务本身研究广告内容，因此该词是内容对象而不是下游方案"
+
+    parsed = parse_content_world_exploration(json.dumps(payload, ensure_ascii=False))
+
+    assert "广告内容" in parsed["content_world_root"]["selection_basis"]
+
+
+def test_parser_reports_missing_and_extra_fields_for_bounded_repair():
+    payload = _valid_exploration()
+    payload.pop("insufficiency")
+    payload["unexpected_field"] = []
+
+    with pytest.raises(ValueError) as exc_info:
+        parse_content_world_exploration(json.dumps(payload, ensure_ascii=False))
+
+    message = str(exc_info.value)
+    assert "missing: insufficiency" in message
+    assert "extra: unexpected_field" in message
+
+
+def test_parser_discards_only_the_two_retired_out_of_scope_fields():
+    payload = _valid_exploration()
+    payload["seller_evidence"] = [{"item": "旧字段内容"}]
+    payload["downstream_unknowns"] = ["旧字段内容"]
+
+    parsed = parse_content_world_exploration(json.dumps(payload, ensure_ascii=False))
+
+    assert "seller_evidence" not in parsed
+    assert "downstream_unknowns" not in parsed
 
 
 def test_explorer_prompt_does_not_treat_the_lexical_head_as_the_automatic_world_root():
@@ -755,7 +802,7 @@ def test_projected_map_preserves_one_root_without_competing_subworld_routes():
     assert projected["fact_boundary"] == {
         "allowed_subject_claims": ["用户逐字原话"],
         "do_not_infer": [
-            "不得把简称或大类补成具体客户、受众、需求、渠道、现场、素材或能力。",
+            "不得把简称或大类补成用户未陈述的具体事实、现场、素材或能力。",
             "不得把‘或’连接的未决选项写成同时具备。",
             "一般知识和待研究连接只说明这个世界可以研究什么，不证明主体亲历、掌握或拥有。",
         ],
@@ -771,7 +818,7 @@ def test_projected_map_preserves_one_root_without_competing_subworld_routes():
             "每个必报轴及其为什么属于这个内容世界",
             "一句研究与主体事实边界",
         ],
-        "stop_rule": "完成 output_shape 第三项后立即结束；不追加未知清单、下一步、追问、定位、形式或承接。",
+        "stop_rule": "完成 output_shape 第三项后立即结束；不追加未知清单、下一步、追问、定位、形式或其他模块事项。",
         "final_line_rule": "研究与主体事实边界必须是最后一段；其后不得再有文字，不得以问句结尾。",
         "required_axis_labels": [
             "种类与子世界",
@@ -786,15 +833,19 @@ def test_projected_map_preserves_one_root_without_competing_subworld_routes():
         ],
         "allowed_subject_claims": ["用户逐字原话"],
         "must_not": [
-            "本轮不讨论 B/C、客户、受众、需求、平台、表现形式、渠道、变现、执行计划或其他下游未知，不得举例补全。",
-            "本轮不询问追问问题；不得因下游未知转成问卷。",
-            "不得把 B/C 等简称补成任何具体客户、需求或成交渠道。",
+            "本轮不展开其他业务模块，也不借边界说明补写其内容。",
+            "本轮不询问追问问题；不得因模块外信息转成问卷。",
+            "不得把未定义简称补成用户没有陈述的具体事实。",
             "不得把源头、生产者或专业身份补成具体场地、亲历、素材、能力或成果。",
             "不得把‘或’连接的未决选项写成同时具备。",
             "不得把地图中的一般知识或待研究方向写成主体事实或已核验事实。",
         ],
-        "unknown_wording": "本轮不提及下游未知；它们不影响当前内容世界边界。",
+        "unknown_wording": "本轮不提及模块外信息；它们不影响当前内容世界边界。",
     }
+
+    serialized_contract = json.dumps(projected["response_contract"], ensure_ascii=False)
+    for out_of_scope_term in ("卖货", "广告", "变现", "成交", "转化", "客单", "复购", "带货"):
+        assert out_of_scope_term not in serialized_contract
 
 
 def test_projection_can_root_an_enabling_product_in_the_named_activity_it_serves():
@@ -1163,7 +1214,7 @@ def test_projected_handoff_leads_with_fact_closure_before_creative_axes():
     assert list(projected)[:2] == ["fact_boundary", "root_subject"]
     assert projected["fact_boundary"]["allowed_subject_claims"] == ["用户真正说的话"]
     assert projected["fact_boundary"]["do_not_infer"] == [
-        "不得把简称或大类补成具体客户、受众、需求、渠道、现场、素材或能力。",
+        "不得把简称或大类补成用户未陈述的具体事实、现场、素材或能力。",
         "不得把‘或’连接的未决选项写成同时具备。",
         "一般知识和待研究连接只说明这个世界可以研究什么，不证明主体亲历、掌握或拥有。",
     ]

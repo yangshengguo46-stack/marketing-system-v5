@@ -79,5 +79,23 @@
     "core_verdict": "The real account supports a broad medical-aesthetics content world while showing that one account may weight an anti-aging editorial lens. It does not justify replacing the category root with aging, copying individual hooks, or claiming monetization without business outcomes.",
     "presentation_format": "unknown_without_video_evidence"
   },
-  "status": "lead_marketing_judgment_accepted_after_revision_runtime_tooling_pending"
+  "status": "lead_marketing_judgment_accepted_after_revision_runtime_tooling_pending",
+  "user_review_2026_08_14": {
+    "status": "supersedes_account_content_structure_interpretation_only",
+    "source_object": "医美",
+    "audience_content_world": "变美",
+    "content_engines": [
+      "抗衰与面部年轻化",
+      "日常保养",
+      "人物外貌与地域比较"
+    ],
+    "attention_entries": [
+      "公众熟悉人物",
+      "地域女性与知名女性形象"
+    ],
+    "presentation_format": "separate_and_still_unknown_without_video_evidence",
+    "module_boundary": "Business-operation design is outside semantic and content-structure modules.",
+    "superseding_audit": "A42",
+    "superseding_evidence": "E28"
+  }
 }

@@ -25,6 +25,7 @@ sources:
   - Gateway thread eval_fruit_contract_20260813_04 / run ff7e16db-6256-46da-8895-4a1b372c3c77
   - Gateway thread eval_industrial_contract_20260813_09 / run 103b6379-7ba1-43cf-992b-906b2c06abad
   - Gateway thread eval_watch_unseen_20260813_01 / run b7d738fc-a3d4-43fb-90f1-fa1f7976df85
+  - docs/mcn-incubation-v5/audits/A42-content-structure-and-commerce-boundary.md
 ---
 
 # A34 生产内容世界探索审计
@@ -36,6 +37,8 @@ sources:
 本轮首次把这个缺口做成默认 Lead 按需调用的有界工具 `explore_content_worlds`。它不选最终定位，只交付一张事实边界封闭、可供 Lead 收敛的内容世界地图。R2/R3 继续修正了 R1 的假设：语义主词不自动是内容根。现在必须分开商业对象、词法主词和最小完整内容根，再判断商品是可持续展开的完整对象、中间实现物，还是买方购买的专业任务。修饰词只有在拿掉后世界不完整、买方构成功能不保留或无法回到生意时才留在根中。火锅底料、海鲜、黄金礼品、水果和工业防护包装五种语义形状已完成当前合同的真实 Gateway 回归。
 
 **这次通过的是“长期讲什么”这一层，不是整个营销脑已经 80 分。** 定位、人设、受众、表现形式、商业承接和后续实验仍需以真实主体信息继续验证。
+
+> 2026-08-14 后续边界：A34 验收的是从单句业务表达展开一张对象地图，不是有真实账号证据时的完整账号内容结构。A42 将账号级结构拆成来源对象、观众内容世界、内容发动机和注意力入口。医美未见探针中“医美为根”的历史输出保留，但不能再用它否定真实账号证据支持的“医美是来源对象、变美是观众世界”。A42/ADR-008 同时规定，语义与内容模块不处理经营方案。
 
 ## 标签来源边界
 
@@ -144,3 +147,5 @@ sources:
 - 内容世界这一坐标：**reviewed and cross-shape live accepted**
 - 完整营销脑 80 分：**not yet accepted**
 - 平台发布、大规模前端、跨用户案例学习：**still out of scope for this change**
+
+> 当前状态以 A42 为准：上面的 adopted 判定是 2026-08-13 对旧对象地图合同的历史验收。2026-08-14 的三个生产边界探针均返回 `invalid_model_output`，四层账号内容结构尚未获得生产升级资格。

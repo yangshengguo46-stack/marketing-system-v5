@@ -675,7 +675,7 @@ def test_content_world_guidance_is_capability_gated_and_narrowly_triggered():
     assert "调用 `explore_content_worlds`" in section
     assert "起号、账号定位、长期讲什么或内容方向" in section
     assert "只问一个能确定商业对象的问题" in section
-    assert "不要先用 B/C、平台、表现形式或变现方式" in section
+    assert "不要先用其他模块事项组成问卷" in section
     assert "不是每轮必经步骤" in section
     assert "最终营销判断仍由你负责" in section
 
@@ -683,24 +683,23 @@ def test_content_world_guidance_is_capability_gated_and_narrowly_triggered():
 def test_content_world_trigger_does_not_confuse_a_clear_object_with_downstream_ambiguity():
     section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
 
-    assert "能识别主体实际提供、销售、加工或服务的产品/服务对象" in section
-    assert "经营方式、生产方式、客户简称" in section
+    assert "能识别主体实际提供、经营、加工或服务的产品/服务对象" in section
+    assert "经营方式、生产方式和素材" in section
     assert "不等于商业对象不明确" in section
     assert "不得因此先调用 `ask_clarification`" in section
     assert "不得为澄清而补造选项" in section
-    assert "不再解释下游未知" in section
+    assert "不再解释模块外信息" in section
 
 
 def test_content_world_guidance_selects_the_largest_effective_world_without_sales_collapse():
     section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
 
     assert "最大有效内容世界" in section
-    assert "离成交最近" in section
+    assert "离原始对象最近" in section
     assert "宽品类本身" in section
     assert "向下的种类" in section
     assert "历史、地域、文化" in section
     assert "别人也能讲" in section
-    assert "B/C" in section
     assert "生产方式" in section
     assert "不得擅自建议拆号" in section
     assert "不接收模型改写的业务事实" in section
@@ -732,8 +731,8 @@ def test_content_world_guidance_selects_the_largest_effective_world_without_sale
     assert "一手经验更少" in section
     assert "不能因此从内容世界删除" in section
     assert "所有有结构关系的非空轴" in section
-    assert "B/C 等简称" in section
-    assert "不得自行展开为具体客户类型或成交渠道" in section
+    assert "未定义简称" in section
+    assert "不得展开成用户没有陈述的具体事实" in section
     assert "只有 `fact_boundary.allowed_subject_claims`" in section
     assert "`coverage_contract` 中的每个非空轴" in section
     assert "明确说出轴的名称和它为何属于这个世界" in section
@@ -743,16 +742,33 @@ def test_content_world_guidance_selects_the_largest_effective_world_without_sale
     assert "不得改写成主体已经拥有" in section
     assert "地图只能证明可讲范围" in section
     assert "不能证明主体亲历、掌握或拥有" in section
-    assert "当前内容世界回答不提及 B/C" in section
-    assert "具体对象、需求与渠道" in section
+    assert "当前内容世界回答不展开其他模块" in section
     assert "不得举例补全" in section
     assert "源头、生产者或专业身份" in section
     assert "只能形成条件化的可信视角" in section
+
+
+def test_content_world_guidance_does_not_shift_attention_to_selling_or_monetization():
+    section = prompt_module.CONTENT_WORLD_EXPLORER_PROMPT_SECTION
+
+    for out_of_scope_term in (
+        "卖货",
+        "销售",
+        "广告",
+        "变现",
+        "成交",
+        "转化",
+        "客单",
+        "复购",
+        "带货",
+    ):
+        assert out_of_scope_term not in section
+    assert "B/C" not in section
     assert "不得推成具体场地、一手经历、供应能力" in section
     assert "回答前最后读取 `response_contract`" in section
     assert "本轮回答范围" in section
     assert "不得擅自扩成完整起号方案" in section
-    assert "不再解释下游未知" in section
+    assert "不再解释模块外信息" in section
     assert "不追问" in section
     assert "完成 `output_shape` 后立即停止" in section
 
