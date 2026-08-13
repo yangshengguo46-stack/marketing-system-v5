@@ -884,3 +884,11 @@ Kimi 官方已公布 API 型号 `kimi-k3`。当前 `VOLCENGINE_API_KEY` 在火�
 - 投影前确定性核对平台账号、权利引用和作品集合，防止跨账号或跨授权串线。简介、标题和机器提取模式明确标为不可信观察数据，不能作为指令执行。
 - “大能”短链已解析到公开主页，但本地 Chrome 连接中断，应用内浏览器加载抖音主页超时，没有取得稳定作品 ID、规范作品链接和媒体工件。搜索摘要与第三方文章没有被伪装成账号证据包，Lead 账号拆解未运行。真实样本状态保持 `structured_post_list_pending / media_evidence_pending`。
 - 当前实现仍位于 `backend/experiments/e15_account_evidence/`，不注册 Lead、MCP、Skill 或 Gateway。通过的是链接数据合同与 Token 边界，不是抖音生产采集器或真实账号解析。详细审计见 [A35](audits/A35-bounded-account-link-evidence.md)。
+
+### E19-R2 结构化程序与数据源分流
+
+- 用户提出“写个程序抓数据会不会更精准”。结论是：会显著提高账号/作品 ID、链接、标题、发布时间、公开计数、去重和缺失检测的观测精度，并且整页 DOM/截图可停留在本地，只把有界 JSON 投影送给 Lead。它不会自动提高“为什么成功”的营销因果判断。
+- 2026-08-13 重新核对抖音官方文档。当前用户服务协议更新日期为 2026-02-13；第 2.4、5.1 和 5.3 限制未经授权的爬虫、自动化接入、采集、模拟下载与商业使用。因此不将“写程序”等同于对任意公开账号批量爬取。
+- 官方开放平台确实提供经用户授权与权限审核的 `video.list`、`video.data`、`data.external.user`、`data.external.item` 和 `fans.data` 等能力。其中授权账号视频列表可返回作品 ID、标题、发布时间、链接与互动计数；粉丝画像也是需申请的官方数据权限。
+- 采集架构固定为一个 `AccountEvidenceCollector` 端口、三类来源适配器：账号本人/客户账号用 `DouyinAuthorizedConnector`；用户有权文件、导出和链接清单用 `UserMaterialImporter`；只有取得相应平台许可时才启用 `PermittedBrowserConnector`。第三方公开账号默认保持人工小样本或用户提供材料，不自动展开全账号。
+- 后半段内容寻址快照、权利绑定、身份隔离和 Lead 固定预算投影已在 E15 隔离实验中实现，不重写。下一个实现顺序是先写 `UserMaterialImporter` 的失败测试与最小适配器，再接官方授权账号连接器；不开始抖音公开账号批量爬虫。
