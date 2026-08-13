@@ -57,6 +57,8 @@ BUSINESS_SEMANTIC_BACKBONE_SYSTEM_PROMPT = """你是离线架构评测中的商�
 - 先用一到三句自然语言释义显化词之间的隐含关系，再填写结构；允许多个合理释义并把未决之处放入 `ambiguities`。
 - `explicit` 只用于用户原话明确支持的信息；常识性的品类功能、复合表达关系或通用买方进展只能用 `lexical_semantics`。
 - 语法主词与商业对象可能不同；经营载体、身份和卖方动作均不得自动取代商业对象。
+- 复合商品表达不得只留整体名称和句尾主词。逐层拆出表达中明示的材质/属性、用途对象或活动、被服务对象、地点/渠道和品牌归属。
+- 某个词若说明商品被用来创造或完成什么，它必须作为 `purpose` 或 `served_object` 保留在 `qualifiers`，不得被整体商品名称吞掉。
 - 如果输入只有身份、做号意图或其他无法解析出商业对象的线索，`offer_object` 返回 null，并说明信息不足。
 - 斜杠、顿号或“或”连接的动作、模式与身份默认表示未决选项，不得改写成主体同时具备；只有用户明确说“都做”“同时做”才可并列为已知事实。
 - B 端、C 端或其他简称只支持其简称本身；用户没有亲自说明时，不得把餐饮、经销、零售、直销等常见例子扩写成 `explicit` 客户、渠道或动作。
@@ -193,6 +195,36 @@ def _relation_records(
     return records
 
 
+def _restore_compound_offer_term(
+    *,
+    commercial_expression: str,
+    offer_object: dict[str, str] | None,
+    qualifiers: list[dict[str, str]],
+) -> dict[str, str] | None:
+    """Recover pre-head compound qualifiers without swallowing seller actions."""
+    if offer_object is None:
+        return None
+    term = offer_object["term"]
+    semantic_head = offer_object["semantic_head"]
+    expression = commercial_expression.strip()
+    if not expression or semantic_head not in expression:
+        return offer_object
+
+    head_end = expression.rfind(semantic_head) + len(semantic_head)
+    offer_start = expression.find(term)
+    starts = [offer_start] if 0 <= offer_start < head_end else [expression.rfind(semantic_head)]
+    for qualifier in qualifiers:
+        qualifier_term = qualifier["term"]
+        qualifier_start = expression.find(qualifier_term)
+        if qualifier["relation"] != "other" and 0 <= qualifier_start < head_end and (qualifier["target"] in term or term in qualifier["target"] or semantic_head in qualifier["target"] or qualifier["target"] in semantic_head):
+            starts.append(qualifier_start)
+
+    compound_term = expression[min(starts) : head_end].strip()
+    if compound_term and semantic_head in compound_term:
+        return {**offer_object, "term": compound_term}
+    return offer_object
+
+
 def parse_business_semantics(value: str) -> dict[str, Any]:
     """Parse and validate the complete semantic backbone contract."""
     payload = _extract_json_object(value)
@@ -212,6 +244,7 @@ def parse_business_semantics(value: str) -> dict[str, Any]:
     if set(payload) != expected:
         raise ValueError("business semantics must contain exactly the configured fields")
 
+    commercial_expression = _optional_text(payload, "commercial_expression")
     offer_object: dict[str, str] | None
     raw_offer = payload["offer_object"]
     if raw_offer is None:
@@ -244,6 +277,11 @@ def parse_business_semantics(value: str) -> dict[str, Any]:
     for index, qualifier in enumerate(qualifiers):
         if qualifier["relation"] not in QUALIFIER_RELATIONS:
             raise ValueError(f"qualifiers[{index}].relation is unsupported")
+    offer_object = _restore_compound_offer_term(
+        commercial_expression=commercial_expression,
+        offer_object=offer_object,
+        qualifiers=qualifiers,
+    )
     seller_activities = _relation_records(
         payload["seller_activities"],
         field="seller_activities",
@@ -269,7 +307,7 @@ def parse_business_semantics(value: str) -> dict[str, Any]:
 
     return {
         "known_facts": _string_list(payload["known_facts"], field="known_facts", allow_empty=False),
-        "commercial_expression": _optional_text(payload, "commercial_expression"),
+        "commercial_expression": commercial_expression,
         "plain_paraphrases": _string_list(payload["plain_paraphrases"], field="plain_paraphrases"),
         "offer_object": offer_object,
         "operating_containers": operating_containers,

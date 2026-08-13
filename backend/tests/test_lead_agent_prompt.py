@@ -705,6 +705,29 @@ def test_content_world_guidance_selects_the_largest_effective_world_without_sale
     assert "不得擅自建议拆号" in section
     assert "不接收模型改写的业务事实" in section
     assert "`content_world_map.root_subject`" in section
+    assert "词法主词" in section
+    assert "商品形态" in section
+    assert "商业表达中已出现的具体对象或活动" in section
+    assert "地域、材质或风格修饰" in section
+    assert "泛化的体验或生活方式" in section
+    assert "最小完整根" in section
+    assert "`modifier_handling`" in section
+    assert "`branch_lens`" in section
+    assert "三项反事实" in section
+    assert "已校验商业语义" in section
+    assert "不重新评分或翻案" in section
+    assert "修饰词专属工艺" in section
+    assert "对具体商品很重要" in section
+    assert "不得再黏回根主语" in section
+    assert "国家、地区、民族与文化群体" in section
+    assert "`cross_cultural_comparison`" in section
+    assert "资源与环境" in section
+    assert "规则与禁忌" in section
+    assert "仪式与社交组织" in section
+    assert "缺少现成事例" in section
+    assert "标准编号" in section
+    assert "不得直接转述" in section
+    assert "不得以问句结尾" in section
     assert "`root_world` 的各轴属于同一张地图" in section
     assert "一手经验更少" in section
     assert "不能因此从内容世界删除" in section

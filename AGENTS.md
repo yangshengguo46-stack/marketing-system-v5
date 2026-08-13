@@ -170,7 +170,11 @@ These apply repo-wide; module guides own the module-specific detail.
   a user's business expression needs semantic explication. For requests about
   starting or positioning an account or choosing a long-term content territory,
   it may call `explore_content_worlds`, which reads user-authored thread text,
-  expands one rooted map, and returns a fact/response contract. Neither tool is
+  separates the commercial object, lexical head, and minimal complete content
+  root, then expands one rooted map and returns a fact/response contract.
+  Modifier decisions are derived from a removal counterfactual over world
+  completeness, buyer-side constitutive function, and the return path to the
+  commercial object; do not replace this with industry keyword rules. Neither tool is
   middleware or a workflow stage, and neither owns the final incubation
   decision. The accepted boundary and live cases are recorded in A34.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend

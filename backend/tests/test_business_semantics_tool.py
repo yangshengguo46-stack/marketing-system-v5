@@ -112,6 +112,9 @@ def test_semantic_contract_is_generic_and_only_explicitates_business_language():
     assert "不得改写成主体同时具备" in prompt
     assert "B 端、C 端或其他简称只支持其简称本身" in prompt
     assert "助手的提问选项、工具参数、总结、举例或改写" in prompt
+    assert "复合商品表达不得只留整体名称和句尾主词" in prompt
+    assert "被用来创造或完成什么" in prompt
+    assert "`purpose` 或 `served_object`" in prompt
     for leaked_answer in ("黄金", "礼品", "水果", "宝妈", "脐橙"):
         assert leaked_answer not in prompt
 
@@ -136,6 +139,54 @@ def test_semantic_parser_rejects_schema_drift():
         assert "exactly" in str(exc)
     else:
         raise AssertionError("schema drift was accepted")
+
+
+def test_semantic_parser_preserves_a_full_compound_offer_when_the_model_only_repeats_its_head():
+    payload = _valid_semantics()
+    payload["commercial_expression"] = "设备防护包装"
+    payload["offer_object"] = {
+        "term": "包装",
+        "semantic_head": "包装",
+        "support": "explicit",
+        "basis": "包装是复合表达的语义主词",
+    }
+    payload["qualifiers"] = [
+        {
+            "term": "设备",
+            "relation": "served_object",
+            "target": "包装",
+            "support": "explicit",
+            "basis": "设备是被保护对象",
+        },
+        {
+            "term": "防护",
+            "relation": "purpose",
+            "target": "包装",
+            "support": "explicit",
+            "basis": "防护是包装用途",
+        },
+    ]
+
+    parsed = parse_business_semantics(json.dumps(payload, ensure_ascii=False))
+
+    assert parsed["commercial_expression"] == "设备防护包装"
+    assert parsed["offer_object"]["term"] == "设备防护包装"
+    assert parsed["offer_object"]["semantic_head"] == "包装"
+
+
+def test_semantic_parser_does_not_promote_trailing_seller_actions_into_the_offer():
+    payload = _valid_semantics()
+    payload["commercial_expression"] = "品类生产加工"
+    payload["offer_object"] = {
+        "term": "品类",
+        "semantic_head": "品类",
+        "support": "explicit",
+        "basis": "品类是商业对象",
+    }
+
+    parsed = parse_business_semantics(json.dumps(payload, ensure_ascii=False))
+
+    assert parsed["offer_object"]["term"] == "品类"
 
 
 def test_tool_schema_exposes_one_expression_and_not_runtime_or_model_controls():

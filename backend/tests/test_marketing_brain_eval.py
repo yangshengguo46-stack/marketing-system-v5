@@ -92,7 +92,8 @@ def test_user_reviewed_anchors_are_marked_reviewed():
 
     assert cases["gold-gift"].review_status == "reviewed"
     assert cases["seafood-source"].review_status == "reviewed"
-    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id not in {"gold-gift", "seafood-source"})
+    assert cases["chongqing-hotpot-base"].review_status == "reviewed"
+    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id not in {"gold-gift", "seafood-source", "chongqing-hotpot-base"})
 
 
 def test_seafood_anchor_records_the_reviewed_broad_category_boundary():
@@ -102,6 +103,18 @@ def test_seafood_anchor_records_the_reviewed_broad_category_boundary():
     assert "不因题目提到两类客户就擅自拆成两个账号" in " ".join(seafood.success_criteria)
     assert "养殖和捕捞是尚未确认的选项" in " ".join(seafood.known_facts)
     assert "只围绕品质、新鲜度、挑选避坑或供应链流转起号" in seafood.failure_modes
+
+
+def test_hotpot_base_anchor_separates_product_form_region_and_content_subject():
+    hotpot = {case.case_id: case for case in default_cases()}["chongqing-hotpot-base"]
+    success = " ".join(hotpot.success_criteria)
+
+    assert hotpot.business_shape == "enabling-product"
+    assert "底料是商品形态和词法主词" in success
+    assert "火锅才是长期内容主语" in success
+    assert "重庆保留为地域与风味分支" in success
+    assert "民族与不同国家的饮食习惯" in success
+    assert "餐饮体验、生活方式、团圆或情绪价值" in " ".join(hotpot.failure_modes)
 
 
 def test_candidate_messages_preserve_the_real_user_input_boundary():

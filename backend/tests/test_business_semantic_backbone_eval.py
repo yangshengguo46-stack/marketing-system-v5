@@ -101,6 +101,8 @@ def test_backbone_prompt_only_explicitates_business_semantics():
     assert "品类构成功能" in prompt
     assert "买方期望进展" in prompt
     assert "不能只按句尾词或语法主词" in prompt
+    assert "复合商品表达不得只留整体名称和句尾主词" in prompt
+    assert "`purpose` 或 `served_object`" in prompt
     assert "lexical_semantics" in prompt
     assert "不得输出人设、受众、平台、表现形式" in prompt
     for leaked_case in ("黄金", "礼品", "水果", "花店", "宝妈", "脐橙"):

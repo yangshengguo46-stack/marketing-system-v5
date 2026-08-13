@@ -105,7 +105,14 @@ stages, and cannot produce the final marketing decision. `explore_content_worlds
 has no model-supplied fact argument: it reads recent real-user messages, runs
 semantic explication and one rooted expansion privately, validates both
 contracts (with at most one schema-only repair), then exposes only the bounded
-map and handoff contract. The offline evaluators remain unregistered. The
+map and handoff contract. Its root contract separates the commercial object,
+lexical head, and minimal complete content root. Modifier placement is derived
+from a removal counterfactual over world completeness, the buyer-side
+constitutive function, and a natural return path to the commercial object;
+cross-cultural axes are retained only when an explicit environmental, rule,
+ritual, tool, or historical-transmission mechanism can alter the root world.
+Unverified named standards, policies, cases, and historical claims remain
+category-level research questions. The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
 preregistered evaluation. A34 owns the production boundary and live acceptance.
