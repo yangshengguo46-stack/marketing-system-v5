@@ -1,0 +1,125 @@
+{
+  "evidence_id": "E29",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate one-call layered account-content mapping with sparse rooted expansion.",
+  "production_baseline": {
+    "commit": "ca2af9f8905698a0ad81a204350afa07fb840bcf",
+    "production_code_changed": false,
+    "rollback_available": true
+  },
+  "candidate": {
+    "runtime_registered": false,
+    "components": [
+      "source_object",
+      "audience_world",
+      "content_engines",
+      "attention_entries",
+      "expansion_nodes"
+    ],
+    "expansion_axes": [
+      "types_and_subworlds",
+      "time_and_history",
+      "geography_and_environment",
+      "culture_and_habits",
+      "people",
+      "events",
+      "conflicts",
+      "cross_domain"
+    ],
+    "final_system_prompt_sha256": "89d17516a226db60ebe4e6f9a44b870b6cc206fd38fa13a533ea9e90279fbd36"
+  },
+  "evaluation": {
+    "run_id": "e29-layered-final-six-20260814-06",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 6,
+    "provider_call_budget": 7,
+    "provider_calls": 7,
+    "schema_repair_budget": 1,
+    "schema_repairs": 1,
+    "passed": 1,
+    "failed_business": 3,
+    "failed_contract": 2,
+    "usage": {
+      "input_tokens": 14110,
+      "output_tokens": 13015,
+      "total_tokens": 27125
+    },
+    "elapsed_seconds_total": 282.918
+  },
+  "case_results": [
+    {
+      "case_id": "gold-gift",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_contract",
+      "source_object": null,
+      "audience_world": null,
+      "error": "Top-level schema drift remained after the one shared schema-only repair.",
+      "visible_answer_sha256": "0242742ef7f7b845d9a76f042030a7180d9d07814ddff21ce156291f9b2f45a5",
+      "provider_reasoning_sha256": "ed51711d7cb06b879b368dde09e66b18a1c1e5d924ef8ca02cf004f7ac11cadc"
+    },
+    {
+      "case_id": "fruit-shop",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_business",
+      "source_object": "水果",
+      "audience_world": "水果",
+      "error": "The root was correct, but culture_and_habits was omitted.",
+      "visible_answer_sha256": "7696d6bed8544ec6571a490fb865e2237703febf9718009bb930c0d00cbae213",
+      "provider_reasoning_sha256": "32347e541319cf7a063e0d02e2d315f6b71581b16c860c122d700ad0b781f353"
+    },
+    {
+      "case_id": "seafood-source",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_business",
+      "source_object": "海鲜",
+      "audience_world": "海鲜",
+      "error": "The root was correct, but time/history and culture/food habits were omitted.",
+      "visible_answer_sha256": "ce49bc7748c67260d07ba5bca5d37a8fc7f877f2abb46f8c1f1ee50455cfe953",
+      "provider_reasoning_sha256": "e0ac5ed9b7f4e35570c4c2e32e26b6b08e8a3089764d7b7c7761604ad96d16c1"
+    },
+    {
+      "case_id": "chongqing-hotpot-base",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_contract",
+      "source_object": null,
+      "audience_world": null,
+      "error": "The first attention entry omitted basis after the shared repair budget was exhausted.",
+      "visible_answer_sha256": "dd42fddc6019b8f16c7fcd39a124eca5870929cb82103e9cd4fc79929bc8d05d",
+      "provider_reasoning_sha256": "113ddfca6911a059c771ed9ee8b7429f2f7c1aef0be0b79a24f5e24812db9803"
+    },
+    {
+      "case_id": "watch-account",
+      "review_status": "reviewed_real_account",
+      "verdict": "passed",
+      "source_object": "腕表",
+      "audience_world": "腕表",
+      "error": null,
+      "visible_answer_sha256": "3fee808917e01fbed72f52d192b8f5f1a3f5183cf0be1710c9b11b7d5cdfc3bc",
+      "provider_reasoning_sha256": "eaa84bfc89e185b557b0842ae793f00186d71153ad4f8dee97b29da01d4cf375"
+    },
+    {
+      "case_id": "medical-aesthetics-account",
+      "review_status": "reviewed_real_account",
+      "verdict": "failed_business",
+      "source_object": "医美",
+      "audience_world": "面部年轻化",
+      "error": "The account world collapsed below the reviewed beauty world and lost an engine signal group.",
+      "visible_answer_sha256": "f21473853d2147f2040b27eda76e53e3918652119f43326c82695fb5b83b36ce",
+      "provider_reasoning_sha256": "b7dea5e09213efb051d2c636dfe8fb51fa4611f79d8bdfb2af2d04ffed2c16d6"
+    }
+  ],
+  "artifact_sha256": {
+    "manifest_json": "cad6c4f0365268c7ced5d5f3412cff8193d6df0804e62cd80238c964bd567efa",
+    "results_json": "ed0e6448ebe0c1d068d74c50a8112704d42ec464f80b8f28a950768222f2402f",
+    "completion_json": "96e5a6b2f38d93f3b92ace2499e2e794a4dd9803460cc77e1f8b84a17558aaee"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_single_call_layered_map_for_production"
+}

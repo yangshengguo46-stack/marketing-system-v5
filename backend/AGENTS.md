@@ -123,7 +123,9 @@ boundary with a sales or advertising keyword blacklist because those terms can
 be legitimate source objects. Business-operation design belongs to a separate
 Lead responsibility, not to semantic explication or content mapping. The E28
 four-layer candidate remains unregistered after three production probes failed.
-The offline evaluators remain unregistered. The
+E29's isolated one-call layered map added rooted expansion nodes but passed only
+one of six frozen cases; ADR-009 rejects that implementation for production. The
+offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
 preregistered evaluation. A34 owns the original object-map acceptance; A42 and
@@ -136,6 +138,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_content_world_map_eval.py \
   tests/test_business_semantic_backbone_eval.py \
   tests/test_account_content_structure_eval.py \
+  tests/test_layered_content_map_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```

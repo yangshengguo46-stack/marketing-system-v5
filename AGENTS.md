@@ -227,7 +227,11 @@ These apply repo-wide; module guides own the module-specific detail.
   positive contracts, not keyword gates: advertising or sales may themselves be
   legitimate business objects. The offline E28 candidate separates source object,
   audience world, content engines, and attention entries. It is not registered
-  because its production probes did not pass. A34 records the original object-map
-  acceptance; A42 and ADR-008 own the newer account-level boundary.
+  because its production probes did not pass. E29's isolated one-call candidate
+  added rooted expansion nodes but passed only one of six frozen cases; ADR-009
+  rejects that implementation for production. Do not register either evaluator or
+  infer production approval from a locally passing sample. A34 records the original
+  object-map acceptance; A42 and ADR-008 own the newer account-level boundary, while
+  A43 and ADR-009 own the layered-map rejection.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
