@@ -229,9 +229,12 @@ These apply repo-wide; module guides own the module-specific detail.
   audience world, content engines, and attention entries. It is not registered
   because its production probes did not pass. E29's isolated one-call candidate
   added rooted expansion nodes but passed only one of six frozen cases; ADR-009
-  rejects that implementation for production. Do not register either evaluator or
-  infer production approval from a locally passing sample. A34 records the original
-  object-map acceptance; A42 and ADR-008 own the newer account-level boundary, while
-  A43 and ADR-009 own the layered-map rejection.
+  rejects that implementation for production. E30 separated skeleton selection from
+  frozen-parent expansion and improved to three of six, but still failed the
+  preregistered threshold and golden-gift semantic leap; ADR-010 rejects production
+  promotion. Do not register these evaluators or infer production approval from a
+  locally passing sample. A34 records the original object-map acceptance; A42 and
+  ADR-008 own the newer account-level boundary, while A43-A44 and ADR-009-ADR-010
+  own the layered-map rejections.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

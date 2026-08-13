@@ -1,0 +1,118 @@
+{
+  "evidence_id": "E30",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate a frozen four-layer skeleton followed by bounded rooted expansion.",
+  "production_baseline": {
+    "commit": "722919f7",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "stage_one": "source object, audience world, content engines, attention entries",
+    "stage_two": "expansion nodes rooted only in the frozen audience world or frozen engines",
+    "skeleton_prompt_sha256": "926c5cba2eefb90d2353ef0a9cecfa1240297c12fe55ef5d1e7bdaf5a26adf5e",
+    "expansion_prompt_sha256": "b5df092eb784bb32ea13be79b7ec54641e9f0c2b38a3f9ec01db2fbf4927d366"
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "all_four_user_corrected_cases_pass": true,
+    "minimum_total_passed": 5,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e30-two-step-final-six-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 6,
+    "provider_call_budget": 14,
+    "provider_calls": 12,
+    "skeleton_schema_repairs": 1,
+    "expansion_schema_repairs": 0,
+    "passed": 3,
+    "failed_business": 2,
+    "failed_contract": 1,
+    "usage": {
+      "input_tokens": 16976,
+      "output_tokens": 21343,
+      "total_tokens": 38319
+    },
+    "elapsed_seconds_total": 450.133,
+    "acceptance_passed": false
+  },
+  "case_results": [
+    {
+      "case_id": "gold-gift",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_business",
+      "source_object": "黄金礼品",
+      "audience_world": "黄金礼品",
+      "error": "The skeleton remained product-led and did not reach the reviewed gifting or human-relations world.",
+      "provider_calls": 3
+    },
+    {
+      "case_id": "fruit-shop",
+      "review_status": "user_corrected_gold",
+      "verdict": "passed",
+      "source_object": "水果",
+      "audience_world": "水果",
+      "error": null,
+      "provider_calls": 2
+    },
+    {
+      "case_id": "seafood-source",
+      "review_status": "user_corrected_gold",
+      "verdict": "passed",
+      "source_object": "海鲜",
+      "audience_world": "海鲜",
+      "error": null,
+      "provider_calls": 2
+    },
+    {
+      "case_id": "chongqing-hotpot-base",
+      "review_status": "user_corrected_gold",
+      "verdict": "failed_skeleton_contract",
+      "source_object": null,
+      "audience_world": null,
+      "error": "The first attention entry omitted basis after the shared skeleton-repair budget was exhausted.",
+      "provider_calls": 1
+    },
+    {
+      "case_id": "watch-account",
+      "review_status": "reviewed_real_account",
+      "verdict": "passed",
+      "source_object": "腕表",
+      "audience_world": "腕表",
+      "error": null,
+      "provider_calls": 2
+    },
+    {
+      "case_id": "medical-aesthetics-account",
+      "review_status": "reviewed_real_account",
+      "verdict": "failed_business",
+      "source_object": "医美",
+      "audience_world": "变美",
+      "error": "The root was correct, but the skeleton omitted reviewed anti-aging and appearance-belief engine groups.",
+      "provider_calls": 2
+    }
+  ],
+  "comparison_to_e29": {
+    "e29_passed": 1,
+    "e30_passed": 3,
+    "e29_contract_failures": 2,
+    "e30_contract_failures": 1,
+    "inference": "Separating stages reduced some attention competition but did not create the missing marketing semantic leap."
+  },
+  "artifact_sha256": {
+    "manifest_json": "f9ff91af138d2c0a8386b7896b126e3b6f65385f5b31dac0a66ad156a837c39f",
+    "results_json": "46cd6a6666062005ca9ec59a4e237a233e29e07092a27f996eef73e9bcb4620a",
+    "completion_json": "e81b76c18f911f9758222e7e2f1d4c1027a6db757e893e6e87d3e76d7bb74d07"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_two_step_candidate_for_production_probe"
+}
