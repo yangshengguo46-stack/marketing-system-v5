@@ -193,6 +193,9 @@ These apply repo-wide; module guides own the module-specific detail.
   content-collaboration research uses authenticated Xingtu evidence, and
   commerce matching uses authenticated Buyin/Selected Alliance evidence. Paid
   third-party analytics are optional cross-checks, never runtime prerequisites.
+  Competitor-account analysis must not route to the authorized-account
+  `fans.data` API; Xingtu competitor evidence is implemented and accepted first,
+  while authorized-account APIs belong to the later own-account retrospective.
   Followers, content viewers, engagers, live viewers, and purchasers must retain
   distinct population scopes. A37, A38, and A40 own these
   experimental boundaries. Source snapshots are content-addressed locally. Even when

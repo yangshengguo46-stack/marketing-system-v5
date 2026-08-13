@@ -47,7 +47,7 @@ sources:
 
 ### 官方优先的数据源路由
 
-后续核实表明，抖音开放平台对授权账号提供 `fans.data`，包含年龄、性别、地域、兴趣、活跃天数和设备等分布；`data.external.user` 另可提供按日新增与总粉丝。巨量星图对星图任务提供作品观众画像，精选联盟/巨量百应承担带货达人与商品匹配场景。因此第五版先自建官方数据源适配，蝉妈妈等付费第三方工具不作运行时依赖。
+后续核实表明，官方能力必须按场景路由，不能混成一个“官方优先”口号。看别人的账号时，巨量星图达人前选是内容/人群匹配的首选，精选联盟/巨量百应补充带货和商品匹配。只有复盘自有或客户 OAuth 授权账号时，才使用抖音开放平台 `fans.data` 与 `data.external.user`；它们不能代查对标达人。蝉妈妈等付费第三方工具不作运行时依赖。
 
 粉丝、作品观众、互动者、直播观众和购买者必须带各自的 `population_scope`，不因共享性别/年龄/地域字段就混合。完整能力、权限和实施顺序见 [A40](A40-douyin-official-audience-sources.md)。
 
@@ -68,9 +68,9 @@ sources:
 | 追加式内容寻址受众快照账本与粉丝净增长差分 | `implemented` |
 | 通用受众互动对象、伪名化和跨作品行为序列 | `implemented; Douyin two-post visible interaction sample accepted, cross-post repeated actor still absent` |
 | HLLM 请求适配、最近 50 条序列、输入哈希与检查点回执 | `implemented contract` |
-| 抖音官方授权粉丝画像适配器 | `official API verified; implementation and live OAuth acceptance pending` |
 | 星图作品观众与达人前选适配器 | `official capability traced; authenticated field acceptance pending` |
 | 百应带货/电商受众适配器 | `official product traced; authenticated schema acceptance pending` |
+| 抖音官方授权粉丝画像适配器 | `own/client-account retrospective only; API verified, implementation deferred` |
 | 其他平台粉丝分布、活跃、直播和电商受众采集器 | `pending platform-by-platform implementation and acceptance` |
 | 真实 HLLM 权重推理 | `pending external GPU model service` |
 
