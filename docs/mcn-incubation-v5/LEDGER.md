@@ -892,3 +892,12 @@ Kimi 官方已公布 API 型号 `kimi-k3`。当前 `VOLCENGINE_API_KEY` 在火�
 - 官方开放平台确实提供经用户授权与权限审核的 `video.list`、`video.data`、`data.external.user`、`data.external.item` 和 `fans.data` 等能力。其中授权账号视频列表可返回作品 ID、标题、发布时间、链接与互动计数；粉丝画像也是需申请的官方数据权限。
 - 采集架构固定为一个 `AccountEvidenceCollector` 端口、三类来源适配器：账号本人/客户账号用 `DouyinAuthorizedConnector`；用户有权文件、导出和链接清单用 `UserMaterialImporter`；只有取得相应平台许可时才启用 `PermittedBrowserConnector`。第三方公开账号默认保持人工小样本或用户提供材料，不自动展开全账号。
 - 后半段内容寻址快照、权利绑定、身份隔离和 Lead 固定预算投影已在 E15 隔离实验中实现，不重写。下一个实现顺序是先写 `UserMaterialImporter` 的失败测试与最小适配器，再接官方授权账号连接器；不开始抖音公开账号批量爬虫。
+
+## E20 锋哥数字员工采集 MCP 审计
+
+- 用户提示电脑中“锋哥的数字员工”可能已有采集程序。在 `/Users/yangyucheng/Desktop/锋哥的数字员工`定位到完整快照，只读审计 `acquisition_mcp.py`、`acquisition_adapters.py`、`mediacrawler_bridge.py`、`account_profile_sync.py`、旧台账、测试与本地审计工件。旧目录无 Git 谱系；压缩包 SHA-256 为 `15954d476387d5bcbeed76220b96139bd3ada0e29e716867a4e92e8313bd9591`。
+- 旧系统确实采用“MCP 外壳 -> 专用采集脚本”，但抖音底层是 MediaCrawler、Cookie/storage state 转接、私有网页接口、响应拦截、DOM fallback、签名与 stealth。MCP 只改变调用形态，不提高底层数据权利或平台合规性。
+- 本地保留的 2026-08-06 快照中，一份约 `485 KB` 的网页响应包含 `8` 个顶层数据条目，其中 `6` 个有完整 `aweme_info` 字段形状。这证明响应 JSON 当时比视觉截图精准；但同次 HTML 是登录/验证状态，旧 DOM 选择器无匹配，台账也标记“实际不可用”后又改为“已集成、未验证”。测试未覆盖抖音搜索或真实 MCP 闭环，不能宣称当前可用。
+- MediaCrawler 子模块目录在快照中为空，且当前许可为 `NON-COMMERCIAL LEARNING LICENSE 1.1`，不适合第五版商业产品。旧 MediaCrawler 桥接、私有端点、Cookie 提取、签名、反检测、原始响应保存和批量互动工具全部拒绝迁移。
+- 采用的只是工程语义：采集脚本与 MCP 分层、平台适配器、字段归一化、ID 去重、数量上限、显式失败状态和浏览器资源租约。其中多数已被 E15 的严格 Schema、权利声明、哈希快照和有界 Lead 投影超越，不重建旧 acquisition runtime。
+- 决定为 `architecture_patterns_only_no_code_migration`。下一实现仍是先写 `UserMaterialImporter`，再写抖音官方授权 `DouyinAuthorizedConnector`，真实账号验收后才包装为只读 MCP/Tool。详细证据和迁移矩阵见 [A36](audits/A36-fengge-acquisition-mcp-audit.md)。

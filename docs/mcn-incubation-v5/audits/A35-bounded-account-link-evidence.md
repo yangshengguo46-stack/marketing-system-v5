@@ -5,6 +5,7 @@ reviewed_at: 2026-08-13
 implementation_status: isolated_boundary_adopted_real_account_pending
 sources:
   - docs/mcn-incubation-v5/audits/A33-account-structured-extraction-feasibility.md
+  - docs/mcn-incubation-v5/audits/A36-fengge-acquisition-mcp-audit.md
   - docs/mcn-incubation-v5/LEDGER.md#e14-视角选择数据来源与抖音采集边界
   - backend/experiments/e15_account_evidence/
   - https://v.douyin.com/J-V1_uhTGXk/
@@ -94,6 +95,7 @@ lead_account_analysis_not_run
 - 用户材料导入器：`planned as first implementation`。
 - 第三方公开账号批量爬虫：`rejected`。
 - 抖音浏览器采集器：`not implemented; permission-gated`。
+- 锋哥数字员工 acquisition MCP/MediaCrawler 代码：`rejected for migration; architecture patterns audited in A36`。
 - “大能”真实多视频账号解析：`pending`。
 - Lead/MCP/Skill 注册：`forbidden until real-account acceptance`。
 
