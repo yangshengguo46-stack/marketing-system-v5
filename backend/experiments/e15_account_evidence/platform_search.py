@@ -110,6 +110,9 @@ class PlatformSearchItem(StrictModel):
     description: str | None = Field(default=None, max_length=8_000)
     author_id: str | None = Field(default=None, max_length=500)
     author_name: str | None = Field(default=None, max_length=500)
+    author_bio: str | None = Field(default=None, max_length=2_000)
+    author_verification: str | None = Field(default=None, max_length=500)
+    author_visible_work_count: int | None = Field(default=None, ge=0)
     author_public_metrics: dict[str, int | float] = Field(default_factory=dict)
     published_at: datetime | None = None
     captured_at: datetime

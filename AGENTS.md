@@ -195,7 +195,14 @@ These apply repo-wide; module guides own the module-specific detail.
   representative post/evidence IDs, coverage, limitations, and hashes, and
   treats all page text as untrusted evidence rather than instructions. Account,
   rights, and post identities must match before projection. A35 owns this
-  experimental boundary; the first real multi-video account remains pending.
+  experimental boundary. A39 records one passing real Douyin account sample:
+  author-qualified recent posts, two local media records, two-post visible
+  audience interactions, and a bounded Lead projection. This permits continued
+  isolated research only; it does not register E15 or establish support for the
+  other platforms. Account analysis must distinguish acquisition positioning,
+  current positioning, migration evidence, and conditions that cannot be
+  copied. A mature person-centric account cannot be presented as a cold-start
+  category template.
   The default Lead may call the bounded `analyze_business_semantics` tool when
   a user's business expression needs semantic explication. For requests about
   starting or positioning an account or choosing a long-term content territory,

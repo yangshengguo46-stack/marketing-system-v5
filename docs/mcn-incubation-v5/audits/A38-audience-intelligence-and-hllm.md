@@ -56,14 +56,16 @@ sources:
 | 公开账号规模与样本作品互动基线 | `implemented in isolated experiment` |
 | 八类数据集、逐项覆盖回执和来源口径 | `implemented` |
 | 追加式内容寻址受众快照账本与粉丝净增长差分 | `implemented` |
-| 通用受众互动对象、伪名化和跨作品行为序列 | `implemented contract; real collector samples pending` |
+| 通用受众互动对象、伪名化和跨作品行为序列 | `implemented; Douyin two-post visible interaction sample accepted, cross-post repeated actor still absent` |
 | HLLM 请求适配、最近 50 条序列、输入哈希与检查点回执 | `implemented contract` |
 | 平台粉丝分布、活跃、直播和电商受众采集器 | `pending platform-by-platform implementation and acceptance` |
 | 真实 HLLM 权重推理 | `pending external GPU model service` |
 
 本机是 Intel MacBook Pro、32 GB 内存、AMD Radeon Pro 5300M 4 GB，与上游 CUDA/DeepSpeed/FAISS-GPU 环境不匹配，本地也没有 HLLM-Creator 权重。因此本轮不声称跑过真实 HLLM；该步骤必须使用独立 GPU 服务完成并返回真实检查点回执。
 
-测试额外固定了四条容易被忽略的口径：同一作品去重优先保留作者指标更完整的观测；本地增长曲线只使用 `observed` 粉丝值，不对第三方估算做差后冒充事实；同一采集时刻的两份不同证据都保留，但不生成零时间窗口增长；商品点击、加购、直播进入等行为保留原始业务语义，不统一降级为“浏览”。最终 E15 回归为 `126 passed`，Ruff 检查与格式检查通过。
+测试额外固定了四条容易被忽略的口径：同一作品去重优先保留作者指标更完整的观测；本地增长曲线只使用 `observed` 粉丝值，不对第三方估算做差后冒充事实；同一采集时刻的两份不同证据都保留，但不生成零时间窗口增长；商品点击、加购、直播进入等行为保留原始业务语义，不统一降级为“浏览”。A39 又补充了两条：同一源账号观测的采集重试不生成虚假零增长；抖音受众原始 ID 在结构化快照前完成本地伪名化。
+
+真实“大能”验收从两条作品各取得 5 条可见互动，共 10 个不同伪名受众。样本没有同一受众跨作品重复出现，因此不运行 HLLM，也不将单条评论或账号作品史冒充行为画像。详情见 [A39](A39-daneng-real-account-acceptance.md)。
 
 ## 判定
 

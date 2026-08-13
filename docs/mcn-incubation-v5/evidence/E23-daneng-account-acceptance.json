@@ -1,0 +1,61 @@
+{
+  "account": {
+    "captured_at": "2026-08-13T13:01:45.663257Z",
+    "display_name": "大能",
+    "platform": "douyin",
+    "public_metrics": {
+      "followers": 9469174,
+      "following": 416,
+      "likes_received": 188180829,
+      "visible_works": 572
+    },
+    "stable_account_id": "MS4wLjABAAAArWw9jFYgYWDg3DbUze14_wJxyHIWUnOMRgEQWqZl1Uk"
+  },
+  "account_source_snapshot": {
+    "author_qualified_post_count": 17,
+    "requested_post_cap": 24,
+    "sha256": "645c610755e8dd1efc635f39b42391b02ad0604b362dacee10fc30aeee512397"
+  },
+  "audience_snapshot": {
+    "actor_linked_interaction_count": 10,
+    "cross_post_repeated_actor_count": 0,
+    "dataset_coverage": {
+      "account_scale": "collected",
+      "audience_activity": "unavailable",
+      "audience_interests": "unavailable",
+      "content_interactions": "partial",
+      "follower_demographics": "unavailable"
+    },
+    "raw_actor_ids_persisted": false,
+    "selected_post_count": 2,
+    "sha256": "42b52539117bef7e91369a3a397f10b4cf59782850d93f188a8b4ad8cd327591"
+  },
+  "contract_version": "e23-daneng-account-acceptance-v1",
+  "lead_projection": {
+    "forbidden_local_or_credential_fields_present": false,
+    "pattern_count": 16,
+    "representative_post_count": 2,
+    "serialized_utf8_bytes": 7745,
+    "sha256": "2287db50136701e36bf6e78776530411f040312a029880f52e20cf6d984b25b9"
+  },
+  "media_evidence_pack": {
+    "cloud_processing_used": false,
+    "sha256": "27104e3fb0db1b7e984531b6bc4d7139ad5dff9949cc5999e5b4a492632c251a",
+    "video_count": 2,
+    "videos": [
+      {
+        "duration_seconds": 148.210998,
+        "post_id": "7656649228613154674",
+        "sampled_frame_count": 10,
+        "source_sha256": "50dd726bf6ffa82108442599d1dbe641bc94daf81619de0ce4f95e0f6e30f502"
+      },
+      {
+        "duration_seconds": 162.377007,
+        "post_id": "7634149948057145225",
+        "sampled_frame_count": 10,
+        "source_sha256": "f3fd83c9c4208c82441861b4f2898e1aad7b466a703d4c63d4d5c113813d2c14"
+      }
+    ]
+  },
+  "status": "isolated_acceptance_passed_runtime_promotion_pending"
+}

@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Protocol
-from urllib.parse import quote, quote_plus, urljoin, urlsplit
+from urllib.parse import quote, quote_plus, unquote, urljoin, urlsplit
 
 from .local_browser_credentials import LocalBrowserCredentials
 from .platform_search import (
@@ -191,6 +191,24 @@ def _metrics(source: object, aliases: Mapping[str, Sequence[str]]) -> dict[str, 
     return result
 
 
+def _douyin_post_metrics(source: object) -> dict[str, int | float]:
+    metrics = _metrics(
+        source,
+        {
+            "plays": ("play_count",),
+            "likes": ("digg_count",),
+            "comments": ("comment_count",),
+            "shares": ("share_count",),
+            "favorites": ("collect_count",),
+        },
+    )
+    # Douyin's public-web account feed reports play_count=0 when the value is
+    # withheld. Treating that sentinel as an observed zero corrupts analysis.
+    if metrics.get("plays") == 0:
+        metrics.pop("plays")
+    return metrics
+
+
 def _walk_dicts(value: object):
     if isinstance(value, Mapping):
         yield value
@@ -223,6 +241,8 @@ def _douyin_items(
     captured_at: datetime,
 ) -> list[PlatformSearchItem]:
     items: list[PlatformSearchItem] = []
+    if isinstance(payload, Mapping) and payload.get("status_code") not in {None, 0}:
+        return items
     if target is PlatformSearchTarget.ACCOUNTS:
         for node in _walk_dicts(payload):
             user = node.get("user_info")
@@ -257,6 +277,8 @@ def _douyin_items(
 
     for node in _walk_dicts(payload):
         aweme = node.get("aweme_info")
+        if not isinstance(aweme, Mapping) and node.get("aweme_id") and isinstance(node.get("author"), Mapping):
+            aweme = node
         if not isinstance(aweme, Mapping):
             continue
         item_id = str(aweme.get("aweme_id") or aweme.get("id") or "").strip()
@@ -285,16 +307,7 @@ def _douyin_items(
                 ),
                 published_at=_timestamp(aweme.get("create_time")),
                 captured_at=captured_at,
-                public_metrics=_metrics(
-                    stats,
-                    {
-                        "plays": ("play_count",),
-                        "likes": ("digg_count",),
-                        "comments": ("comment_count",),
-                        "shares": ("share_count",),
-                        "favorites": ("collect_count",),
-                    },
-                ),
+                public_metrics=_douyin_post_metrics(stats),
                 thumbnail_url=_thumbnail(video.get("cover") or video.get("origin_cover")),
             )
         )
@@ -611,6 +624,9 @@ def _item_completeness(item: PlatformSearchItem) -> tuple[int, int]:
                 item.description,
                 item.author_id,
                 item.author_name,
+                item.author_bio,
+                item.author_verification,
+                item.author_visible_work_count,
                 item.published_at,
                 item.thumbnail_url,
             )
@@ -677,6 +693,152 @@ _DOM_PATTERNS: dict[
         PlatformSearchItemType.ACCOUNT: re.compile(r"/@([^/?#]+)"),
     },
 }
+
+
+def _account_identity_from_url(
+    platform: SearchPlatform,
+    value: str,
+) -> str | None:
+    parsed = urlsplit(value)
+    host = parsed.hostname or ""
+    if not _host_matches(host, _PLATFORM_HOSTS[platform]):
+        return None
+    patterns = {
+        SearchPlatform.DOUYIN: re.compile(r"/(?:share/)?user/([^/?#]+)"),
+        SearchPlatform.XIAOHONGSHU: re.compile(r"/user/profile/([^/?#]+)"),
+        SearchPlatform.KUAISHOU: re.compile(r"/profile/([^/?#]+)"),
+        SearchPlatform.BILIBILI: re.compile(r"^/([0-9]+)(?:/|$)"),
+        SearchPlatform.TIKTOK: re.compile(r"/@([^/?#]+)"),
+    }
+    match = patterns[platform].search(parsed.path)
+    if match is None:
+        return None
+    account_id = unquote(match.group(1)).strip()
+    if not account_id or account_id == "self":
+        return None
+    return account_id
+
+
+def _canonical_account_page_url(
+    platform: SearchPlatform,
+    value: str,
+) -> str | None:
+    account_id = _account_identity_from_url(platform, value)
+    if account_id is None:
+        return None
+    builders = {
+        SearchPlatform.DOUYIN: f"https://www.douyin.com/user/{quote(account_id, safe='')}",
+        SearchPlatform.XIAOHONGSHU: f"https://www.xiaohongshu.com/user/profile/{quote(account_id, safe='')}",
+        SearchPlatform.KUAISHOU: f"https://www.kuaishou.com/profile/{quote(account_id, safe='')}",
+        SearchPlatform.BILIBILI: f"https://space.bilibili.com/{quote(account_id, safe='')}/video",
+        SearchPlatform.TIKTOK: f"https://www.tiktok.com/@{quote(account_id, safe='')}",
+    }
+    return builders[platform]
+
+
+def _requires_canonical_account_navigation(
+    *,
+    platform: SearchPlatform,
+    requested_url: str,
+    final_url: str,
+) -> bool:
+    canonical = _canonical_account_page_url(platform, final_url)
+    if canonical is None:
+        return False
+    requested = urlsplit(requested_url)
+    requested_account = _account_identity_from_url(platform, requested_url)
+    requested_host = requested.hostname or ""
+    canonical_host = urlsplit(canonical).hostname or ""
+    return requested_account is None or requested_host != canonical_host
+
+
+@dataclass(frozen=True, slots=True)
+class _AccountProfileFields:
+    account_id: str
+    display_name: str | None
+    bio: str | None
+    verification: str | None
+    visible_work_count: int | None
+    public_metrics: dict[str, int | float]
+
+
+def _douyin_account_profile(payloads: Sequence[object]) -> _AccountProfileFields | None:
+    for payload in payloads:
+        if not isinstance(payload, Mapping) or payload.get("status_code") not in {None, 0}:
+            continue
+        user = payload.get("user")
+        if not isinstance(user, Mapping):
+            continue
+        account_id = str(user.get("sec_uid") or user.get("uid") or "").strip()
+        if not account_id:
+            continue
+        visible_work_count = _number(user.get("aweme_count"))
+        return _AccountProfileFields(
+            account_id=account_id,
+            display_name=_text(user.get("nickname"), limit=500),
+            bio=_text(user.get("signature"), limit=2_000),
+            verification=_text(
+                user.get("custom_verify") or user.get("enterprise_verify_reason"),
+                limit=500,
+            ),
+            visible_work_count=(int(visible_work_count) if isinstance(visible_work_count, int | float) else None),
+            public_metrics=_metrics(
+                user,
+                {
+                    "followers": ("follower_count", "fans_count"),
+                    "following": ("following_count",),
+                    "likes_received": ("total_favorited",),
+                },
+            ),
+        )
+    return None
+
+
+def _enrich_account_posts(
+    *,
+    items: Sequence[PlatformSearchItem],
+    profile: _AccountProfileFields | None,
+) -> list[PlatformSearchItem]:
+    if profile is None:
+        return list(items)
+    enriched: list[PlatformSearchItem] = []
+    for item in items:
+        if item.author_id != profile.account_id:
+            enriched.append(item)
+            continue
+        enriched.append(
+            item.model_copy(
+                update={
+                    "author_name": profile.display_name or item.author_name,
+                    "author_bio": profile.bio,
+                    "author_verification": profile.verification,
+                    "author_visible_work_count": profile.visible_work_count,
+                    "author_public_metrics": {
+                        **profile.public_metrics,
+                        **item.author_public_metrics,
+                    },
+                }
+            )
+        )
+    return enriched
+
+
+def _author_qualified_account_posts(
+    *,
+    platform: SearchPlatform,
+    final_url: str,
+    items: Sequence[PlatformSearchItem],
+    limit: int,
+) -> tuple[PlatformSearchItem, ...]:
+    expected_author = _account_identity_from_url(platform, final_url)
+    authored = [item for item in items if item.author_id]
+    if expected_author is not None:
+        authored = [item for item in authored if item.author_id == expected_author]
+    else:
+        author_ids = {item.author_id for item in authored}
+        if len(author_ids) != 1:
+            return ()
+    return _deduplicate(authored, limit=limit)
 
 
 def _parse_visible_links(
@@ -834,6 +996,21 @@ class LocalPlaywrightSearchRunner:
                     wait_until="domcontentloaded",
                     timeout=self._navigation_timeout_ms,
                 )
+                if target is PlatformSearchTarget.ACCOUNT_POSTS and _requires_canonical_account_navigation(
+                    platform=platform,
+                    requested_url=url,
+                    final_url=page.url,
+                ):
+                    canonical_account_url = _canonical_account_page_url(
+                        platform,
+                        page.url,
+                    )
+                    if canonical_account_url is not None:
+                        await page.goto(
+                            canonical_account_url,
+                            wait_until="domcontentloaded",
+                            timeout=self._navigation_timeout_ms,
+                        )
                 await page.wait_for_timeout(self._settle_ms)
                 scrolls = min(12, max(2, (page_size + 9) // 10))
                 for _ in range(scrolls):
@@ -899,6 +1076,12 @@ class PlaywrightPlatformSearchAdapter:
                 raise ValueError("account post search requires a platform account URL")
             parsed = urlsplit(url)
             clean_url = parsed._replace(query="", fragment="").geturl().rstrip("/")
+            canonical_account_url = _canonical_account_page_url(
+                self.platform,
+                clean_url,
+            )
+            if canonical_account_url is not None:
+                return canonical_account_url
             if self.platform is SearchPlatform.BILIBILI:
                 return f"{clean_url}/video"
             return clean_url
@@ -948,18 +1131,32 @@ class PlaywrightPlatformSearchAdapter:
                     limit=request.page_size,
                 )
             )
-        parsed.extend(
-            _parse_visible_links(
-                platform=self.platform,
-                target=request.target,
-                links=capture.visible_links,
-                captured_at=capture.captured_at,
-                limit=request.page_size,
+        if self.platform is SearchPlatform.DOUYIN and request.target is PlatformSearchTarget.ACCOUNT_POSTS:
+            parsed = _enrich_account_posts(
+                items=parsed,
+                profile=_douyin_account_profile(capture.response_payloads),
             )
+        visible_items = _parse_visible_links(
+            platform=self.platform,
+            target=request.target,
+            links=capture.visible_links,
+            captured_at=capture.captured_at,
+            limit=request.page_size,
         )
-        items = _deduplicate(parsed, limit=request.page_size)
         source = PlatformSearchSource.AUTHENTICATED_BROWSER if credentials is not None else PlatformSearchSource.PUBLIC_BROWSER
         limitations = list(capture.limitations)
+        if request.target is PlatformSearchTarget.ACCOUNT_POSTS:
+            items = _author_qualified_account_posts(
+                platform=self.platform,
+                final_url=capture.final_url,
+                items=parsed,
+                limit=request.page_size,
+            )
+            if not items:
+                limitations.append("No author-qualified account posts were observed; global recommendations and unscoped visible links were excluded.")
+        else:
+            parsed.extend(visible_items)
+            items = _deduplicate(parsed, limit=request.page_size)
         if request.cursor is not None:
             limitations.append("This browser adapter does not yet expose a stable platform cursor.")
 

@@ -2,7 +2,7 @@
 id: A35
 status: reviewed
 reviewed_at: 2026-08-13
-implementation_status: isolated_boundary_adopted_real_account_pending
+implementation_status: isolated_boundary_and_douyin_real_account_accepted_runtime_pending
 sources:
   - docs/mcn-incubation-v5/audits/A33-account-structured-extraction-feasibility.md
   - docs/mcn-incubation-v5/audits/A36-fengge-acquisition-mcp-audit.md
@@ -75,18 +75,18 @@ sources:
 
 ## “大能”真实样本状态
 
-用户提供的短链可解析到“大能”的公开抖音主页。人工排障曾看到主页和首屏作品，但没有形成可复现的结构化作品清单。随后外部 Chrome 连接中断，应用内浏览器加载该抖音主页超时，未取得稳定作品 ID、规范作品链接或可分析媒体工件。
-
-因此本轮不把截图、搜索摘要或第三方文章改写成 `AccountEvidencePack`，也不让 Lead 假装完成账号拆解。“大能”被登记为第一个真实账号验收样本，状态为：
+本节原始失败记录保留：第一次人工浏览器路径没有形成可复现的结构化作品清单，外部 Chrome 和应用内浏览器也曾超时。后续 A39 使用账号级本地登录态重新验收，短链已解析为稳定账号 ID，并取得 17 条作者一致的近期作品、两条完整代表视频、10 条伪名化可见互动和 7.7 KB Lead 投影。当前状态改为：
 
 ```text
 identity_resolved
-structured_post_list_pending
-media_evidence_pending
-lead_account_analysis_not_run
+structured_post_list_accepted
+representative_media_evidence_accepted
+bounded_audience_response_accepted
+lead_projection_accepted
+production_runtime_registration_pending
 ```
 
-下一次验收优先使用第五版本地登录态连接器获取稳定小样本；平台要求登录或验证时由用户在可见浏览器手动完成。用户有权的作品链接清单、文件和导出仍是补充来源。先完成结构化采集，再抽取代表作品，最后比较 Lead 使用与不使用证据投影的营销判断；不能退回逐屏视觉阅读。
+详细证据、失败修复、账号拆解与剩余限制见 [A39](A39-daneng-real-account-acceptance.md)。该结果不追溯修改前文失败事实，也不自动授权生产注册或其他平台能力。
 
 ## 判定
 
@@ -94,10 +94,10 @@ lead_account_analysis_not_run
 - 抖音授权账号 Open API 连接器：`planned`。
 - 用户材料导入器：`planned as first implementation`。
 - 六平台内容/账号/账号作品统一搜索合同：`implemented in isolated experiment`。
-- 五平台本地浏览器采集器：`implemented; Bilibili public smoke passed, authenticated acceptance pending for four platforms`。
+- 五平台本地浏览器采集器：`implemented; Douyin real account accepted, Bilibili public smoke passed, authenticated acceptance pending for Xiaohongshu/Kuaishou/TikTok`。
 - 视频号桌面搜索桥接：`strict port implemented; desktop bridge pending`。
 - 锋哥数字员工 acquisition MCP/MediaCrawler 代码：`rejected for migration; architecture patterns audited in A36`。
-- “大能”真实多视频账号解析：`pending`。
-- Lead/MCP/Skill 注册：`forbidden until real-account acceptance`。
+- “大能”真实多视频账号解析：`accepted in isolated E15; runtime promotion pending`。
+- Lead/MCP/Skill 注册：`still unregistered; requires a separate reviewed production-promotion decision after this acceptance`。
 
 本轮没有修改 Lead 提示词、生产工具、中间件、前端或运行时注册。通过的是正确的数据入口与 Token 边界，不是账号拆解产品已经交付。

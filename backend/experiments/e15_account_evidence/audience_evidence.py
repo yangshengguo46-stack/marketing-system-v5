@@ -148,6 +148,7 @@ class AudienceInteractionObservation(StrictModel):
     kind: AudienceInteractionKind
     actor_ref: str = Field(pattern=r"^actor://sha256/[0-9a-f]{64}$")
     text: str | None = Field(default=None, max_length=8_000)
+    public_metrics: dict[str, int | float] = Field(default_factory=dict)
     occurred_at: datetime | None = None
     captured_at: datetime
     evidence_ref: str = Field(min_length=1, max_length=2_000)
@@ -180,6 +181,19 @@ class AudienceInteractionObservation(StrictModel):
         if value is None:
             return None
         return _aware(value, field_name=info.field_name)
+
+    @field_validator("public_metrics")
+    @classmethod
+    def validate_public_metrics(
+        cls,
+        value: dict[str, int | float],
+    ) -> dict[str, int | float]:
+        for name, metric in value.items():
+            if not name or len(name) > 80:
+                raise ValueError("public metric names must be between 1 and 80 characters")
+            if isinstance(metric, bool) or not isfinite(metric) or metric < 0:
+                raise ValueError("public metrics must be finite non-negative numbers")
+        return value
 
     @model_validator(mode="after")
     def validate_capture_order(self) -> AudienceInteractionObservation:

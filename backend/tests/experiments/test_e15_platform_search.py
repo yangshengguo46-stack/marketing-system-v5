@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import httpx
 import pytest
 
 from experiments.e15_account_evidence.account_link_collection import (
@@ -20,6 +21,7 @@ from experiments.e15_account_evidence.local_browser_credentials import (
 from experiments.e15_account_evidence.platform_account_reader import (
     PlatformAccountReader,
     PlatformAccountReadError,
+    resolve_platform_account_url,
 )
 from experiments.e15_account_evidence.platform_search import (
     SUPPORTED_SEARCH_PLATFORMS,
@@ -41,7 +43,9 @@ from experiments.e15_account_evidence.platform_search_adapters import (
     BrowserSearchPageState,
     DesktopSearchBridgeAdapter,
     PlaywrightPlatformSearchAdapter,
+    _canonical_account_page_url,
     _read_relevant_response_json,
+    _requires_canonical_account_navigation,
     build_platform_search_adapters,
     parse_platform_response,
 )
@@ -712,6 +716,252 @@ async def test_playwright_adapter_uses_cookie_locally_and_returns_only_normalize
     assert COOKIE_SECRET not in result.model_dump_json()
 
 
+def test_douyin_account_posts_parse_direct_aweme_list() -> None:
+    items = parse_platform_response(
+        platform=SearchPlatform.DOUYIN,
+        target=PlatformSearchTarget.ACCOUNT_POSTS,
+        payload={
+            "status_code": 0,
+            "aweme_list": [
+                {
+                    "aweme_id": "71003",
+                    "desc": "手表为什么不只是看时间",
+                    "author": {
+                        "sec_uid": "watch-account",
+                        "nickname": "大能",
+                        "follower_count": 12_000_000,
+                    },
+                    "statistics": {
+                        "play_count": 0,
+                        "digg_count": 88,
+                        "comment_count": 7,
+                    },
+                }
+            ],
+        },
+        captured_at=NOW,
+        limit=12,
+    )
+
+    assert len(items) == 1
+    assert items[0].item_id == "71003"
+    assert items[0].author_id == "watch-account"
+    assert items[0].author_name == "大能"
+    assert items[0].author_public_metrics == {"followers": 12_000_000}
+    assert items[0].public_metrics == {"likes": 88, "comments": 7}
+
+
+def test_douyin_share_profile_normalizes_to_the_account_work_page() -> None:
+    assert (
+        _canonical_account_page_url(
+            SearchPlatform.DOUYIN,
+            "https://www.iesdouyin.com/share/user/watch-account?from=share",
+        )
+        == "https://www.douyin.com/user/watch-account"
+    )
+    assert _requires_canonical_account_navigation(
+        platform=SearchPlatform.DOUYIN,
+        requested_url="https://v.douyin.com/share-link",
+        final_url="https://www.douyin.com/user/watch-account",
+    )
+    assert not _requires_canonical_account_navigation(
+        platform=SearchPlatform.DOUYIN,
+        requested_url="https://www.douyin.com/user/watch-account?from=share",
+        final_url="https://www.douyin.com/user/watch-account",
+    )
+
+
+@pytest.mark.asyncio
+async def test_account_reader_resolves_douyin_short_link_before_browser_collection() -> None:
+    short_url = "https://v.douyin.com/short-account-link/"
+    canonical_url = "https://www.douyin.com/user/watch-account"
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert str(request.url) == short_url
+        return httpx.Response(
+            302,
+            headers={"location": ("https://www.iesdouyin.com/share/user/watch-account?from=web_code_link")},
+        )
+
+    resolved = await resolve_platform_account_url(
+        platform=SearchPlatform.DOUYIN,
+        requested_url=short_url,
+        transport=httpx.MockTransport(handler),
+    )
+
+    assert resolved == canonical_url
+
+
+@pytest.mark.asyncio
+async def test_account_reader_rejects_short_link_redirect_outside_platform() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(302, headers={"location": "https://example.com/user/watch-account"})
+
+    with pytest.raises(PlatformAccountReadError, match="outside the selected platform"):
+        await resolve_platform_account_url(
+            platform=SearchPlatform.DOUYIN,
+            requested_url="https://v.douyin.com/short-account-link/",
+            transport=httpx.MockTransport(handler),
+        )
+
+
+@pytest.mark.asyncio
+async def test_douyin_account_profile_payload_enriches_author_observation() -> None:
+    class Runner:
+        async def capture(self, **kwargs):
+            return BrowserSearchCapture(
+                captured_at=NOW,
+                final_url="https://www.douyin.com/user/watch-account",
+                page_state=BrowserSearchPageState.READY,
+                response_payloads=(
+                    {
+                        "status_code": 0,
+                        "user": {
+                            "sec_uid": "watch-account",
+                            "nickname": "大能",
+                            "signature": "独立制表人",
+                            "custom_verify": "钟表行业从业者",
+                            "follower_count": 9_469_207,
+                            "following_count": 377,
+                            "total_favorited": 187_371_241,
+                            "aweme_count": 572,
+                        },
+                    },
+                    {
+                        "status_code": 0,
+                        "aweme_list": [
+                            {
+                                "aweme_id": "71003",
+                                "desc": "手表为什么不只是看时间",
+                                "author": {
+                                    "sec_uid": "watch-account",
+                                    "nickname": "大能",
+                                },
+                            }
+                        ],
+                    },
+                ),
+            )
+
+    request = PlatformSearchRequest(
+        platform=SearchPlatform.DOUYIN,
+        target=PlatformSearchTarget.ACCOUNT_POSTS,
+        query="https://www.douyin.com/user/watch-account",
+        page_size=12,
+    )
+    result = await collect_platform_search(
+        request,
+        adapter=PlaywrightPlatformSearchAdapter(
+            platform=SearchPlatform.DOUYIN,
+            runner=Runner(),
+        ),
+    )
+
+    assert len(result.items) == 1
+    item = result.items[0]
+    assert item.author_bio == "独立制表人"
+    assert item.author_verification == "钟表行业从业者"
+    assert item.author_visible_work_count == 572
+    assert item.author_public_metrics == {
+        "followers": 9_469_207,
+        "following": 377,
+        "likes_received": 187_371_241,
+    }
+
+
+@pytest.mark.asyncio
+async def test_account_post_search_keeps_only_author_matched_structured_posts() -> None:
+    class Runner:
+        async def capture(self, **kwargs):
+            return BrowserSearchCapture(
+                captured_at=NOW,
+                final_url="https://www.douyin.com/user/watch-account",
+                page_state=BrowserSearchPageState.READY,
+                response_payloads=(
+                    {
+                        "status_code": 0,
+                        "aweme_list": [
+                            {
+                                "aweme_id": "71003",
+                                "desc": "目标账号作品",
+                                "author": {
+                                    "sec_uid": "watch-account",
+                                    "nickname": "大能",
+                                },
+                            },
+                            {
+                                "aweme_id": "99999",
+                                "desc": "页面推荐作品",
+                                "author": {
+                                    "sec_uid": "another-account",
+                                    "nickname": "其他人",
+                                },
+                            },
+                        ],
+                    },
+                ),
+                visible_links=(
+                    BrowserLinkObservation(
+                        href="https://www.douyin.com/video/88888",
+                        text="另一条页面推荐",
+                    ),
+                ),
+            )
+
+    request = PlatformSearchRequest(
+        platform=SearchPlatform.DOUYIN,
+        target=PlatformSearchTarget.ACCOUNT_POSTS,
+        query="https://v.douyin.com/account-link",
+        page_size=12,
+    )
+    result = await collect_platform_search(
+        request,
+        adapter=PlaywrightPlatformSearchAdapter(
+            platform=SearchPlatform.DOUYIN,
+            runner=Runner(),
+        ),
+    )
+
+    assert result.status is PlatformSearchStatus.SUCCESS
+    assert [item.item_id for item in result.items] == ["71003"]
+    assert result.items[0].author_id == "watch-account"
+
+
+@pytest.mark.asyncio
+async def test_account_post_search_does_not_misreport_global_recommendations_as_account_posts() -> None:
+    class Runner:
+        async def capture(self, **kwargs):
+            return BrowserSearchCapture(
+                captured_at=NOW,
+                final_url="https://www.douyin.com/user/watch-account",
+                page_state=BrowserSearchPageState.READY,
+                visible_links=(
+                    BrowserLinkObservation(
+                        href="https://www.douyin.com/video/88888",
+                        text="全站推荐视频",
+                    ),
+                ),
+            )
+
+    request = PlatformSearchRequest(
+        platform=SearchPlatform.DOUYIN,
+        target=PlatformSearchTarget.ACCOUNT_POSTS,
+        query="https://www.douyin.com/user/watch-account",
+        page_size=12,
+    )
+    result = await collect_platform_search(
+        request,
+        adapter=PlaywrightPlatformSearchAdapter(
+            platform=SearchPlatform.DOUYIN,
+            runner=Runner(),
+        ),
+    )
+
+    assert result.status is PlatformSearchStatus.PARTIAL
+    assert result.items == ()
+    assert any("author-qualified" in item for item in result.limitations)
+
+
 @pytest.mark.asyncio
 async def test_closed_page_response_is_ignored_without_leaking_runner_error() -> None:
     class ClosedResponse:
@@ -826,7 +1076,7 @@ async def test_platform_account_reader_turns_account_posts_into_snapshot_input(
 ) -> None:
     class Runner:
         async def capture(self, **kwargs):
-            assert kwargs["url"] == "https://v.douyin.com/short-account-link"
+            assert kwargs["url"] == "https://www.douyin.com/user/account-sec-uid"
             assert kwargs["storage_state"]["cookies"][0]["value"] == COOKIE_SECRET
             return BrowserSearchCapture(
                 captured_at=NOW,
@@ -880,7 +1130,7 @@ async def test_platform_account_reader_turns_account_posts_into_snapshot_input(
     )
 
     observation = await reader(
-        requested_url="https://v.douyin.com/short-account-link?share=1",
+        requested_url="https://www.douyin.com/user/account-sec-uid?share=1",
         max_posts=12,
     )
 
@@ -1067,6 +1317,19 @@ async def test_tiktok_reader_keeps_requested_public_handle_url() -> None:
 
     assert observation.profile.account_id == "numeric-user-id"
     assert observation.profile.canonical_url == "https://www.tiktok.com/@watchmaker"
+
+
+@pytest.mark.asyncio
+async def test_non_douyin_account_urls_keep_their_existing_connector_routing() -> None:
+    requested_url = "https://channels.weixin.qq.com/account/local-reference"
+
+    assert (
+        await resolve_platform_account_url(
+            platform=SearchPlatform.WECHAT_CHANNELS,
+            requested_url=requested_url,
+        )
+        == requested_url
+    )
 
 
 @pytest.mark.asyncio

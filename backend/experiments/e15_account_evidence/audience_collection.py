@@ -450,6 +450,11 @@ def derive_longitudinal_audience_metrics(
         after = _metric_by_name(current, metric_name)
         if before is None or after is None:
             continue
+        # A later audience-collection retry may reuse the same account-source
+        # observation. It is additional collection evidence, not a new point in
+        # the account growth series.
+        if before.metric_id == after.metric_id or before.observed_at >= after.observed_at:
+            continue
         source_ids = (before.metric_id, after.metric_id)
         payload = {
             "platform": current.platform.value,

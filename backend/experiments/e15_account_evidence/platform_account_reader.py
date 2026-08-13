@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from collections import Counter
-from urllib.parse import urlsplit
+from urllib.parse import quote, urljoin, urlsplit
+
+import httpx
 
 from .account_link_collection import StructuredAccountObservation
 from .local_browser_credentials import LocalBrowserCredentialProvider
@@ -19,6 +21,66 @@ from .source_snapshot import AccountProfileObservation, PostListObservation
 
 class PlatformAccountReadError(RuntimeError):
     """A stable account-read failure that never includes browser credentials."""
+
+
+_PLATFORM_HOSTS: dict[SearchPlatform, tuple[str, ...]] = {
+    SearchPlatform.DOUYIN: ("douyin.com", "iesdouyin.com"),
+    SearchPlatform.XIAOHONGSHU: ("xiaohongshu.com",),
+    SearchPlatform.KUAISHOU: ("kuaishou.com", "gifshow.com"),
+    SearchPlatform.BILIBILI: ("bilibili.com",),
+    SearchPlatform.TIKTOK: ("tiktok.com",),
+    SearchPlatform.WECHAT_CHANNELS: (),
+}
+
+
+def _platform_host(platform: SearchPlatform, value: str) -> bool:
+    host = (urlsplit(value).hostname or "").lower().strip(".")
+    return any(host == domain or host.endswith(f".{domain}") for domain in _PLATFORM_HOSTS[platform])
+
+
+def _canonical_douyin_profile(value: str) -> str | None:
+    parts = [part for part in urlsplit(value).path.split("/") if part]
+    if len(parts) >= 2 and parts[-2] == "user" and parts[-1]:
+        return f"https://www.douyin.com/user/{quote(parts[-1], safe='')}"
+    return None
+
+
+async def resolve_platform_account_url(
+    *,
+    platform: SearchPlatform,
+    requested_url: str,
+    transport: httpx.AsyncBaseTransport | httpx.BaseTransport | None = None,
+) -> str:
+    requested_url = _clean_requested_url(requested_url)
+    if platform is not SearchPlatform.DOUYIN:
+        return requested_url
+    if not _platform_host(platform, requested_url):
+        raise PlatformAccountReadError("Account URL belongs to another platform.")
+    canonical = _canonical_douyin_profile(requested_url)
+    if canonical is not None:
+        return canonical
+
+    current = requested_url
+    async with httpx.AsyncClient(
+        transport=transport,
+        follow_redirects=False,
+        timeout=15,
+        headers={"User-Agent": "Mozilla/5.0"},
+    ) as client:
+        for _ in range(6):
+            response = await client.get(current)
+            if response.status_code not in {301, 302, 303, 307, 308}:
+                break
+            location = response.headers.get("location")
+            if not location:
+                break
+            current = urljoin(current, location)
+            if not _platform_host(platform, current):
+                raise PlatformAccountReadError("Account short link redirected outside the selected platform.")
+            canonical = _canonical_douyin_profile(current)
+            if canonical is not None:
+                return canonical
+    raise PlatformAccountReadError("Account short link did not resolve to a stable platform profile.")
 
 
 def _clean_requested_url(value: str) -> str:
@@ -41,6 +103,20 @@ def _single_author(items: tuple[PlatformSearchItem, ...]) -> tuple[str, str | No
     names = Counter(item.author_name.strip() for item in items if item.author_name and item.author_id == account_id and item.author_name.strip())
     display_name = names.most_common(1)[0][0] if names else None
     return account_id, display_name
+
+
+def _consistent_author_field(
+    items: tuple[PlatformSearchItem, ...],
+    field_name: str,
+    *,
+    limitation_name: str,
+) -> tuple[object | None, tuple[str, ...]]:
+    values = {value for item in items if (value := getattr(item, field_name)) is not None}
+    if len(values) == 1:
+        return next(iter(values)), ()
+    if len(values) > 1:
+        return None, (f"Conflicting author {limitation_name} was omitted from the account snapshot.",)
+    return None, ()
 
 
 def _consistent_author_metrics(
@@ -83,11 +159,15 @@ class PlatformAccountReader:
         max_posts: int,
     ) -> StructuredAccountObservation:
         requested_url = _clean_requested_url(requested_url)
+        collection_url = await resolve_platform_account_url(
+            platform=self.platform,
+            requested_url=requested_url,
+        )
         page = await collect_platform_search(
             PlatformSearchRequest(
                 platform=self.platform,
                 target=PlatformSearchTarget.ACCOUNT_POSTS,
-                query=requested_url,
+                query=collection_url,
                 page_size=max_posts,
                 session_ref=self._session_ref,
             ),
@@ -104,6 +184,21 @@ class PlatformAccountReader:
 
         account_id, display_name = _single_author(page.items)
         author_metrics, author_metric_limitations = _consistent_author_metrics(page.items)
+        author_bio, author_bio_limitations = _consistent_author_field(
+            page.items,
+            "author_bio",
+            limitation_name="bio",
+        )
+        author_verification, author_verification_limitations = _consistent_author_field(
+            page.items,
+            "author_verification",
+            limitation_name="verification",
+        )
+        visible_work_count, work_count_limitations = _consistent_author_field(
+            page.items,
+            "author_visible_work_count",
+            limitation_name="visible work count",
+        )
         canonical_profile_url = _canonical_profile_url(
             platform=self.platform,
             account_id=account_id,
@@ -122,6 +217,9 @@ class PlatformAccountReader:
         )
         limitations = list(page.limitations)
         limitations.extend(author_metric_limitations)
+        limitations.extend(author_bio_limitations)
+        limitations.extend(author_verification_limitations)
+        limitations.extend(work_count_limitations)
         limitations.append("Profile identity was derived from the consistent author fields in the collected post list.")
         if page.status is PlatformSearchStatus.PARTIAL:
             limitations.append("The platform returned only a partial account post list.")
@@ -131,6 +229,9 @@ class PlatformAccountReader:
                 account_id=account_id,
                 canonical_url=canonical_profile_url,
                 display_name=display_name,
+                bio=author_bio,
+                verification=author_verification,
+                visible_work_count=visible_work_count,
                 public_metrics=author_metrics,
                 captured_at=page.captured_at,
             ),
@@ -166,4 +267,8 @@ def _canonical_profile_url(
     raise PlatformAccountReadError("Unsupported account platform.")
 
 
-__all__ = ["PlatformAccountReadError", "PlatformAccountReader"]
+__all__ = [
+    "PlatformAccountReadError",
+    "PlatformAccountReader",
+    "resolve_platform_account_url",
+]

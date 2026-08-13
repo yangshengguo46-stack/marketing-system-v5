@@ -171,6 +171,14 @@ The same isolated package now owns these pre-runtime boundaries:
   sampled post-response fields already present in an account snapshot. It must
   leave demographics, interests, activity, live, and commerce datasets
   unavailable when they were not collected.
+- `douyin_audience_adapter.py` is the first accepted detailed audience
+  collector in the isolated package. It may visit only canonical post URLs
+  already present in the bound source snapshot, triggers and parses a bounded
+  first-party visible-comment response, and pseudonymizes raw actor IDs before
+  constructing any persistent model. A visible interaction sample remains
+  `content_interactions=partial`; it cannot fill demographics, interests, or
+  activity. The local pseudonym salt and browser state are owner-only untracked
+  files.
 - `audience_ledger.py` is an append-only, content-addressed account history.
   Growth is derived deterministically from ordered snapshots; never let a model
   invent or rewrite historical metrics.
@@ -182,11 +190,13 @@ The same isolated package now owns these pre-runtime boundaries:
   A generic chat model cannot issue an HLLM checkpoint receipt.
 
 These files do not constitute a production crawler or link tool. Bilibili public
-content/account search has passed only a local smoke check; the other web
-platforms still require account login-state acceptance, and the WeChat Channels
-desktop bridge is not implemented. Detailed audience collectors and real HLLM
-weights/provider inference are also pending. Stable media artifacts and passing
-real account/audience acceptance are still required. Run all isolated E15 coverage with
+content/account search has passed a local smoke check, and Douyin has passed one
+real third-party account sample with author-qualified posts, two media records,
+and ten pseudonymized visible interactions. That sample is partial and does not
+establish full-account coverage, demographics, or causal analysis. The other web
+platforms still require account login-state acceptance, the WeChat Channels
+desktop bridge is not implemented, and real HLLM weights/provider inference are
+pending. Run all isolated E15 coverage with
 `PYTHONPATH=. uv run pytest tests/experiments -q` from `backend/`.
 
 ### Documentation Update Policy

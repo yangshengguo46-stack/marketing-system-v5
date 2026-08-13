@@ -52,7 +52,9 @@ and an unrecognized empty page returns `partial` or `schema_drift` rather than
 claiming that the platform has no results.
 
 As of 2026-08-13, Bilibili public keyword content and account search passed
-live smoke checks. Douyin, Xiaohongshu, Kuaishou, and TikTok have implementation
+live smoke checks. Douyin passed one real third-party account-link acceptance
+with local login state, author-qualified recent posts, and bounded media and
+audience evidence. Xiaohongshu, Kuaishou, and TikTok have implementation
 coverage but still require real local login-state acceptance. WeChat Channels
 has the strict desktop bridge contract but no accepted desktop search bridge.
 None of these adapters is registered as a Lead tool or MCP server.
@@ -73,6 +75,11 @@ Observed platform values, local derivations, third-party estimates, and model
 estimates use different provenance contracts.
 
 Actor-linked interactions are pseudonymized before they enter a snapshot.
+`douyin_audience_adapter.py` is the first detailed collector accepted in this
+isolated package. It only opens canonical posts present in the bound account
+snapshot, triggers the visible first-party response, and converts raw actor IDs
+to stable local pseudonyms before persistence. The result remains a bounded
+response sample, not a follower census or demographic profile.
 `hllm_audience.py` then adapts only genuine audience behavior sequences to the
 pinned ByteDance HLLM-Creator row/request shape. It rejects creator publishing
 history and aggregate account performance as audience substitutes. The adapter
@@ -123,7 +130,7 @@ still match, and model-training permission must be explicit before code can
 build a training candidate.
 
 This experiment still has no production browser/MCP registration and has not
-accepted detailed platform audience collectors or real HLLM inference. It does
+accepted detailed collectors for the other platforms or real HLLM inference. It does
 not establish why a post performed or authorize model training. Training candidates require separate source rights, atom-level
 review, signal-level review and explicit training permission. Promotion still
 requires platform-by-platform real account acceptance and a real multi-video

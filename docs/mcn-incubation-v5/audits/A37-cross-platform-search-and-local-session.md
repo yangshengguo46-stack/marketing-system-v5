@@ -2,7 +2,7 @@
 id: A37
 status: reviewed
 reviewed_at: 2026-08-13
-decision: isolated_clean_room_contract_adopted_live_acceptance_incomplete
+decision: isolated_clean_room_contract_adopted_douyin_account_read_accepted_other_platforms_incomplete
 sources:
   - backend/experiments/e15_account_evidence/local_browser_credentials.py
   - backend/experiments/e15_account_evidence/platform_search.py
@@ -33,10 +33,10 @@ sources:
 ## 现实验收状态
 
 - Bilibili 公开内容搜索和账号搜索已完成一次本地 smoke check。
-- 抖音、小红书、快手和 TikTok 有解析与本地登录态代码覆盖，尚未完成真实账号验收。
+- 抖音已用“大能”账号完成短链解析、登录态主页、作者限定作品列表和进程重启后的重复采集验收；详情见 A39。小红书、快手和 TikTok 仍只有代码覆盖，尚未完成真实账号验收。
 - 视频号只完成桌面桥接合同，尚无通过验收的实现。
 - 本套件仍在 E15 隔离实验，没有注册为 Lead Tool、MCP 或 Skill。
-- 本轮最终 E15 回归为 `126 passed`，Ruff 检查与格式检查通过。
+- A38 阶段的 E15 回归为 `126 passed`。后续 A39 新增抖音真实账号与受众验收；最终测试数以 A39 和当前 CI 为准。
 
 ## 判定
 

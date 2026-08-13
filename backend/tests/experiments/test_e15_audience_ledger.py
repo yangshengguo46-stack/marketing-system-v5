@@ -28,12 +28,19 @@ from experiments.e15_account_evidence.platform_search import SearchPlatform
 NOW = datetime(2026, 8, 13, 16, 0, tzinfo=UTC)
 
 
-def _snapshot(*, captured_at: datetime, followers: int) -> AudienceCollectionSnapshot:
-    metric_id = f"followers-{int(captured_at.timestamp())}"
+def _snapshot(
+    *,
+    captured_at: datetime,
+    followers: int,
+    observed_at: datetime | None = None,
+    source_snapshot_sha256: str = "a" * 64,
+) -> AudienceCollectionSnapshot:
+    effective_observed_at = observed_at or captured_at
+    metric_id = f"followers-{int(effective_observed_at.timestamp())}"
     return AudienceCollectionSnapshot(
         platform=SearchPlatform.DOUYIN,
         account_id="watch-account",
-        source_account_snapshot_sha256="a" * 64,
+        source_account_snapshot_sha256=source_snapshot_sha256,
         requested_datasets=(AudienceDataset.ACCOUNT_SCALE,),
         status=AudienceCollectionStatus.SUCCESS,
         source=AudienceCollectionSource.PUBLIC_PLATFORM,
@@ -57,8 +64,8 @@ def _snapshot(*, captured_at: datetime, followers: int) -> AudienceCollectionSna
                 shape=AudienceMetricShape.STOCK,
                 nature=AudienceMetricNature.OBSERVED,
                 origin=AudienceMetricOrigin.PLATFORM_PUBLIC,
-                observed_at=captured_at,
-                captured_at=captured_at,
+                observed_at=effective_observed_at,
+                captured_at=effective_observed_at,
                 evidence_refs=(f"platform://douyin/{metric_id}",),
             ),
         ),
@@ -137,3 +144,34 @@ def test_audience_ledger_account_paths_do_not_embed_raw_account_ids(tmp_path) ->
     )
 
     assert "user/unsafe?raw=id" not in str(result.path)
+
+
+def test_audience_ledger_does_not_derive_growth_between_retries_of_one_source_observation(
+    tmp_path,
+) -> None:
+    observed_at = NOW
+    append_audience_snapshot(
+        _snapshot(
+            captured_at=NOW + timedelta(hours=1),
+            observed_at=observed_at,
+            followers=1_000,
+        ),
+        ledger_root=tmp_path,
+    )
+    append_audience_snapshot(
+        _snapshot(
+            captured_at=NOW + timedelta(hours=2),
+            observed_at=observed_at,
+            followers=1_000,
+        ),
+        ledger_root=tmp_path,
+    )
+
+    history = load_audience_history(
+        platform=SearchPlatform.DOUYIN,
+        account_id="watch-account",
+        ledger_root=tmp_path,
+    )
+
+    assert len(history.snapshots) == 2
+    assert history.derived_metrics == ()
