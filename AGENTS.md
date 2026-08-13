@@ -242,5 +242,10 @@ These apply repo-wide; module guides own the module-specific detail.
   not Pearl-style evidence of market causality. Any semantic concept-bottleneck
   candidate must remain optional, inspectable, and offline until a preregistered
   contrastive evaluation passes; it must not become another mandatory workflow.
+  E31's full concept bottleneck did not pass: it surfaced the golden-gift
+  gifting-practice leap but increased contract failures, unsupported detail,
+  and theory-shaped over-abstraction during convergence. ADR-011 rejects that
+  runtime architecture. Preserve candidate-recall versus final-convergence as
+  an evaluation distinction only; do not register E31 or tune on its six cases.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

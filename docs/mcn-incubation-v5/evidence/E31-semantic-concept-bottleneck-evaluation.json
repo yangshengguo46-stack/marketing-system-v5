@@ -1,0 +1,161 @@
+{
+  "evidence_id": "E31",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate an inspectable semantic concept bottleneck before source-object and audience-world selection.",
+  "production_baseline": {
+    "commit": "7be24636",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "stage_one": "nullable semantic roles, human-job/frame hypotheses, practice candidates, candidate worlds, and contrastive probes",
+    "stage_two": "independent source-object and audience-world selection with permission to correct stage one",
+    "concept_prompt_sha256": "444d5e9d55e8cffd58811ab2e91d954f49aa6bb8aec0059aa7d9239680c49879",
+    "decision_prompt_sha256": "22293eed682b695a4a413b217aa8f72baa63e0da9b5d6f96df8cd1195002e49e"
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "all_four_user_corrected_candidate_recall": true,
+    "all_four_user_corrected_final_selection": true,
+    "minimum_candidate_recall": 5,
+    "minimum_final_selection": 5,
+    "no_fabricated_completeness": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e31-concept-bottleneck-final-six-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 6,
+    "provider_call_budget": 14,
+    "provider_calls": 11,
+    "concept_schema_repairs": 1,
+    "decision_schema_repairs": 0,
+    "failed_concept_contract": 2,
+    "completed_both_stages": 4,
+    "frozen_exact_candidate_recall_passed": 0,
+    "frozen_exact_final_selection_passed": 0,
+    "posthoc_semantic_candidate_recall_passed_among_completed": 4,
+    "posthoc_semantic_final_selection_passed_among_completed": 1,
+    "usage": {
+      "input_tokens": 21638,
+      "output_tokens": 21379,
+      "total_tokens": 43017
+    },
+    "elapsed_seconds_total": 476.932,
+    "acceptance_passed": false
+  },
+  "scoring_boundary": {
+    "frozen_score_changed_posthoc": false,
+    "automatic_rule": "Canonicalized exact term equality against hidden reviewed labels.",
+    "observed_defect": "The exact matcher rejected semantically valid phrases such as 礼仪馈赠社会实践 and object-world labels with descriptive suffixes.",
+    "manual_audit_role": "Diagnose semantic behavior only; it does not replace or repair the preregistered frozen score."
+  },
+  "case_results": [
+    {
+      "case_id": "gold-gift",
+      "automatic_status": "failed_business",
+      "automatic_candidate_recall": "failed",
+      "automatic_final_selection": "failed",
+      "source_object": "黄金礼品",
+      "audience_world": "礼仪馈赠社会实践",
+      "semantic_candidate_recall": "passed_posthoc",
+      "semantic_final_selection": "passed_posthoc",
+      "diagnosis": "The concept stage explicitly produced 作为礼品赠送, 情感表达与礼仪交换, 礼仪性馈赠实践, and a 礼仪馈赠社会实践世界 candidate. The decision selected that candidate. This is the requested product-to-use-to-social-practice leap, but the exact label matcher did not accept its wording."
+    },
+    {
+      "case_id": "fruit-shop",
+      "automatic_status": "failed_business",
+      "automatic_candidate_recall": "failed",
+      "automatic_final_selection": "failed",
+      "source_object": "应季水果",
+      "audience_world": "挑选与品鉴水果活动世界",
+      "semantic_candidate_recall": "passed_posthoc",
+      "semantic_final_selection": "failed",
+      "diagnosis": "The concept stage contained a valid fruit object-world candidate, but the decision narrowed the source without evidence and promoted selection/tasting over the complete fruit world. It also introduced unsupported local, source, stocking, customer, and tail-inventory detail."
+    },
+    {
+      "case_id": "seafood-source",
+      "automatic_status": "failed_concept_contract",
+      "automatic_candidate_recall": "not_run",
+      "automatic_final_selection": "not_run",
+      "source_object": null,
+      "audience_world": null,
+      "semantic_candidate_recall": "unknown",
+      "semantic_final_selection": "unknown",
+      "diagnosis": "The concept output gave an empty evidence_refs list to a constitutive element after the shared concept-repair budget had already been consumed. Only its visible-answer hash was retained."
+    },
+    {
+      "case_id": "chongqing-hotpot-base",
+      "automatic_status": "failed_concept_contract",
+      "automatic_candidate_recall": "not_run",
+      "automatic_final_selection": "not_run",
+      "source_object": null,
+      "audience_world": null,
+      "semantic_candidate_recall": "unknown",
+      "semantic_final_selection": "unknown",
+      "diagnosis": "The concept output gave an empty evidence_refs list to a constitutive element. The frozen shared repair policy prevented another call, so the decision stage did not run."
+    },
+    {
+      "case_id": "watch-account",
+      "automatic_status": "failed_business",
+      "automatic_candidate_recall": "failed",
+      "automatic_final_selection": "failed",
+      "source_object": "腕表",
+      "audience_world": "腕表社交符号与玩表实践",
+      "semantic_candidate_recall": "passed_posthoc",
+      "semantic_final_selection": "failed",
+      "diagnosis": "The concept stage contained the correct 腕表对象世界 candidate. The decision instead promoted attention-entry evidence about social scenes into the root, repeating the account-layer confusion already identified in A42."
+    },
+    {
+      "case_id": "medical-aesthetics-account",
+      "automatic_status": "failed_business",
+      "automatic_candidate_recall": "failed",
+      "automatic_final_selection": "failed",
+      "source_object": "面部年轻化与变美服务",
+      "audience_world": "容貌审美与日常保养实践",
+      "semantic_candidate_recall": "passed_posthoc",
+      "semantic_final_selection": "failed",
+      "diagnosis": "The concept stage contained a valid 普通人变美与认同欲望世界 candidate, but the decision conflated the source with its result and promoted a compound engine/practice phrase instead of the minimal 变美 root."
+    }
+  ],
+  "comparison_to_e30": {
+    "common_scope": "source object and audience world only",
+    "e30_root_results": "four semantically correct roots, one wrong root, and one contract failure",
+    "e30_total_tokens": 38319,
+    "e30_elapsed_seconds": 450.133,
+    "e31_result": "one semantically correct final root among four completed cases and two concept-contract failures",
+    "e31_total_tokens": 43017,
+    "e31_elapsed_seconds": 476.932,
+    "inference": "The full concept bottleneck increased candidate breadth and exposed failure location, but its large theory-shaped handoff increased contract surface, token cost, and preference for abstract social-practice worlds."
+  },
+  "architecture_learning": {
+    "retained": [
+      "Expose candidate generation separately from final selection so missing recall and bad convergence are distinguishable.",
+      "Allow concepts to be absent and decisions to correct candidates.",
+      "Use contrastive cases and human-calibrated semantic review instead of exact phrase equality alone."
+    ],
+    "rejected": [
+      "Passing the full Qualia, human-job, frame, social-practice, candidate-world, and probe object into the final decision call.",
+      "Requiring evidence references on every inferred micro-concept.",
+      "Using theory vocabulary as the model-visible runtime method.",
+      "Promoting this candidate to Lead, Tool, Skill, subagent, middleware, or Gateway."
+    ],
+    "next_candidate_boundary": "If research continues, test a plain-language, compressed semantic lattice that carries only object, direct use, practice/result candidate, return path, and over-abstraction risk into convergence. It requires a new held-out contrast set and preregistration; no second E31 run is allowed."
+  },
+  "artifact_sha256": {
+    "manifest_json": "541c6e77e2d2d2bdfa889c712a2c9cdbd238b3429bf1f42b60f00bfc68d92f02",
+    "results_json": "729a45bf82a56b585386faa22d88fe2845934a27b32f2bf9d6e4a8f0fb62f9d7",
+    "completion_json": "e81b76c18f911f9758222e7e2f1d4c1027a6db757e893e6e87d3e76d7bb74d07"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_parsed_intermediate_concepts_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_full_semantic_concept_bottleneck_keep_diagnostic_insight"
+}

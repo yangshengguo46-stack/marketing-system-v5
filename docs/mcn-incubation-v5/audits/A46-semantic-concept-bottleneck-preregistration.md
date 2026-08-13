@@ -1,14 +1,18 @@
 ---
 id: A46
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: 50ff3719
+frozen_candidate_commit: 7be24636
 candidate_runtime_registered: false
-decision: pending_frozen_e31_evaluation
+decision: reject_full_bottleneck_keep_recall_convergence_diagnostic
 sources:
   - docs/mcn-incubation-v5/audits/A44-two-step-content-map-preregistration.md
   - docs/mcn-incubation-v5/audits/A45-marketing-semantic-causal-theory.md
   - docs/mcn-incubation-v5/evidence/E30-two-step-content-map-evaluation.json
+  - docs/mcn-incubation-v5/evidence/E31-semantic-concept-bottleneck-evaluation.json
+  - docs/mcn-incubation-v5/decisions/ADR-011-reject-full-semantic-concept-bottleneck.md
   - https://aclanthology.org/J91-4003/
   - https://proceedings.mlr.press/v119/koh20a.html
   - https://doi.org/10.18653/v1/2020.findings-emnlp.117
@@ -66,3 +70,33 @@ E29 与 E30 证明，把一次大回答拆成骨架和展开可以减少部分�
 E30 的完整业务验收为 `3/6`；按本轮较窄的来源对象/观众世界口径重新查看冻结结果，水果、海鲜、腕表和医美的根判断正确，黄金错误，火锅合同失败，即 `4/6` 且一次合同失败。这是本轮可比基线。
 
 若 E31 超过该结果，只能暂时支持“显式中间概念与可纠正选择可能改善语义判断”。单轮、单模型、六个已知案例不能证明因果，也不能排除提示措辞、采样波动或案例熟悉度影响。A45 中的最小对比与蜕变测试仍是下一道验证门槛。
+
+## 冻结运行结果
+
+- 运行：`e31-concept-bottleneck-final-six-20260814-01`。
+- 冻结候选提交：`7be24636`；概念提示哈希 `444d5e9d...9879`，决策提示哈希 `22293eed...e49e`。
+- 共完成六例，使用 `11` 次供应方调用、`43,017 tokens`、`476.932s`。概念阶段使用一次共享 Schema 修复，决策阶段没有修复。
+- 两例在概念阶段合同失败：海鲜与火锅的构成元素使用空 `evidence_refs`，共享修复已被医美使用，因此决策阶段未运行。
+- 其余四例的冻结精确词匹配均记为候选召回失败和最终选择失败，未达到任何预登记阈值。
+- 水果最终为“应季水果 -> 挑选与品鉴水果活动世界”，腕表为“腕表 -> 腕表社交符号与玩表实践”，医美为“面部年轻化与变美服务 -> 容貌审美与日常保养实践”；三例都把候选中的题材机制、注意力入口或社会实践抬成观众根。
+- 水果概念阶段还补造了本地、源头、进货渠道、客人和尾货等输入未提供的经营细节，独立触发“不能为完整而补造”的止损条件。
+
+## 人工语义复核
+
+冻结分数不做事后修改，但精确词匹配存在明确的开放语义误判：
+
+- 黄金概念阶段已经得到“作为礼品赠送”“情感表达与礼仪交换”“礼仪性馈赠实践”，最终选择“礼仪馈赠社会实践”。这在语义上完成了黄金礼品到送礼/人情世界的关键跃迁，只是没有逐字命中隐藏标签。
+- 水果、腕表和医美的概念阶段也分别包含“水果对象世界”“腕表对象世界”和“普通人变美与认同欲望世界”等正确候选，但最终调用没有选择它们。
+
+因此，四个完成两阶段的案例均显示候选召回有价值；最终收敛只有黄金在人工复核中正确。这里的人工复核只用于定位故障，不替代预登记机器分数，也不挽救已触发合同、回归和编造止损线的架构。
+
+## 结论
+
+完整概念瓶颈被拒绝进入生产。它把 Qualia、人的任务、框架、社会实践、候选世界与探针同时暴露给模型，增加了 Schema 面、Token 和理论化候选的注意力权重。把完整中间态继续交给决策调用后，模型更容易选择听起来更完整、更抽象的社会实践，而不是最小有效内容根。
+
+保留的架构学习只有两项：
+
+1. 候选召回与最终收敛必须分开记录；只看最终回答无法判断模型是没有想到还是想到后选错。
+2. 下一候选若继续，只能使用普通语言的薄语义格：对象、直接用途、实践或结果候选、业务返回路径、过度抽象风险。完整理论展开不能进入收敛上下文。
+
+E31 不再重跑。下一实验必须另写预登记并使用新的留出最小对比集；现役 Lead、Tool、Skill、MCP、子 Agent、中间件与 Gateway 均不修改。

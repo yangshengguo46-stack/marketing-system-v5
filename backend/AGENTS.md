@@ -135,6 +135,13 @@ E29's isolated one-call layered map added rooted expansion nodes but passed only
 one of six frozen cases; ADR-009 rejects that implementation for production.
 E30's two-step skeleton-then-expansion evaluator improved to three of six but
 still failed its preregistered threshold; ADR-010 rejects production promotion.
+E31 exposed a full semantic concept bottleneck before root selection. It made
+the golden-gift gifting-practice leap visible, but two of six cases failed the
+concept contract and the convergence call promoted theory-shaped practice
+phrases over the reviewed fruit, watch, and beauty roots. ADR-011 rejects the
+full bottleneck for production. Retain only the diagnostic separation between
+candidate recall and final convergence; do not pass the full theory object into
+Lead context or rerun E31's six cases as a tuned benchmark.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
