@@ -1,0 +1,83 @@
+{
+  "account": {
+    "captured_at": "2026-08-13T15:20:35.689847Z",
+    "display_name": "田永成",
+    "platform": "douyin",
+    "public_metrics": {
+      "followers": 116425,
+      "following": 46,
+      "likes_received": 814289,
+      "visible_works": 131
+    },
+    "stable_account_id": "MS4wLjABAAAAtbKR72-Sx4AGUBIyqyhHZvi3zbnIHiH9nsfmToPAJSi4u2A2hRxK18dC1QWadgKK"
+  },
+  "agent_runs": [
+    {
+      "answer_sha256": "0db59c8a002041e4ca29557135c8058b06cb07089183892843430c9284cbd850",
+      "answer_chars": 4446,
+      "model": "glm-5-2-260617",
+      "reasoning_effort": "low",
+      "run_id": "fce815ae-5154-4824-bb42-15eef4492b18",
+      "thinking_enabled": true,
+      "thread_id": "eval_tianyongcheng_account_analysis_20260813_01",
+      "verdict": "marketing_core_correct_fact_discipline_failed"
+    },
+    {
+      "answer_sha256": "00875dea8c4c103026b87264b1c4b0f752f738d0601d58beb43260e72c1cda30",
+      "answer_chars": 6520,
+      "model": "glm-5-2-260617",
+      "reasoning_effort": "low",
+      "run_id": "79c74c01-8d39-45fc-8b96-1192ea390e77",
+      "thinking_enabled": true,
+      "thread_id": "eval_tianyongcheng_account_analysis_20260813_01",
+      "verdict": "accepted_after_deterministic_fact_revision_with_counting_residual"
+    }
+  ],
+  "collection": {
+    "author_qualified_visible_posts": 39,
+    "remaining_visible_count_not_collected": 92,
+    "source_projection_sha256": "ad2e19c7edffdf31162eff668f5b37a08719687b446c0241ae2b4d15e601aa58",
+    "structured_next_page_available": true,
+    "temporary_media_urls_persisted": false,
+    "visible_works_reported_by_platform": 131
+  },
+  "deterministic_sample_metrics": {
+    "share_buckets": {
+      "1000_to_10000": 3,
+      "100_to_999": 18,
+      "above_10000": 1,
+      "below_100": 17
+    },
+    "totals": {
+      "comments": 2149,
+      "favorites": 18097,
+      "likes": 36908,
+      "shares": 36619
+    }
+  },
+  "epistemic_boundary": {
+    "platform_did_not_return": [
+      "plays",
+      "reach",
+      "leads",
+      "appointments",
+      "transactions",
+      "average_order_value",
+      "repeat_purchase"
+    ],
+    "user_supplied_clues": [
+      "The account is considered a leading medical-aesthetics account by the user.",
+      "The account has unusually strong monetization despite an approximately 100k follower scale.",
+      "Several early million-play posts existed and have since been removed."
+    ],
+    "removed_post_content_or_metrics_reconstructed": false
+  },
+  "marketing_judgment": {
+    "account_editorial_lens": "衰老的规律与差异",
+    "commercial_association_observed": "Stable service-domain and TBM tags keep medical aesthetics visibly associated with diverse topics; conversion was not observed.",
+    "content_world_root": "医美",
+    "core_verdict": "The real account supports a broad medical-aesthetics content world while showing that one account may weight an anti-aging editorial lens. It does not justify replacing the category root with aging, copying individual hooks, or claiming monetization without business outcomes.",
+    "presentation_format": "unknown_without_video_evidence"
+  },
+  "status": "lead_marketing_judgment_accepted_after_revision_runtime_tooling_pending"
+}
