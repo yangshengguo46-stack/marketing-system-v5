@@ -91,9 +91,28 @@ def test_user_reviewed_anchors_are_marked_reviewed():
     cases = {case.case_id: case for case in default_cases()}
 
     assert cases["gold-gift"].review_status == "reviewed"
+    assert cases["fruit-shop"].review_status == "reviewed"
     assert cases["seafood-source"].review_status == "reviewed"
     assert cases["chongqing-hotpot-base"].review_status == "reviewed"
-    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id not in {"gold-gift", "seafood-source", "chongqing-hotpot-base"})
+    reviewed_case_ids = {
+        "gold-gift",
+        "fruit-shop",
+        "seafood-source",
+        "chongqing-hotpot-base",
+    }
+    assert all(case.review_status == "draft" for case_id, case in cases.items() if case_id not in reviewed_case_ids)
+
+
+def test_fruit_shop_anchor_records_the_reviewed_complete_object_world():
+    fruit = {case.case_id: case for case in default_cases()}["fruit-shop"]
+    success = " ".join(fruit.success_criteria)
+    failures = " ".join(fruit.failure_modes)
+
+    assert "水果选为最小完整内容根" in success
+    assert "种类、时间与历史、地域与空间、不同国家和文化群体的饮食习惯" in success
+    assert "水果店保留为经营载体" in success
+    assert "专业选品、品质避坑或供应链" in failures
+    assert "消费世界或生活方式" in failures
 
 
 def test_seafood_anchor_records_the_reviewed_broad_category_boundary():
