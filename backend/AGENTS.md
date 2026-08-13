@@ -136,6 +136,25 @@ both be fully reviewed; explicit training permission is still required before
 building a training candidate. Do not expose it as a Lead tool or Skill until
 the ledger records a passing authorized multi-video evaluation.
 
+The same isolated package now owns three pre-runtime boundaries:
+
+- `account_link_collection.py` exposes a collector port that receives only a
+  user-supplied HTTP(S) URL and a maximum post count. The returned model is a
+  strict whitelist; do not add cookies, storage, raw page payloads, private
+  network responses, or expiring media URLs.
+- `source_snapshot.py` validates profile/post observations and writes an
+  immutable content-addressed local snapshot. Browser selectors and platform
+  page logic belong behind the collector port, not in these contracts.
+- `lead_projection.py` creates the only payload that may later be shown to the
+  Lead. It enforces account/rights/post identity alignment, removes raw media
+  artifacts and transcripts, and fits the result to a hard byte budget. Do not
+  replace this with full-pack prompt injection or a model-authored summary.
+
+These files do not constitute a working Douyin crawler or a production link
+tool. A visible-browser or first-party adapter, stable media artifacts, and a
+passing real multi-video acceptance are still required. Run all isolated E15
+coverage with `PYTHONPATH=. uv run pytest tests/experiments -q` from `backend/`.
+
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**
 

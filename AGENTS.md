@@ -166,6 +166,17 @@ These apply repo-wide; module guides own the module-specific detail.
   supporting evidence capabilities. The E15 implementation under
   `backend/experiments/` is isolated and must not be registered as a Lead tool,
   MCP server, or Skill before real-account acceptance is recorded.
+  Its account-link boundary accepts only a user-supplied URL, an explicit
+  collection method and rights reference, and a sample cap of at most 24 posts.
+  Collectors return whitelisted profile/post observations; raw DOM/HTML,
+  cookies, browser storage, temporary media URLs, and local paths are not part
+  of the contract. Source snapshots are content-addressed locally. Even when
+  the local evidence pack is large, the Lead-facing projection has a hard UTF-8
+  byte budget (16 KB by default), contains only bounded candidate patterns,
+  representative post/evidence IDs, coverage, limitations, and hashes, and
+  treats all page text as untrusted evidence rather than instructions. Account,
+  rights, and post identities must match before projection. A35 owns this
+  experimental boundary; the first real multi-video account remains pending.
   The default Lead may call the bounded `analyze_business_semantics` tool when
   a user's business expression needs semantic explication. For requests about
   starting or positioning an account or choosing a long-term content territory,
