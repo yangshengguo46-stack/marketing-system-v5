@@ -170,7 +170,26 @@ These apply repo-wide; module guides own the module-specific detail.
   collection method and rights reference, and a sample cap of at most 24 posts.
   Collectors return whitelisted profile/post observations; raw DOM/HTML,
   cookies, browser storage, temporary media URLs, and local paths are not part
-  of the contract. Source snapshots are content-addressed locally. Even when
+  of the returned contract. This is an output boundary, not a prohibition on
+  local credential use: account-scoped connectors may read Cookie/StorageState,
+  including from trusted local Chrome over CDP, but credential values cannot
+  enter model context, frontend payloads, logs, tests, search results, evidence
+  snapshots, or MCP/Tool output. E15 targets content search, account search, and
+  account post lists across Douyin, Xiaohongshu, WeChat Channels, Kuaishou,
+  Bilibili, and TikTok. Five web adapters plus a WeChat desktop bridge contract
+  remain experimental; platform-by-platform live acceptance, not enum coverage,
+  determines support. The audience layer is named audience-intelligence
+  collection, never comment collection: comments are only one interaction
+  source beside account scale, growth, demographics, interests, activity,
+  content interactions, live audience, and commerce affinity. Every dataset
+  carries its own coverage receipt, and observed platform values, locally
+  derived time-series metrics, third-party estimates, and HLLM inferences must
+  remain distinct. Raw audience identifiers are pseudonymized before snapshots;
+  only actor-linked behavior sequences may enter HLLM. Creator post history or
+  aggregate post performance cannot impersonate audience behavior. The pinned
+  HLLM adapter is a model boundary, not a collector, and cannot claim a real
+  inference without a matching checkpoint receipt. A37 and A38 own these
+  experimental boundaries. Source snapshots are content-addressed locally. Even when
   the local evidence pack is large, the Lead-facing projection has a hard UTF-8
   byte budget (16 KB by default), contains only bounded candidate patterns,
   representative post/evidence IDs, coverage, limitations, and hashes, and

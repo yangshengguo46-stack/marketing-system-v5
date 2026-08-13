@@ -136,7 +136,7 @@ both be fully reviewed; explicit training permission is still required before
 building a training candidate. Do not expose it as a Lead tool or Skill until
 the ledger records a passing authorized multi-video evaluation.
 
-The same isolated package now owns three pre-runtime boundaries:
+The same isolated package now owns these pre-runtime boundaries:
 
 - `account_link_collection.py` exposes a collector port that receives only a
   user-supplied HTTP(S) URL and a maximum post count. The returned model is a
@@ -149,11 +149,45 @@ The same isolated package now owns three pre-runtime boundaries:
   Lead. It enforces account/rights/post identity alignment, removes raw media
   artifacts and transcripts, and fits the result to a hard byte budget. Do not
   replace this with full-pack prompt injection or a model-authored summary.
+- `local_browser_credentials.py` registers login state by platform and account,
+  including a trusted-loopback CDP import path for an already logged-in local
+  Chrome. Local Cookie/LocalStorage use is allowed inside the connector. Never
+  add credential values to the registry index, model context, frontend, logs,
+  tests, search result, snapshot, or MCP/Tool output.
+- `platform_search.py` owns the six-platform strict result and failure contract
+  for keyword content search, keyword account search, and account post lists.
+  A platform failure remains isolated, and an ambiguous empty page must not be
+  reported as a successful zero-result search.
+- `platform_search_adapters.py` is a clean-room experiment with five local
+  Playwright web adapters plus a WeChat Channels desktop bridge port. Structured
+  in-memory responses are preferred and visible canonical links are the
+  fallback; raw JSON, HTML, screenshots, and browser state are not persisted.
+- `audience_collection.py` owns audience-intelligence datasets and provenance.
+  Do not rename this layer to comment collection. A comment is only one
+  `content_interactions` observation. Every requested dataset must return an
+  explicit coverage status; observed, locally derived, third-party estimated,
+  and model-inferred values cannot impersonate one another.
+- `audience_snapshot_adapter.py` converts only the public account scale and
+  sampled post-response fields already present in an account snapshot. It must
+  leave demographics, interests, activity, live, and commerce datasets
+  unavailable when they were not collected.
+- `audience_ledger.py` is an append-only, content-addressed account history.
+  Growth is derived deterministically from ordered snapshots; never let a model
+  invent or rewrite historical metrics.
+- `audience_evidence.py`, `hllm_audience.py`, and `account_audience.py` keep
+  actor-linked behavior, aggregate observations, and HLLM inferences separate.
+  Raw platform actor IDs are pseudonymized at the collection boundary. Only
+  audience behavior sequences may enter the pinned HLLM-Creator adapter;
+  creator post history and aggregate account performance are not substitutes.
+  A generic chat model cannot issue an HLLM checkpoint receipt.
 
-These files do not constitute a working Douyin crawler or a production link
-tool. A visible-browser or first-party adapter, stable media artifacts, and a
-passing real multi-video acceptance are still required. Run all isolated E15
-coverage with `PYTHONPATH=. uv run pytest tests/experiments -q` from `backend/`.
+These files do not constitute a production crawler or link tool. Bilibili public
+content/account search has passed only a local smoke check; the other web
+platforms still require account login-state acceptance, and the WeChat Channels
+desktop bridge is not implemented. Detailed audience collectors and real HLLM
+weights/provider inference are also pending. Stable media artifacts and passing
+real account/audience acceptance are still required. Run all isolated E15 coverage with
+`PYTHONPATH=. uv run pytest tests/experiments -q` from `backend/`.
 
 ### Documentation Update Policy
 **CRITICAL: Always update README.md and AGENTS.md after every code change**

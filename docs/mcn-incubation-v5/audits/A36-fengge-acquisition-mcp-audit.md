@@ -2,7 +2,7 @@
 id: A36
 status: reviewed
 reviewed_at: 2026-08-13
-decision: architecture_patterns_only_no_code_migration
+decision: architecture_patterns_and_local_session_use_adopted_by_clean_room_rewrite
 sources:
   - /Users/yangyucheng/Desktop/锋哥的数字员工/szyg
   - /Users/yangyucheng/Desktop/锋哥的数字员工/szyg-master.zip
@@ -22,10 +22,10 @@ Hermes Lead
 -> 自写 stdio JSON-RPC MCP server
 -> acquisition adapter
 -> MediaCrawler 私有网页接口 / Playwright 响应拦截 / DOM fallback
--> 统一搜索或评论 JSON
+-> 统一搜索或受众互动观察
 ```
 
-这个实现证明了第五版选择“脚本负责精准观测，MCP 负责受控调用”的方向是对的。但旧抖音内核依赖 Cookie 转接、私有接口、响应拦截、签名与反检测实现，与第五版的授权、密钥和平台边界冲突。本轮只采用工程模式和失败经验，不迁移其代码。
+这个实现证明了第五版选择“脚本负责精准观测，MCP 负责受控调用”的方向是对的。这里曾把“本地读取 Cookie”本身误判为禁止项，用户于 2026-08-13 纠正了这个边界：账号级本地连接器可以读取并使用 Cookie/StorageState，问题只在于是否跨账号串用、是否泄露给模型/前端/日志，以及是否依赖受限代码、私有签名或反检测实现。第五版因此采用本地登录态能力并清洁室重写采集器，但不迁移旧 MediaCrawler 代码。
 
 ## 来源快照
 
@@ -44,7 +44,7 @@ Hermes Lead
 | `server/szyg/mcp_servers/acquisition_mcp.py` | 暴露平台列表、搜索、读评论、发评论、批量发评论和私信 | MCP 外壳理念可参考；读写权限混在同一服务不采用。 |
 | `server/szyg/mcp_server.py` | 自写的最小 `initialize/tools/list/tools/call` stdio JSON-RPC 服务 | 不迁移。第五版使用现有 DeerFlow/MCP SDK 能力，不再维护一套部分 MCP 实现。 |
 | `server/szyg/integrations/acquisition_adapters.py` | 平台适配器、字段归一化、ID 去重、诊断状态、资源归还 | 仅清洁室重写这些可验证的工程语义。 |
-| `server/szyg/integrations/mediacrawler_bridge.py` | 读取 storage state，提取 Cookie/UA，初始化 MediaCrawler，调用抖音搜索、详情和评论网页端点 | 整体拒绝：许可证、平台条款、账号隔离和密钥边界均不满足第五版。 |
+| `server/szyg/integrations/mediacrawler_bridge.py` | 读取 storage state，提取 Cookie/UA，初始化 MediaCrawler，调用抖音搜索、详情和评论网页端点 | 拆分判定：本地读取/使用登录态采用；MediaCrawler 受限代码、全局 client、私有端点、签名和反检测实现拒绝。 |
 | `server/szyg/account_profile_sync.py` | 打开抖音创作者后台，从页面文字取账号数据，再调用站内 `/janus/.../work_list` | 页面文本解析思路可作失败样本；私有站内接口与 stealth 脚本不迁移。 |
 | `data/audit/douyin/` | 一次搜索的完整响应、HTML 和截图 | 仅用于本次结构证据核对，不复制、不入库、不送入模型。第五版禁止默认保存完整页面和原始响应。 |
 
@@ -73,8 +73,10 @@ Hermes Lead
 | BrowserContext 租约和 `finally` 归还 | `adopt semantics` | 账号级租约、超时、取消、进程重启和残留任务测试。 |
 | 保存完整 API 响应、HTML 和全页截图 | `reject` | 只保存白名单观测、哈希、Schema 版本和脱敏诊断。 |
 | MediaCrawler 桥接与受限代码 | `reject` | 不进 SBOM，不作为生产依赖，不复制。 |
-| Cookie/storage state 提取与返回 | `reject` | 令牌由授权连接器本地保管，不返回 Agent、MCP 输出或前端。 |
-| 私有网页端点、响应拦截、签名与 stealth | `reject` | 自有/客户账号使用官方授权 API；其他来源遵守 A35 数据源路由。 |
+| Cookie/storage state 本地读取与浏览器复用 | `adopt by clean-room rewrite` | `local_browser_credentials.py` 按平台和账号登记、过滤和本地使用，也可从可信本地 Chrome CDP 导入。 |
+| Cookie/storage state 返回或泄露 | `reject` | 不进入 Agent、MCP 输出、前端、日志、测试、证据快照和索引。 |
+| 页面结构化响应拦截 | `adopt in isolated connector` | 仅在本地浏览器内存中解析白名单字段，不保存完整响应或 HTML；Schema 漂移显式报告。 |
+| 私有签名、stealth、验证码绕过与反检测 | `reject` | 不迁移，不作为平台可用性的前提。 |
 | 搜索、读取、批量评论和私信共享 MCP | `reject` | 证据采集与不可逆执行服务分开；发布/互动另走账号、审批、幂等和回执合同。 |
 | 模块级全局 client/adapter 单例 | `reject` | 用户 + 平台 + 账号三元组隔离，禁止跨账号缓存客户端。 |
 
@@ -82,11 +84,11 @@ Hermes Lead
 
 E15 已经实现了比旧系统更强的采集端口、权利声明、严格字段白名单、内容寻址快照、账号一致性和 Token 投影。不再新建一套旧版 acquisition runtime。
 
-实施顺序保持为：
+纠偏后的实施顺序为：
 
-1. 先为用户有权的创作者导出、作品清单和文件实现 `UserMaterialImporter`。
-2. 再实现抖音开放平台 OAuth 和数据权限连接器 `DouyinAuthorizedConnector`。
-3. 两者均输出同一 `StructuredAccountObservation`，复用 E15 快照和 Lead 投影。
-4. 真实账号验收通过后，再将稳定连接器包装成只读 MCP/Tool；不把原始连接器或浏览器工具直接暴露给 Lead。
+1. 建立六平台统一搜索合同，覆盖内容、账号和账号作品三类请求。
+2. 本地浏览器登录态按用户、平台和账号隔离；Cookie 可以被连接器使用但不能出现在输出。
+3. 五个网页平台采用 Playwright 结构化响应优先、规范链接兜底；视频号走桌面桥接。
+4. 各平台分别完成真实登录态验收后，再将稳定连接器包装成只读 MCP/Tool；原始浏览器和凭据不直接暴露给 Lead。
 
-“大能”对标账号不使用旧 MediaCrawler 路径自动展开。当前继续等待用户有权作品材料、平台许可的数据通道，或人工小样本研究证据。
+“大能”对标账号不复制旧 MediaCrawler 路径。它可以在第五版本地登录态连接器通过抖音真实验收后作为首个账号作品样本继续验证。

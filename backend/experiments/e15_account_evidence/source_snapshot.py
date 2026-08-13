@@ -38,14 +38,26 @@ def _public_http_url(value: str) -> str:
     return value
 
 
+def _validate_public_metrics(
+    value: dict[str, int | float],
+) -> dict[str, int | float]:
+    for name, metric in value.items():
+        if not name or len(name) > 80:
+            raise ValueError("public metric names must be between 1 and 80 characters")
+        if isinstance(metric, bool) or not isfinite(metric) or metric < 0:
+            raise ValueError("public metrics must be finite non-negative numbers")
+    return value
+
+
 class AccountProfileObservation(StrictModel):
     platform: str = Field(min_length=1, max_length=80)
     account_id: str = Field(min_length=1, max_length=240)
     canonical_url: str = Field(min_length=1, max_length=1_000)
-    display_name: str = Field(min_length=1, max_length=300)
+    display_name: str | None = Field(default=None, min_length=1, max_length=300)
     bio: str | None = Field(default=None, max_length=2_000)
     verification: str | None = Field(default=None, max_length=500)
     visible_work_count: int | None = Field(default=None, ge=0)
+    public_metrics: dict[str, int | float] = Field(default_factory=dict)
     captured_at: datetime
 
     @field_validator("canonical_url")
@@ -57,6 +69,11 @@ class AccountProfileObservation(StrictModel):
     @classmethod
     def validate_captured_at(cls, value: datetime) -> datetime:
         return _aware(value, field_name="captured_at")
+
+    @field_validator("public_metrics")
+    @classmethod
+    def validate_public_metrics(cls, value: dict[str, int | float]) -> dict[str, int | float]:
+        return _validate_public_metrics(value)
 
 
 class PostListObservation(StrictModel):
@@ -83,12 +100,7 @@ class PostListObservation(StrictModel):
     @field_validator("public_metrics")
     @classmethod
     def validate_metrics(cls, value: dict[str, int | float]) -> dict[str, int | float]:
-        for name, metric in value.items():
-            if not name or len(name) > 80:
-                raise ValueError("public metric names must be between 1 and 80 characters")
-            if isinstance(metric, bool) or not isfinite(metric) or metric < 0:
-                raise ValueError("public metrics must be finite non-negative numbers")
-        return value
+        return _validate_public_metrics(value)
 
     @field_validator("media_artifact_ref")
     @classmethod

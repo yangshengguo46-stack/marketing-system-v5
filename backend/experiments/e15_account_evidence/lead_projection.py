@@ -32,7 +32,7 @@ class LeadAccountProfile(StrictModel):
     platform: str
     account_id: str
     canonical_url: str
-    display_name: str
+    display_name: str | None
     bio: str | None = None
     verification: str | None = None
 
