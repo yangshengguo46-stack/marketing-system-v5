@@ -236,5 +236,11 @@ These apply repo-wide; module guides own the module-specific detail.
   locally passing sample. A34 records the original object-map acceptance; A42 and
   ADR-008 own the newer account-level boundary, while A43-A44 and ADR-009-ADR-010
   own the layered-map rejections.
+  A45 maps the next research boundary to qualia roles, means-end chains,
+  Jobs-to-be-Done, frame semantics, concept bottlenecks, and causal models.
+  Removal or substitution probes are semantic ablations over model behavior,
+  not Pearl-style evidence of market causality. Any semantic concept-bottleneck
+  candidate must remain optional, inspectable, and offline until a preregistered
+  contrastive evaluation passes; it must not become another mandatory workflow.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
