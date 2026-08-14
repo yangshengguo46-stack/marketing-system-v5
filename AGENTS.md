@@ -264,5 +264,12 @@ These apply repo-wide; module guides own the module-specific detail.
   among complete object, seller operation/proof, buyer ordinary use, and buyer
   recurring social practice/result. It must use new cases and replace, not
   stack on, E33.
+  E34 is the frozen offline successor in A49. It keeps the relation-first
+  two-layer shape, applies those four roles only to inspectable candidate
+  options, and evaluates eight new minimal-pair cases with positive signal
+  families and normalized exact-term boundaries. Its prompts, labels, scorer,
+  and call budget are sealed before the single live run. Do not register it in
+  production even if the offline threshold passes; that requires a separate
+  reviewed production probe.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

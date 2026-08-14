@@ -3,7 +3,8 @@ id: A49
 status: traced
 preregistered_at: 2026-08-14
 baseline_commit: 8ca70686
-frozen_candidate_commit: pending
+frozen_preregistration_commit: 5df87635
+frozen_candidate_commit: 025f676e
 candidate_runtime_registered: false
 decision: pending_frozen_evaluation
 sources:
@@ -48,6 +49,8 @@ E34 不重跑 E33，只在同一个关系调用中给竞争项加一个小型角
 - 评分器只使用正向词族、枚举和规范化后精确词检查，不使用 E33 那种可跨字命中的禁止子串。
 - 不读取记忆、Skill、Tool、MCP 或子 Agent，不运行模型裁判。可见输出只在 gitignored `.deer-flow/`；隐藏思考只保留哈希。
 - 代码、测试、预登记和提示哈希先提交，真实模型只跑一轮；不在运行后改题、改标签、改分数或拼结果。
+
+冻结预登记提交为 `5df87635`，冻结候选实现提交为 `025f676e`。角色/关系提示 SHA-256 为 `f2fbb28fc19e9b62766a66313635fb5cb24c6a9e1b883de406099a9c1c9669dc`，收敛提示 SHA-256 为 `58c8b89bc8f9f912db36b540732ddd04fbdb5781f16a93830c84058cb43ce9d8`。真实运行前的相关后端回归为 `184 passed`。
 
 ## 通过与止损
 

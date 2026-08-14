@@ -123,6 +123,13 @@ The retained E16 research utilities are deliberately offline:
   relation. Hidden review separately measures relation judgment, both candidate
   recalls, both final convergences, and the resulting contrast. It does not
   import E32, expose prior cases, or register runtime behavior.
+- `scripts/run_actor_role_semantic_contrast_eval.py` is the isolated E34
+  successor preregistered in A49. It keeps the same relation-first pair plus two
+  independent convergence calls and adds only four inspectable option roles:
+  complete object, seller operation/proof, buyer ordinary use, and buyer
+  recurring social practice/result. Hidden review scores role/disposition
+  separately from root recall and convergence. Its positive signal families and
+  normalized exact-term boundaries replace E33's forbidden-substring scorer.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -176,6 +183,13 @@ first comparison. Any successor may add only a small actor-role distinction
 between complete object, seller operation/proof, buyer ordinary use, and buyer
 recurring social practice/result. It requires new cases and must replace rather
 than stack on E33.
+E34 is frozen before live evaluation at A49. Its eight new cases compare a
+children's-book business container, seller operations around leather shoes,
+wedding invitation versus notebook use, and two regional dumpling-filling
+styles. Do not alter its prompts, hidden labels, role expectations, scorer, or
+call budget after the sealed run begins; do not rerun or selectively combine
+results. Passing its offline threshold still does not authorize production
+registration.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -194,6 +208,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_semantic_concept_bottleneck_eval.py \
   tests/test_thin_semantic_lattice_eval.py \
   tests/test_relational_semantic_contrast_eval.py \
+  tests/test_actor_role_semantic_contrast_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```
