@@ -1,0 +1,139 @@
+{
+  "evidence_id": "E37",
+  "recorded_at": "2026-08-14",
+  "purpose": "Test whether one call can select a content subject by demonstrated capacity and then emit actual map nodes rooted to that selected subject.",
+  "production_baseline": {
+    "commit": "ca2af9f8905698a0ad81a204350afa07fb840bcf",
+    "frozen_test_commit": "bcd79b7f",
+    "frozen_candidate_commit": "7ff281a9",
+    "frozen_run_contract_commit": "a234cbd6",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "prompt_sha256": "c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608",
+    "calls_per_case": 1,
+    "forced_dual_world": false,
+    "content_engines": false,
+    "attention_entries": false,
+    "actual_rooted_map_nodes": true,
+    "user_gold_in_model_messages": false
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "semantic_worlds": "4/4",
+    "actual_rooted_content_maps": "4/4",
+    "fact_boundary": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e37-rooted-content-map-four-user-cases-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 4,
+    "provider_call_budget": 5,
+    "provider_calls": 4,
+    "repair_calls": 0,
+    "contract_failures": 0,
+    "usage": {
+      "input_tokens": 5775,
+      "output_tokens": 9122,
+      "total_tokens": 14897
+    },
+    "elapsed_seconds": 244.963,
+    "semantic_worlds_passed": 2,
+    "semantic_worlds_total": 4,
+    "correctly_rooted_content_maps_passed": 2,
+    "correctly_rooted_content_maps_total": 4,
+    "manual_fact_boundary_passed": false,
+    "acceptance_passed": false
+  },
+  "case_results": [
+    {
+      "case_id": "fruit-shop",
+      "selected_content_world": "水果",
+      "candidate_recall": "passed",
+      "semantic_status": "passed",
+      "content_map_status": "passed",
+      "axis_count": 6,
+      "diagnosis": "The model retained the complete fruit object over ordinary selection and tasting. It produced actual directions for varieties, season and history, geography, culture, conflict, and cross-domain research."
+    },
+    {
+      "case_id": "seafood-source",
+      "selected_content_world": "海鲜",
+      "candidate_recall": "passed",
+      "semantic_status": "passed",
+      "content_map_status": "passed",
+      "axis_count": 5,
+      "diagnosis": "The model removed source identity and uncertain production method, retained seafood, and produced actual directions for types, waters and environments, season and history, acquisition science, and regional food culture."
+    },
+    {
+      "case_id": "gold-gift",
+      "selected_content_world": "黄金礼品",
+      "candidate_recall": "passed_but_not_selected",
+      "recalled_alternative": "黄金送礼实践",
+      "semantic_status": "failed",
+      "content_map_status": "failed_wrong_root",
+      "axis_count": 7,
+      "diagnosis": "The model recalled the intended gifting and human-relations direction but converged on the closer product because it optimized business specificity and return distance. The resulting rich map rationalized the wrong root rather than correcting it."
+    },
+    {
+      "case_id": "chongqing-hotpot-base",
+      "selected_content_world": "重庆火锅底料",
+      "candidate_recall": "partial_failed",
+      "recalled_alternative": "重庆火锅",
+      "semantic_status": "failed",
+      "content_map_status": "failed_wrong_root",
+      "axis_count": 7,
+      "diagnosis": "The model generated a parent-object candidate but retained the regional modifier and then chose the intermediate product. It treated possible drift toward restaurants as more important than the complete hotpot world's larger content capacity."
+    }
+  ],
+  "manual_fact_boundary_review": {
+    "status": "failed_specific_unsourced_claims_and_effect_predictions",
+    "findings": [
+      "The hot-pot map presupposed a dock-worker origin sequence, named ingredient origins, regional household practices, master-craftsman inheritance, and a traditional-versus-industrial conflict without sources.",
+      "The golden-gift map asserted regional gift-form and weight preferences, historical form sequences, and specific cultural meanings without sources.",
+      "Several business-return paths predicted professional trust, purchase intention, demand, or repeat purchase rather than limiting themselves to a logical content-to-business relation.",
+      "research_needed=true prevents these nodes from being publishable facts, but it does not satisfy the prompt's stricter requirement to avoid inventing specific claims during map construction."
+    ]
+  },
+  "comparison_to_e36": {
+    "same_four_development_cases": true,
+    "e36_semantic_worlds": "0/4",
+    "e37_semantic_worlds": "2/4",
+    "e36_actual_content_map_contract": false,
+    "e37_correctly_rooted_content_maps": "2/4",
+    "causal_attribution": "not_established",
+    "reason": "E37 both removed E35's need-biased wording and added candidate capacity examples plus rooted map nodes, so the improvement cannot be attributed to content-map integration alone."
+  },
+  "architecture_learning": {
+    "retained": [
+      "One selected candidate id can safely bind the emitted term and every content-map parent reference.",
+      "Actual category-level directions are more inspectable than bare capacity-axis labels.",
+      "The one-call reduced contract completed all four cases without schema repair.",
+      "Candidate recall and final convergence remain separate failure locations."
+    ],
+    "rejected": [
+      "Using a model's ability to generate many plausible branches as proof that a candidate is the correct content root.",
+      "Optimizing business closeness or shortest return path after a candidate has already met a natural-return threshold.",
+      "Allowing a wrong selected root to gain legitimacy from its own generated map.",
+      "Registering E37 as a Lead stage, Tool, Skill, subagent, middleware, or Gateway path."
+    ],
+    "next_boundary": "Semantic decomposition and root selection must be corrected before map expansion. A future candidate should explicitly expose the lexical head, material or modifier, seller operation, intermediate-to-complete-object relation, and optional social frame; the Lead selects one root, then the map expands that frozen root without voting on it."
+  },
+  "artifact_sha256": {
+    "manifest_json": "ec152bfbc9a2b95d75bf07d90e3dc239958651114c89e922625ce0edfdf904d6",
+    "results_json": "efa1f3ee5368c13bccb51bee07dbb6ce5dd777d35f4c91a8118fc9ee825f44b0",
+    "completion_json": "bf33c61b068fac5c3f2e47bd7b615a0aa76015100021529c09fb6bf6a0a91414"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_content_maps_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_e37_retain_root_binding_and_actual_map_node_contract"
+}

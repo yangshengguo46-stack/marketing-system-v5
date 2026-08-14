@@ -1,13 +1,14 @@
 ---
 id: A53
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: ca2af9f8905698a0ad81a204350afa07fb840bcf
 frozen_test_commit: bcd79b7f
 frozen_candidate_commit: 7ff281a9
 candidate_prompt_sha256: c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608
 runtime_registered: false
-decision: pending_single_run
+decision: reject_e37_retain_binding_and_map_contract
 sources:
   - docs/mcn-incubation-v5/audits/A43-single-call-layered-content-map-preregistration.md
   - docs/mcn-incubation-v5/audits/A44-two-step-content-map-preregistration.md
@@ -64,3 +65,14 @@ E37 不叠加 E35 与 E29。它缩成一次调用内的一个完整判断：生�
 - 任一项失败即拒绝 E37。即使全部通过，也只证明已知开发回归可以结合，不自动注册生产；还需新的未见案例验证泛化。
 
 冻结测试与预登记提交为 `bcd79b7f`，冻结候选实现提交为 `7ff281a9`，提示 SHA-256 为 `c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608`。真实运行前，E37 与相关旧评测回归为 `56 passed`，ruff 检查和格式检查均通过。
+
+## 冻结结果
+
+- 唯一运行 `e37-rooted-content-map-four-user-cases-20260814-01` 完成四例，使用 `4 calls / 0 repairs / 14,897 tokens / 244.963s`，零合同失败。
+- 水果与海鲜选中用户确认的对象根，并输出覆盖最低要求的实际地图方向。
+- 黄金已经召回“黄金送礼实践”却选择“黄金礼品”；火锅只召回“重庆火锅”并最终选择“重庆火锅底料”。两个错误根同样生成七轴丰富地图，说明生成容量不能裁决语义根。
+- 内容世界与正确根化地图均为 `2/4`，事实边界因具体未核验历史、地域、工艺和效果断言失败。整体未通过。
+
+## 结论
+
+拒绝 E37 提示和“地图容量决定根”的架构。保留候选 id 绑定与实际地图节点合同；语义主语必须先由 Lead 选择并冻结，内容地图随后只负责展开。详见 E37 与 ADR-017。

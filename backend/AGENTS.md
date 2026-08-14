@@ -232,6 +232,12 @@ E37 is frozen at prompt SHA-256
 before its single development run. Do not alter its prompt, four cases, shared
 repair budget, or acceptance after execution begins. A development-set pass is
 not production or generalization evidence.
+The frozen E37 run completed all four contracts without repair but reached only
+`2/4` semantic worlds and `2/4` correctly rooted maps, with a failed fact-
+specificity review. ADR-017 rejects generated map richness as a root judge.
+Retain candidate-id term binding and same-root parent references only; the Lead
+must select and freeze the subject before map expansion. Do not rerun, tune,
+stack, or register E37.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately

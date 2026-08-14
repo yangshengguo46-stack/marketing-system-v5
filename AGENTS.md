@@ -294,5 +294,11 @@ These apply repo-wide; module guides own the module-specific detail.
   user-corrected labels remain hidden from model messages. Do not change its
   prompt, cases, repair budget, or acceptance after the live run begins, and do
   not infer production readiness from a development-set pass.
+  The frozen E37 run passed contracts but only reached `2/4` for both semantic
+  worlds and correctly rooted maps; fact specificity also failed. ADR-017
+  rejects map richness as a root judge. Retain deterministic candidate binding
+  and rooted parent references only: the Lead must select and freeze the
+  content subject before map expansion. Do not rerun, tune, stack, or register
+  E37.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
