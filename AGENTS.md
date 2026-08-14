@@ -279,5 +279,13 @@ These apply repo-wide; module guides own the module-specific detail.
   equal primary calls and hidden exact-alias review. Do not inject the six
   development annotations into either arm or infer production promotion from a
   semantic-only win.
+  The one frozen E35 run did not pass its automatic exact-alias threshold.
+  Manual review found systematic scorer false negatives and judged the new
+  candidate better on four cases with two scope tradeoffs, but did not repair
+  the frozen score. ADR-015 retains `ca2af9f8` as the full-structure rollback
+  baseline and adopts only the object-world/audience-world attention direction
+  for a future minimal internal change. Do not rerun E35, extend its aliases,
+  register its evaluator, or replace the baseline's content engines and
+  attention entries with the semantic-only candidate.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

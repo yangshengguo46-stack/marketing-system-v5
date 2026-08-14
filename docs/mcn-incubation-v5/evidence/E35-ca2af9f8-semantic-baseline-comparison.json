@@ -1,0 +1,196 @@
+{
+  "evidence_id": "E35",
+  "recorded_at": "2026-08-14",
+  "purpose": "Compare the exact user-designated ca2af9f8 rollback version with one plain-language object-world and audience-world attention candidate on six new cases.",
+  "production_baseline": {
+    "commit": "ca2af9f8905698a0ad81a204350afa07fb840bcf",
+    "prompt_sha256": "96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d",
+    "frozen_preregistration_commit": "313913a1",
+    "frozen_candidate_commit": "60865135",
+    "frozen_run_contract_commit": "1c7c46dd",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "description": "One plain-language call compares product/object, direct use or activity, and recurring need; it selects separate object-world and audience-world candidates by id.",
+    "prompt_sha256": "0bdc826d1256828f399515dc5a4f9149603947cd7ca22397915f45bf2e886b6f",
+    "fixed_actor_roles": false,
+    "development_examples_in_prompt": false,
+    "second_agent_or_stage": false
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "candidate_minimum_source": 5,
+    "candidate_minimum_audience_accepted": 5,
+    "candidate_minimum_audience_utility": 9,
+    "candidate_minimum_object_accepted": 5,
+    "candidate_minimum_object_utility": 9,
+    "candidate_minimum_recall": 5,
+    "candidate_minimum_audience_utility_lead": 2,
+    "fact_boundary_manual_review": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e35-ca2af9f8-semantic-comparison-heldout-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 6,
+    "primary_calls_per_arm": 6,
+    "provider_call_budget": 14,
+    "provider_calls": 13,
+    "usage": {
+      "input_tokens": 16700,
+      "output_tokens": 13373,
+      "total_tokens": 30073
+    },
+    "elapsed_seconds_total": 364.618,
+    "baseline": {
+      "contract_failures": 1,
+      "source_object_passed": 5,
+      "audience_preferred": 2,
+      "audience_acceptable": 2,
+      "audience_accepted": 4,
+      "audience_utility": 6,
+      "provider_calls": 7,
+      "repair_calls": 1,
+      "total_tokens": 16139,
+      "elapsed_seconds": 123.703
+    },
+    "candidate": {
+      "contract_failures": 0,
+      "source_object_passed": 6,
+      "audience_preferred": 0,
+      "audience_acceptable": 0,
+      "audience_accepted": 0,
+      "audience_utility": 0,
+      "object_preferred": 0,
+      "object_acceptable": 0,
+      "object_accepted": 0,
+      "object_utility": 0,
+      "candidate_recall": 1,
+      "provider_calls": 6,
+      "repair_calls": 0,
+      "total_tokens": 13934,
+      "elapsed_seconds": 240.915
+    },
+    "frozen_audience_utility_delta_candidate_minus_baseline": -6,
+    "automatic_acceptance_passed": false,
+    "frozen_score_changed_posthoc": false,
+    "acceptance_passed": false
+  },
+  "automatic_scorer_review": {
+    "status": "failed_as_semantic_judge",
+    "diagnosis": "The boundary-safe exact matcher removed E33-E34 substring false positives but produced systematic false negatives for semantically equivalent compounds and valid alternative roots.",
+    "false_negative_examples": [
+      "家庭烘焙实践 was scored different from the frozen alias 家庭烘焙.",
+      "淡水钓鱼实践 was scored different from 淡水钓鱼.",
+      "生日庆祝与仪式 was scored different from the separately listed aliases 生日庆祝 and 生日仪式.",
+      "观赏鱼饲养与水族造景 was scored different from the listed 观赏鱼饲养 and 水族饲养 alternatives.",
+      "古籍保存与延寿需求 was a valid audience root omitted from the system-authored hidden alternatives.",
+      "宠物离世哀伤支持 and the baseline's 宠物告别与哀悼 were valid roots omitted from the system-authored hidden alternatives."
+    ],
+    "consequence": "The frozen automatic score remains a failed preregistration. It cannot establish the business winner and is not repaired by adding aliases after the run."
+  },
+  "manual_business_review": {
+    "status": "candidate_direction_supported_but_not_promoted",
+    "pairwise_summary": {
+      "candidate_better": 4,
+      "tie_or_scope_tradeoff": 2,
+      "baseline_better": 0
+    },
+    "aggregate_score_recalculated": false,
+    "cases": [
+      {
+        "case_id": "ornamental-fish-shop",
+        "baseline_world": "观赏鱼",
+        "candidate_object_world": "观赏鱼饲养与水族造景",
+        "candidate_audience_world": "观赏鱼饲养与水族造景",
+        "judgment": "tie_or_scope_tradeoff",
+        "reason": "The baseline preserves the broad object world; the candidate turns it into an actionable recurring practice but combines care and aquascaping into one narrower territory."
+      },
+      {
+        "case_id": "freshwater-fishing-bait",
+        "baseline_world": "淡水钓鱼",
+        "candidate_object_world": "饵料应用与搭配",
+        "candidate_audience_world": "淡水钓鱼实践",
+        "judgment": "tie_or_scope_tradeoff",
+        "reason": "Both reach freshwater fishing. The baseline is cleaner and already emits engines; the candidate usefully separates near-product usage from the audience's full activity."
+      },
+      {
+        "case_id": "baking-molds",
+        "baseline_world": null,
+        "candidate_object_world": "家庭烘焙实践",
+        "candidate_audience_world": "家庭烘焙实践",
+        "judgment": "candidate_better",
+        "reason": "The baseline remained contract-invalid after its shared repair. The candidate reliably moved from the tool to the complete activity it serves."
+      },
+      {
+        "case_id": "birthday-cakes",
+        "baseline_world": "生日蛋糕",
+        "candidate_object_world": "生日庆祝与仪式",
+        "candidate_audience_world": "生日庆祝与仪式",
+        "judgment": "candidate_better",
+        "reason": "The candidate makes the intended product-to-use-to-social-practice leap; the baseline explicitly stays at the product because evidence is sparse."
+      },
+      {
+        "case_id": "ancient-book-restoration",
+        "baseline_world": "古籍修复",
+        "candidate_object_world": "古籍修复实践",
+        "candidate_audience_world": "古籍保存与延寿需求",
+        "judgment": "candidate_better",
+        "reason": "The candidate distinguishes professional practice from the long-running preservation need and keeps a direct path back to restoration services."
+      },
+      {
+        "case_id": "pet-farewell-service",
+        "baseline_world": "宠物告别与哀悼",
+        "candidate_object_world": "宠物告别仪式",
+        "candidate_audience_world": "宠物离世哀伤支持",
+        "judgment": "candidate_better",
+        "reason": "Both are semantically sound; the candidate more clearly separates the delivered ritual from the audience's recurring emotional need and marks capability limits as unknown."
+      }
+    ]
+  },
+  "manual_fact_boundary_review": {
+    "status": "passed_with_domain_source_caveat",
+    "findings": [
+      "No output invented user-owned material, customer cases, account results, business scale, credentials, or operating capabilities as observed facts.",
+      "Candidate-specific capability assumptions were placed in conditions or unknowns rather than asserted as user facts.",
+      "General domain claims about restoration, animal grief, fish care, and food practice would still require sourced research before becoming publishable content."
+    ]
+  },
+  "comparison_limits": {
+    "baseline_unique_capabilities": "ca2af9f8 also emits content engines and attention entries; the E35 candidate deliberately does not, so the candidate cannot replace the full baseline contract.",
+    "heldout_labels": "The six hidden labels were preregistered system hypotheses, not user-reviewed gold annotations.",
+    "causal_claim": "One six-case run supports a design direction, not a causal claim about all businesses or models."
+  },
+  "architecture_learning": {
+    "retained": [
+      "Move model attention from the sold noun to the complete object or activity and then to the audience's recurring need.",
+      "Keep object world and audience world separate because they may coincide or diverge.",
+      "Generate and inspect alternatives before convergence, while preserving one Lead as final decision owner.",
+      "Bind final selections to generated candidate ids and keep all user-specific capability assumptions conditional."
+    ],
+    "rejected": [
+      "Treating exact Chinese phrase equality as a semantic business judge.",
+      "Changing frozen labels or rerunning E35 after seeing outputs.",
+      "Registering the E35 evaluator, schema, or candidate as a mandatory Tool, Skill, subagent, middleware stage, or Gateway path.",
+      "Replacing ca2af9f8's content engines and attention entries with a semantic-only candidate."
+    ],
+    "next_boundary": "Retain ca2af9f8 as the full-structure rollback baseline. If production is changed, make one minimal replacement inside its audience-world reasoning so the Lead can distinguish object world from audience world, then validate the complete answer rather than another exact-alias score."
+  },
+  "artifact_sha256": {
+    "manifest_json": "9692db0ae138ef1153c427b7ffe854c391f3263dc8b695366c5eb1e9a175f7e7",
+    "results_json": "46d5a047a75492214083bcda221bb1a3bf039a5c3b7be0f98672f6610382dfe0",
+    "completion_json": "b441f65c13b6d09af316981bbb5513611029a31d206f79b44516b09fda363092"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_semantic_payloads_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "retain_ca2af9f8_full_structure_and_adopt_dual_world_attention_as_next_minimal_direction"
+}

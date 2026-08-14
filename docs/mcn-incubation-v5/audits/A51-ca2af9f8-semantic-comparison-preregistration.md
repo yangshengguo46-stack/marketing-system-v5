@@ -1,13 +1,14 @@
 ---
 id: A51
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: ca2af9f8905698a0ad81a204350afa07fb840bcf
 baseline_prompt_sha256: 96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d
 frozen_preregistration_commit: 313913a1
 frozen_candidate_commit: 60865135
 runtime_registered: false
-decision: pending_frozen_comparison
+decision: retain_ca2af9f8_full_structure_adopt_dual_world_direction_only
 sources:
   - docs/mcn-incubation-v5/audits/A42-content-structure-and-commerce-boundary.md
   - docs/mcn-incubation-v5/audits/A50-user-reviewed-semantic-annotation-protocol.md
@@ -73,3 +74,14 @@ sources:
 - 即使新候选胜出，也只证明单句商业表达的语义核心有改进，不自动替换 `ca2af9f8` 的完整内容结构能力或注册生产。
 
 冻结预登记提交为 `313913a1`，冻结比较器提交为 `60865135`。原版提示 SHA-256 为 `96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d`，新候选提示 SHA-256 为 `0bdc826d1256828f399515dc5a4f9149603947cd7ca22397915f45bf2e886b6f`。真实运行前的相关回归为 `201 passed`。
+
+## 冻结运行结果
+
+- 唯一运行 `e35-ca2af9f8-semantic-comparison-heldout-20260814-01` 完成双方各六个主调用；原版因一次 Schema 修复共调用 `7` 次，新候选调用 `6` 次，总计 `13 calls / 30,073 tokens / 364.618s`。
+- 原版有一次最终合同失败，来源对象 `5/6`，观众世界冻结效用 `6/12`；新候选零合同失败、来源对象 `6/6`，但精确别名评分只召回 `1/6`，对象与观众世界均为 `0/12`。冻结自动门槛失败，不修改分数。
+- 人工复核确认评分器系统性假阴性：“家庭烘焙实践”“淡水钓鱼实践”“生日庆祝与仪式”等正确复合表达未命中较短别名，系统预写标签还遗漏古籍延寿与宠物哀伤等合理根。该复核不补标签、不重跑，也不把自动失败改写为通过。
+- 逐案业务判断为新候选四题更好、两题有范围取舍、原版零题明确更好；事实边界通过但专业内容仍需外部来源。新候选只证明双世界注意力方向有价值，不能替换原版已有的内容发动机和注意力入口。
+
+## 结论
+
+保留 `ca2af9f8` 作为完整结构基线；采用“对象世界 / 观众世界”双世界注意力作为下一次最小内部改造方向。E35 比较器和候选调用不注册生产，六题不再重跑。详见 E35 与 ADR-015。

@@ -213,6 +213,12 @@ case with the same GLM model and evidence. Do not alter either prompt, hidden
 aliases, cases, thresholds, or repair budget after the run begins. A candidate
 win cannot replace the baseline's content-engine or attention-entry behavior;
 it only supports a separately reviewed semantic-core promotion decision.
+The frozen run failed the exact-alias threshold. Manual review found systematic
+false negatives and a four-better/two-tradeoff candidate signal, but did not
+repair the score. ADR-015 retains `ca2af9f8` as the full-structure rollback
+baseline and permits only a future minimal internal dual-world attention
+change. Do not rerun E35, add post-run aliases, register its evaluator, or drop
+the baseline's content engines and attention entries.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
