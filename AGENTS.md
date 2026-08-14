@@ -313,5 +313,16 @@ These apply repo-wide; module guides own the module-specific detail.
   or analogy edges market causality. No TopicBridge runtime, vector database,
   GraphRAG index, fixed subagent roster, or core-prompt change is approved
   before the preregistered comparison in ADR-018 passes.
+  A55 and ADR-019 reframe semantic recognition, rooted content mapping, and
+  topic generation as three inspectable outputs of an open-world marketing
+  reading-comprehension core. Validate object meaning, participant/action
+  relations, typed map edges, cross-text supporting facts, the central premise,
+  and unknown boundaries before optimizing prose. The downstream order is
+  `TopicBrief -> MessagePlan -> BaseDraft -> PresentationAdaptation`: first
+  decide what is worth saying and make its reasoning coherent, then adapt it to
+  oral delivery, short drama, image-text, pure-material, platform, or style.
+  Do not let fluent copy hide reading errors, do not implement presentation
+  work before the reading layer passes held-out cases, and do not turn
+  FrameNet, AMR, STORM, or Project Debater into mandatory runtime dependencies.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

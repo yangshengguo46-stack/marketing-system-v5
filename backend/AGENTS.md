@@ -251,6 +251,16 @@ probe are research inspirations only; its fixed story slots and implementation
 must not be migrated. No TopicBridge Tool, subagent roster, middleware, vector
 database, GraphRAG index, or Lead-prompt change is approved before the
 preregistered comparison passes.
+The next research boundary is owned by A55 and ADR-019. Treat semantic
+recognition, rooted content mapping, and topic generation as inspectable
+outputs of one open-world marketing reading-comprehension core. Reading
+acceptance checks the interpreted object, participants and action targets,
+typed relations, cross-text supporting facts, premise, and unknowns. Only after
+held-out reading cases pass may a candidate proceed through `TopicBrief ->
+MessagePlan -> BaseDraft`; presentation and platform adaptation come later.
+Fluency, oral style, script format, or completeness cannot compensate for a
+reading error. FrameNet, AMR, HotpotQA, ReadAgent, Project Debater, and STORM
+are research references, not approved packages, schemas, services, or runtimes.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
