@@ -1,8 +1,10 @@
 ---
 id: A50
-status: traced
+status: reviewed
 started_at: 2026-08-14
+reviewed_at: 2026-08-14
 comparison_baseline_commit: ca2af9f8905698a0ad81a204350afa07fb840bcf
+implementation_commit: c5833213
 runtime_registered: false
 sources:
   - docs/mcn-incubation-v5/LEDGER.md E18-R4
@@ -63,3 +65,10 @@ E34 证明单一金标会混淆三种情况：模型确实答错、评分器误�
 - 候选召回、对象世界选择、观众世界选择、事实边界和合同可靠性分别计数。
 - 自动分数必须接受人工语义复核；任何评分器假阳性都不修补冻结分数，但不得据此宣称候选胜出。
 - 比较完成前不改生产 Lead、Tool、Skill、MCP、中间件、模型配置或 Gateway。
+
+## 实现判定
+
+- `marketing_semantic_annotation_protocol.py` 只保存开发证据及确定性校验，不被 Lead、Tool、Skill、MCP、中间件或 Gateway 导入。
+- 六例分别记录对象世界与观众世界的首选、可接受替代和拒绝项；所有首选均有内容容量与业务返回路径。
+- 协议实现提交为 `c5833213`，聚焦协议测试 `7 passed`。
+- 判定：**adopted as evaluation data only**。它不是生产知识库、提示注入或固定工作流。

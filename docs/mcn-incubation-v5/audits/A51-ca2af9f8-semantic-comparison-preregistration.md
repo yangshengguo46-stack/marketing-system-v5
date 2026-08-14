@@ -4,8 +4,8 @@ status: traced
 preregistered_at: 2026-08-14
 baseline_commit: ca2af9f8905698a0ad81a204350afa07fb840bcf
 baseline_prompt_sha256: 96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d
-frozen_preregistration_commit: pending
-frozen_candidate_commit: pending
+frozen_preregistration_commit: 313913a1
+frozen_candidate_commit: 60865135
 runtime_registered: false
 decision: pending_frozen_comparison
 sources:
@@ -71,3 +71,5 @@ sources:
 - 六个开发标注不得进入模型消息。输出顺序随机，结果按案例与臂排序后统一评分。
 - 代码、测试、提示哈希和预登记先提交，只运行一轮；运行后不改题、改标签、改分数、重跑或拼接局部最佳。
 - 即使新候选胜出，也只证明单句商业表达的语义核心有改进，不自动替换 `ca2af9f8` 的完整内容结构能力或注册生产。
+
+冻结预登记提交为 `313913a1`，冻结比较器提交为 `60865135`。原版提示 SHA-256 为 `96fb4ad3c50c349d6b641a61730b7bb2c06dfec2807718f7e124480d93ae873d`，新候选提示 SHA-256 为 `0bdc826d1256828f399515dc5a4f9149603947cd7ca22397915f45bf2e886b6f`。真实运行前的相关回归为 `201 passed`。

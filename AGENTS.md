@@ -273,5 +273,11 @@ These apply repo-wide; module guides own the module-specific detail.
   ADR-014 rejects E34 and the four roles as a mandatory bottleneck. Do not
   rerun, tune, register, or stack E34. Calibrate a user-reviewable annotation
   protocol with valid alternative roots before another prompt experiment.
+  A50 now owns that six-case development annotation protocol as evaluation data
+  only. E35/A51 compares a new single-call semantic candidate against the exact
+  user-designated rollback baseline `ca2af9f8` on six new cases. Both arms have
+  equal primary calls and hidden exact-alias review. Do not inject the six
+  development annotations into either arm or infer production promotion from a
+  semantic-only win.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

@@ -130,6 +130,17 @@ The retained E16 research utilities are deliberately offline:
   recurring social practice/result. Hidden review scores role/disposition
   separately from root recall and convergence. Its positive signal families and
   normalized exact-term boundaries replace E33's forbidden-substring scorer.
+- `scripts/marketing_semantic_annotation_protocol.py` stores the six
+  user-corrected development annotations adopted in A50. It distinguishes the
+  source object, object world, and audience world and permits preferred,
+  acceptable, and rejected candidates per scope. It is evaluation data only;
+  runtime prompts and model messages must not import these annotations.
+- `scripts/run_semantic_baseline_comparison_eval.py` is the isolated E35
+  comparison preregistered in A51. Its baseline arm reuses the unchanged
+  `ca2af9f8` account-content prompt and parser. Its equal-call candidate arm
+  compares roots in plain language, selects object and audience worlds by id,
+  and binds the selected term and kind deterministically. Six entirely new
+  cases and exact normalized aliases remain hidden until both arms finish.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -196,6 +207,12 @@ mandatory concept bottleneck. Do not rerun, tune, register, or stack E34. Before
 another prompt experiment, A49 requires a user-reviewable annotation protocol
 that permits multiple valid roots and separates model errors, evaluator errors,
 and gold-label ambiguity.
+E35 is frozen before its single live comparison. The user-designated baseline
+is commit `ca2af9f8`, not E16-R4. Both arms use one primary call per held-out
+case with the same GLM model and evidence. Do not alter either prompt, hidden
+aliases, cases, thresholds, or repair budget after the run begins. A candidate
+win cannot replace the baseline's content-engine or attention-entry behavior;
+it only supports a separately reviewed semantic-core promotion decision.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -215,6 +232,8 @@ PYTHONPATH=. uv run pytest \
   tests/test_thin_semantic_lattice_eval.py \
   tests/test_relational_semantic_contrast_eval.py \
   tests/test_actor_role_semantic_contrast_eval.py \
+  tests/test_marketing_semantic_annotation_protocol.py \
+  tests/test_semantic_baseline_comparison_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```
