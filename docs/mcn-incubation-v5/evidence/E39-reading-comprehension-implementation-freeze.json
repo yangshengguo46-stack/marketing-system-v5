@@ -1,0 +1,43 @@
+{
+  "evidence_id": "E39-reading-comprehension-implementation-freeze",
+  "status": "frozen_before_live_run",
+  "frozen_at": "2026-08-14",
+  "preregistration": {
+    "audit": "A56-reading-comprehension-baseline-preregistration.md",
+    "commit": "1ee4607fec398f5453a829e946ecdd7b669ba84c"
+  },
+  "implementation": {
+    "commit": "a1ef7ffee0049ca45df953aa3bc0bc0cfe22cfe1",
+    "tree": "9432de1db42ff0e8ae34481d7851d978a1984287",
+    "baseline_method_commit": "c0d2b914e82904842bf38fd40065300eb768fb5c"
+  },
+  "frozen_hashes": {
+    "baseline_method_sha256": "29c5a762d1d35f1d86a15b6b068e5ccf1c5d132c9ae766a174113cfced7fea6d",
+    "candidate_method_sha256": "7150ffafc2f4e77b98e853426c1582ba1e0a75b9e238d26438425e9abb2ce9cb",
+    "shared_output_contract_sha256": "51ef7f1c16c41bc3477d0586cc4857349d626b02a198a8a587e8d7b41bcbea40",
+    "baseline_system_prompt_sha256": "547be76e7e4bf5a6187d0074628914e2a9c057c4d6b2b4b78bce419acdba3583",
+    "candidate_system_prompt_sha256": "5c6d17fad8f06f32d1a23589c4a53e10c393fcefa09c4a738e3c36864f4769e5",
+    "evaluator_sha256": "201aea3c50408ef9b962addd5f390c2c1b55c145aec9df44f8ec799665b5e078",
+    "test_sha256": "92508d68e5385810754e0c23bf452627e637af0639c1b91aaff430db21b73664"
+  },
+  "sealed_run": {
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 6,
+    "arm_count": 2,
+    "primary_calls": 12,
+    "maximum_provider_calls": 14,
+    "hidden_action_relations": 15,
+    "hidden_semantic_groups": 24,
+    "blind_seed": 56
+  },
+  "verification": {
+    "command": "PYTHONPATH=. uv run pytest tests/test_reading_comprehension_baseline_eval.py tests/test_topic_bridge_skill_experiment.py tests/test_semantic_baseline_comparison_eval.py -q",
+    "result": "26 passed",
+    "ruff": "passed",
+    "secret_scan": "passed"
+  },
+  "runtime_registered": false,
+  "production_decision": "not_evaluated"
+}
