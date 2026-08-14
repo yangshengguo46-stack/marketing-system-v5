@@ -3,7 +3,8 @@ id: A47
 status: traced
 preregistered_at: 2026-08-14
 baseline_commit: 92556f2a
-frozen_candidate_commit: pending
+frozen_preregistration_commit: d4ea6007
+frozen_candidate_commit: 41a6eb83
 candidate_runtime_registered: false
 decision: pending_frozen_evaluation
 sources:
@@ -65,6 +66,8 @@ E31 证明同一模型有时已经想到正确候选，却在最终收敛时被�
 - 可见中间态只保存在 gitignored 的 `.deer-flow/`；供应方隐藏思考只保留哈希。
 - 代码、测试、预登记与提示哈希必须先提交，再运行一轮真实模型。运行后不改题、不改判分、不拼接局部最佳。
 
+冻结预登记提交为 `d4ea6007`，冻结候选实现提交为 `41a6eb83`。候选提示 SHA-256 为 `f87cb2194b4fd430d90bc95212d4c7f961a9b67a65fdb0280137f25783448257`，收敛提示 SHA-256 为 `4e817be86f8f10877c0c23f6d12aaacb0f4a9014e9555303b0f2fd13122735fc`。真实运行前的相关后端回归为 `162 passed`。
+
 ## 通过与止损
 
 架构假设只在同时满足以下条件时通过：
@@ -76,4 +79,3 @@ E31 证明同一模型有时已经想到正确候选，却在最终收敛时被�
 - 不出现为补齐结构而编造的主体能力、素材、案例、数据、史实或业务条件。
 
 任一条失败，候选就停留在离线证据。即使全部通过，本轮也不修改 Lead、现役 Tool、Skill、子 Agent、中间件或 Gateway；通过只允许进入人工业务复核和生产探针设计。
-
