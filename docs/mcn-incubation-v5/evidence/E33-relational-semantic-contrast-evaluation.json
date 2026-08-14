@@ -1,0 +1,148 @@
+{
+  "evidence_id": "E33",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate relation-first semantic root selection on four new held-out minimal pairs.",
+  "production_baseline": {
+    "commit_before_live_run": "33e2bc9a",
+    "frozen_candidate_commit": "b612db21",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "relation_stage": "compare one changed factor, predict same/different/uncertain root relation, and generate correctable candidates for both sides",
+    "decision_stage": "one independent source-object and audience-world decision per side with permission to correct the relation stage",
+    "relation_prompt_sha256": "2b503a8ab9d81ea02f25648117e6529f9a2107ff0d7bb3e3d22a0d5afd39cc77",
+    "decision_prompt_sha256": "ac137463c3fcb0881ebc15c5a064ea383fac3917ce32f9b3429a2d81be49cfd4"
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "all_relation_judgments": true,
+    "minimum_candidate_recall": 7,
+    "minimum_final_convergence": 7,
+    "minimum_final_contrasts": 3,
+    "no_fabricated_completeness": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e33-relational-semantic-contrast-heldout-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "pair_count": 4,
+    "case_count": 8,
+    "provider_call_budget": 14,
+    "provider_calls": 13,
+    "relation_schema_repairs": 1,
+    "decision_schema_repairs": 0,
+    "contract_failures": 0,
+    "relation_judgments_passed": 4,
+    "candidate_recall_passed": 6,
+    "final_convergence_passed": 6,
+    "final_contrasts_passed": 3,
+    "usage": {
+      "input_tokens": 13261,
+      "output_tokens": 7472,
+      "total_tokens": 20733
+    },
+    "elapsed_seconds_total": 211.725,
+    "automatic_acceptance_passed": false,
+    "manual_fact_boundary_passed": false,
+    "acceptance_passed": false
+  },
+  "pair_results": [
+    {
+      "pair_id": "remove-business-container",
+      "relation": "same_root",
+      "automatic_status": "passed",
+      "left_world": "面包",
+      "right_world": "面包",
+      "diagnosis": "The model kept the bread object stable across opening a shop versus selling the product. Return paths nevertheless assumed making bread and having customer-feedback content even though the operating mode was explicitly unknown."
+    },
+    {
+      "pair_id": "intermediate-style-substitution",
+      "relation": "same_root",
+      "automatic_status": "passed",
+      "left_world": "月饼",
+      "right_world": "月饼",
+      "diagnosis": "Both regional filling variants returned to the complete mooncake object instead of promoting filling sales or ordinary baking."
+    },
+    {
+      "pair_id": "same-use-different-material",
+      "relation": "same_root",
+      "automatic_status": "passed",
+      "left_world": "退休纪念品定制",
+      "right_world": "退休纪念品定制",
+      "diagnosis": "The material invariance was correct, but the automatic signal-family review produced a semantic false positive. The selected root remained seller-side customization rather than the audience-side retirement commemoration and farewell practice. Return paths also assumed glass/wood craft execution and invented possible product forms."
+    },
+    {
+      "pair_id": "same-material-different-use",
+      "relation": "different_root",
+      "automatic_status": "failed_business",
+      "left_world": "毕业纪念礼品",
+      "right_world": "日用餐具",
+      "diagnosis": "The model correctly recognized that use changes the root, but the graduation side stayed on the product instead of the graduation-commemoration/gifting practice. The tableware object was semantically correct, yet the frozen forbidden substring 用餐 accidentally matched across the characters in 日用餐具, creating an automatic false negative. The tableware return path also assumed production capability although only design was observed."
+    }
+  ],
+  "scoring_boundary": {
+    "frozen_score_changed_posthoc": false,
+    "automatic_defects": [
+      "The substring-based forbidden check matched 用餐 inside 日用餐具, so a correct tableware object candidate and final decision were counted as failures.",
+      "The retirement acceptance family matched 退休 plus 纪念 and an activity kind, so seller-side 退休纪念品定制 was counted as the intended audience-side commemoration/farewell practice."
+    ],
+    "manual_review_role": "Explain false positives, false negatives, and semantic actor errors only. It does not repair the preregistered score or promote the candidate."
+  },
+  "manual_fact_boundary_review": {
+    "status": "failed",
+    "findings": [
+      "Bread return paths treated selection, making, display, and customer feedback as available content before the model knew whether the seller baked, resold, wholesaled, or had usable feedback.",
+      "Retirement-memento outputs treated glass and wood craft execution as the subject's capability and introduced award, plaque, and ornament forms that were not supplied.",
+      "The tableware output returned through design and production even though only design was observed.",
+      "Several seller operations were presented as content roots or available evidence rather than conditional possibilities."
+    ]
+  },
+  "comparison_to_e32": {
+    "case_sets_are_directly_comparable": false,
+    "e32_relation_judgments": "not model-visible",
+    "e33_relation_judgments": "4/4",
+    "e32_candidate_recall": "5/7",
+    "e33_candidate_recall_frozen": "6/8",
+    "e32_final_convergence": "3/7",
+    "e33_final_convergence_frozen": "6/8",
+    "e32_final_contrasts": "1/4",
+    "e33_final_contrasts": "3/4",
+    "e32_total_tokens": 20394,
+    "e33_total_tokens": 20733,
+    "e32_elapsed_seconds": 250.308,
+    "e33_elapsed_seconds": 211.725,
+    "inference": "Making the minimal relation model-visible improved invariance, parent-object recovery, and relation classification on new cases. It did not reliably distinguish audience-side human practices from seller-side customization or production operations."
+  },
+  "architecture_learning": {
+    "retained": [
+      "Relation-first comparison is a useful attention-control primitive: all four new stay/change relations were classified correctly.",
+      "Container removal and intermediate-product return both converged correctly on two unseen pairs.",
+      "The final side-specific decisions must retain permission to correct the relation stage.",
+      "Candidate, final, relation, and fact-boundary outcomes must remain separately visible."
+    ],
+    "rejected": [
+      "Registering E33 as a Lead stage, Tool, Skill, subagent, middleware, or Gateway path.",
+      "Treating a correct same/different relation as proof that either selected root is correct.",
+      "Using substring signal matching without token or boundary checks for Chinese labels.",
+      "Allowing seller operations such as customization, design, manufacturing, or content capture to impersonate the audience's content world."
+    ],
+    "next_candidate_boundary": "Keep relation-first comparison but add one small actor-role distinction before convergence: complete object; seller operation or proof; buyer ordinary use; buyer recurring social practice or desired result. Seller operations cannot become the audience root merely because they are repeatable. Buyer ordinary use does not automatically outrank a complete object. This must be a new preregistered replacement with new held-out cases, not an E33 rerun or stacked workflow."
+  },
+  "artifact_sha256": {
+    "manifest_json": "6f906dfe9e8622b5a59558e0d55dfb0cdf44478aee0cfbe4aba1b8a44026d075",
+    "results_json": "742879abf89e3577f859e944f10c8888734db362e34c5fbc7337533b77595b33",
+    "completion_json": "038908f6182355b1cff9c8b7a2fbb35a367979eea8ae846e6098b2d4bccfb96a"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_relation_and_decision_payloads_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_e33_runtime_retain_relation_first_and_add_actor_role_boundary"
+}

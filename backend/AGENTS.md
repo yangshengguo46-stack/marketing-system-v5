@@ -166,10 +166,16 @@ rejects it for production. Do not put its intermediate object into Lead
 context, add examples or theory to its frozen prompts, or rerun/tune its seven
 cases. Retain only the thin-contract shape and recall/convergence/contrast
 diagnostics for a separately preregistered replacement experiment.
-E33 is that separately preregistered replacement. Its four new pairs and eight
-cases are frozen before execution. Do not expose its expected relations or
-acceptance families to model messages, reuse E29-E32 cases, or infer production
-approval from an offline pass.
+E33 classified all four held-out stay/change relations correctly and recovered
+the bread and mooncake object roots, but frozen candidate recall and final
+convergence were both six of eight. Its scorer also exposed one Chinese
+substring false negative and one seller-operation false positive. Manual review
+found unsupported production, craft, product-form, and feedback assumptions.
+ADR-013 rejects the implementation for production while retaining relation-
+first comparison. Any successor may add only a small actor-role distinction
+between complete object, seller operation/proof, buyer ordinary use, and buyer
+recurring social practice/result. It requires new cases and must replace rather
+than stack on E33.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately

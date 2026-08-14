@@ -255,11 +255,14 @@ These apply repo-wide; module guides own the module-specific detail.
   independent two-call lattice for production. Do not tune or rerun its seven
   cases, expose hidden labels, or stack more prompts/agents onto it. Retain its
   thin-contract and recall/convergence/contrast diagnostics only.
-  E33 is the only current successor experiment. It replaces independent-case
-  reasoning with a relation-first minimal pair: one call identifies what should
-  stay or change, then one independent decision per side may correct it. Its
-  four pairs and eight cases are new and hidden-reviewed. Keep it offline and
-  unregistered; do not import E32, reuse prior cases, or treat a frozen pass as
-  production approval.
+  E33's relation-first replacement classified all four stay/change relations
+  correctly but reached only six of eight candidate recalls and final roots.
+  It also exposed a Chinese substring-scoring false negative and a seller-
+  operation false positive; manual review found unsupported production and
+  evidence assumptions. ADR-013 rejects E33 for production while retaining the
+  relation-first primitive. A successor may add only the small distinction
+  among complete object, seller operation/proof, buyer ordinary use, and buyer
+  recurring social practice/result. It must use new cases and replace, not
+  stack on, E33.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

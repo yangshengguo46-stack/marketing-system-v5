@@ -1,17 +1,20 @@
 ---
 id: A48
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: 6e672095
 frozen_preregistration_commit: 290f8054
 frozen_candidate_commit: b612db21
 candidate_runtime_registered: false
-decision: pending_frozen_evaluation
+decision: reject_runtime_retain_relation_first_add_actor_role
 sources:
   - docs/mcn-incubation-v5/audits/A45-marketing-semantic-causal-theory.md
   - docs/mcn-incubation-v5/audits/A47-thin-semantic-lattice-preregistration.md
   - docs/mcn-incubation-v5/evidence/E32-thin-semantic-lattice-evaluation.json
   - docs/mcn-incubation-v5/decisions/ADR-012-reject-independent-thin-semantic-lattice.md
+  - docs/mcn-incubation-v5/evidence/E33-relational-semantic-contrast-evaluation.json
+  - docs/mcn-incubation-v5/decisions/ADR-013-retain-relation-first-reject-e33-runtime.md
 ---
 
 # A48 关系优先语义对比预登记
@@ -68,3 +71,15 @@ E33 只在同时满足以下条件时通过离线门：
 - 人工复核不存在为补齐关系或返回路径而编造的主体能力、素材、案例、数据、史实或业务条件。
 
 任一条失败，候选就停留在离线证据。即使全部通过，也只允许进入用户业务复核和单次生产探针设计，不自动注册 Lead、Tool、Skill、子 Agent、中间件或 Gateway。
+
+## 冻结运行结果
+
+- 运行 `e33-relational-semantic-contrast-heldout-20260814-01` 完成四组、八题，共 `13` 次供应方调用、`20,733 tokens / 211.725s`。退休纪念品组的关系阶段因左右候选 id 重复使用了全组唯一一次关系 Schema 修复；无最终合同失败。
+- 关系判断 `4/4`，证明模型能在当前注意中识别容器、材质、用途和中间风格变化。面包两侧都选面包，月饼馅两侧都回到月饼。
+- 冻结候选召回和最终收敛均为 `6/8`，低于 `7/8`；最终对比 `3/4`。“日用餐具”被禁止子串“用餐”跨字误伤，但冻结分数不做事后修改。
+- 自动通过也存在假阳性：退休两侧选的是“退休纪念品定制”，仍为卖方操作，不是观众的纪念/送别实践。陶瓷毕业礼品也停在产品，没有进入毕业纪念/赠礼。
+- 人工事实复核发现面包制作/客户反馈、玻璃/木质工艺、奖杯/牌匾/摆件和餐具制作等未证实内容，独立触发止损。
+
+## 结论
+
+E33 不进生产，但“关系优先”得到保留。新故障是模型没有分清卖方定制/设计/加工、买方普通使用、买方反复社会实践和完整对象。下一候选只在关系阶段补这一个小型角色区分，使用全新留出集，不重跑 E33、不增加第三调用、不建知识库。详见 E33 与 ADR-013。
