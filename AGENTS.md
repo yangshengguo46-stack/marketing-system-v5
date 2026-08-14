@@ -300,5 +300,18 @@ These apply repo-wide; module guides own the module-specific detail.
   and rooted parent references only: the Lead must select and freeze the
   content subject before map expansion. Do not rerun, tune, stack, or register
   E37.
+  A54 and ADR-018 define the next downstream boundary: semantic recognition
+  selects and explains the subject, the content map expands only a frozen root,
+  and topic generation turns one rooted map path into an evidence-backed
+  premise. Do not make the content map write topics or let topic generation
+  reselect the root. A candidate TopicBridge should begin as a thin, optional
+  Skill using the existing web search/fetch tools on demand. The model owns
+  association and interpretation; primary sources own named works, people,
+  history, quotations, numbers, and current facts; the Lead owns final
+  convergence. Keep textual observation, interpretation, and creative
+  hypothesis distinct, and do not call category, occurrence, narrative trigger,
+  or analogy edges market causality. No TopicBridge runtime, vector database,
+  GraphRAG index, fixed subagent roster, or core-prompt change is approved
+  before the preregistered comparison in ADR-018 passes.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

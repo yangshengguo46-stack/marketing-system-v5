@@ -1,0 +1,161 @@
+{
+  "evidence_id": "E38",
+  "recorded_at": "2026-08-14",
+  "purpose": "Test whether a thin optional Skill can turn one frozen content-map path into an evidence-grounded topic brief without reselecting the root, inventing business operations, or jumping directly to presentation and drafting.",
+  "status": "development_case_pass_with_precision_caveats",
+  "boundary": {
+    "pipeline": [
+      "business semantic recognition",
+      "rooted content map",
+      "topic generation",
+      "later writing"
+    ],
+    "production_code_changed": false,
+    "runtime_registered": false,
+    "lead_prompt_changed": false,
+    "content_map_changed": false
+  },
+  "development_case": {
+    "content_root": "海鲜",
+    "map_path": [
+      {
+        "from": "海鲜",
+        "relation": "下位类别",
+        "to": "牡蛎"
+      },
+      {
+        "from": "牡蛎",
+        "relation": "出现在作品中",
+        "to": "《我的叔叔于勒》"
+      }
+    ],
+    "source_pack": {
+      "primary_source": "https://www.gutenberg.org/cache/epub/55167/pg55167-images.html",
+      "observations": [
+        {
+          "id": "e1",
+          "observation": "The father regards eating oysters on the ship as a refined or genteel gesture."
+        },
+        {
+          "id": "e2",
+          "observation": "The ragged oyster opener is noticed and then identified as Jules."
+        },
+        {
+          "id": "e3",
+          "observation": "After the identification, the family fears recognition and returns on another boat."
+        }
+      ],
+      "author_intent_evidence": false
+    }
+  },
+  "candidate": {
+    "skill_path": "backend/experiments/e38_topic_bridge/generate-content-topic/SKILL.md",
+    "skill_sha256": "29c5a762d1d35f1d86a15b6b068e5ccf1c5d132c9ae766a174113cfced7fea6d",
+    "agent_metadata_path": "backend/experiments/e38_topic_bridge/generate-content-topic/agents/openai.yaml",
+    "agent_metadata_sha256": "7c3494cc1482b5132b7e11f355e73dc0c9fd98f1d05d3f840f35137c27ecca63",
+    "test_path": "backend/tests/test_topic_bridge_skill_experiment.py",
+    "test_sha256": "2295529da2e9ed8465ebf53dc16a257ef477a6edf3c5fb907128cc438ebb5fdb",
+    "shape": "thin_optional_skill_plus_frozen_evidence_pack",
+    "fixed_candidate_quota": false,
+    "vector_database": false,
+    "graph_database": false,
+    "fixed_multi_agent_roster": false
+  },
+  "test_driven_revision": {
+    "first_run": {
+      "result": "3 failed, 1 passed",
+      "failures": [
+        "The Skill did not explicitly preserve relation names supplied by the map.",
+        "The Skill did not explicitly prohibit unsupported author-intent framing.",
+        "The Skill did not explicitly track the actual target of a character action."
+      ]
+    },
+    "revision": [
+      "Preserve supplied edges and add any evidence-supported derived relation separately.",
+      "Ask about textual function or effect unless author-intent evidence exists.",
+      "Track whom or what characters pursue, avoid, judge, or change toward."
+    ],
+    "final_run": {
+      "result": "4 passed",
+      "elapsed_seconds": 4.84,
+      "skill_validation": "Skill is valid!"
+    }
+  },
+  "live_probes": [
+    {
+      "probe_id": "e38-seafood-literature-before-revision",
+      "model": "glm-5-2-260617",
+      "thinking_enabled": true,
+      "reasoning_effort": "low",
+      "usage": {
+        "input_tokens": 1119,
+        "output_tokens": 1401,
+        "total_tokens": 2520,
+        "reasoning_tokens": 731
+      },
+      "accepted_insight": "The family tries to perform refinement by eating oysters and, through that same act, encounters poor Jules serving and opening oysters.",
+      "failures": [
+        "It replaced the supplied occurrence edge with a narrative-trigger edge instead of preserving both.",
+        "It asked why Maupassant chose oysters despite having no author-intent evidence.",
+        "It described the family as changing from wanting oysters to avoiding oysters, although the avoidance target was Jules."
+      ],
+      "decision": "failed_but_diagnostic"
+    },
+    {
+      "probe_id": "e38-seafood-literature-after-revision",
+      "model": "glm-5-2-260617",
+      "thinking_enabled": true,
+      "reasoning_effort": "low",
+      "usage": {
+        "input_tokens": 1273,
+        "output_tokens": 1311,
+        "total_tokens": 2584,
+        "reasoning_tokens": 515
+      },
+      "reviewed_topic_brief": {
+        "preserved_map_path": "海鲜 --下位类别--> 牡蛎 --出现在作品中--> 《我的叔叔于勒》",
+        "derived_relation": "牡蛎食用场景触发对开牡蛎者的注意与身份确认",
+        "topic_question": "牡蛎如何在文本中成为擕开一家人体面幻象、显露亲情条件的触发物？",
+        "central_premise": "一家人想借吃牡蛎靠近体面，却在这个消费场景中认出了正替人开牡蛎的落魄于勒；追求的身份姿态与眼前的穷亲戚发生正面冲突，人物的价值判断因此变得可见。"
+      },
+      "passed_checks": [
+        "The original map relations were preserved and the derived narrative relation was separate.",
+        "The premise captured the refinement-versus-poor-relative-in-service-role mechanism.",
+        "The answer avoided unsupported author-intent claims.",
+        "The avoidance target remained Jules rather than oysters.",
+        "Source observations, interpretations, and unknown author intent were separated.",
+        "No presentation format, sales design, platform plan, experiment quota, or full draft was added."
+      ],
+      "precision_caveats": [
+        "The phrase ‘middle-class refinement’ was stronger than the evidence pack; ‘refined or genteel aspiration’ is safer.",
+        "The phrase ‘completely dependent on money and status’ was too absolute.",
+        "The output used a family-expectation label not included in the supplied three-item evidence pack; it needs another evidence item or omission.",
+        "The derived relation target mixed an event with a thematic interpretation and needs held-out schema testing."
+      ],
+      "decision": "development_case_pass_with_precision_caveats"
+    }
+  ],
+  "architecture_learning": {
+    "retained": [
+      "A content map path is a retrieval and association route, not yet a topic.",
+      "Typed relations prevent category, occurrence, narrative trigger, interpretation, and real-world causality from collapsing into one arrow.",
+      "The model should create the premise while external sources verify named works, events, quotations, numbers, and current facts.",
+      "A TopicBrief is a useful handoff boundary between mapping and later writing.",
+      "A thin optional Skill is sufficient for this first candidate; the experiment does not justify a knowledge base or another mandatory Agent stage."
+    ],
+    "not_yet_established": [
+      "Generalization beyond the user-authored seafood development case.",
+      "Whether online retrieval outperforms a frozen primary-source evidence pack.",
+      "Whether the Skill should be registered in the product.",
+      "Whether a stable machine-readable relation schema is needed."
+    ],
+    "next_evaluation": "Preregister held-out paths covering object-to-history, object-to-real-event, object-to-person, internal conflict, and user-provided private material; compare direct model response, frozen evidence pack, and on-demand search with the same model."
+  },
+  "privacy": {
+    "visible_answer_summary_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_committed": false,
+    "credentials_committed": false
+  },
+  "decision": "retain_isolated_topic_bridge_candidate_and_continue_held_out_evaluation"
+}

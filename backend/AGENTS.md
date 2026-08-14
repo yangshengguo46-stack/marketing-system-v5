@@ -238,6 +238,19 @@ specificity review. ADR-017 rejects generated map richness as a root judge.
 Retain candidate-id term binding and same-root parent references only; the Lead
 must select and freeze the subject before map expansion. Do not rerun, tune,
 stack, or register E37.
+Topic generation is a separate downstream boundary owned by A54 and ADR-018.
+It consumes one path under an already frozen content root and produces an
+evidence-backed premise; it cannot reselect the root, expand the whole map,
+choose presentation form, design operations, or write a full draft by default.
+The first candidate must remain a thin optional Skill and use the existing web
+search/fetch tools only when named works, people, events, quotations, history,
+numbers, current claims, or other source-dependent facts require verification.
+Keep observations from sources, model interpretations, and creative hypotheses
+separate. The fourth-version causal-bridge relationship edges and substitution
+probe are research inspirations only; its fixed story slots and implementation
+must not be migrated. No TopicBridge Tool, subagent roster, middleware, vector
+database, GraphRAG index, or Lead-prompt change is approved before the
+preregistered comparison passes.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
