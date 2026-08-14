@@ -1,16 +1,19 @@
 ---
 id: A49
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: 8ca70686
 frozen_preregistration_commit: 5df87635
 frozen_candidate_commit: 025f676e
 candidate_runtime_registered: false
-decision: pending_frozen_evaluation
+decision: reject_runtime_and_fixed_actor_role_bottleneck
 sources:
   - docs/mcn-incubation-v5/audits/A48-relational-semantic-contrast-preregistration.md
   - docs/mcn-incubation-v5/evidence/E33-relational-semantic-contrast-evaluation.json
   - docs/mcn-incubation-v5/decisions/ADR-013-retain-relation-first-reject-e33-runtime.md
+  - docs/mcn-incubation-v5/evidence/E34-actor-role-semantic-contrast-evaluation.json
+  - docs/mcn-incubation-v5/decisions/ADR-014-reject-fixed-actor-role-bottleneck.md
 ---
 
 # A49 动作主体/角色语义对比预登记
@@ -61,3 +64,16 @@ E34 不重跑 E33，只在同一个关系调用中给竞争项加一个小型角
 - 人工复核无主体能力、素材、案例、客户反馈、数据、史实、产品属性或业务条件编造。
 
 任一条失败就停留离线。即使通过，也只允许进入用户业务复核和一次受控生产探针设计，不自动注册 Lead、Tool、Skill、子 Agent、中间件或 Gateway。
+
+## 冻结运行结果
+
+- 唯一运行 `e34-actor-role-semantic-contrast-heldout-20260814-01` 完成四组八题，使用 `12` 次供应方调用，无 Schema 修复、无合同失败；总计 `28,809 tokens / 317.791s`。
+- 自动结果为关系 `3/4`、角色/处置 `11/16`、候选召回 `7/8`、最终收敛 `5/8`、最终对比 `2/4`，未达到冻结门槛。
+- 婚礼请柬阶段能想到婚礼筹备、宾客邀请与仪式沟通，却只标为条件候选并最终退回请柬产品；这是本轮最清楚的“想到但未选中”。
+- 饺子馅组自动全过但语义失败：左侧停在馅料，右侧把家庭餐桌实践错标为对象并借用了馅料 option id。正向子串仍让“饺子馅料”冒充“饺子”，冻结分数不修改。
+- 儿童阅读和手工定制两题也证明隐藏角色金标不够唯一：前者可能是真正社会实践，后者可能就是被售卖的服务。四角色可作检查视角，不能成为固定瓶颈。
+- 人工事实复核发现空间/社区/客流/复购、量脚/选皮/接单/交付周期、生产/配方/采购/工厂/供应链等未观察内容，独立触发止损。
+
+## 结论
+
+拒绝 E34 进生产，也拒绝把四角色对象叠进 Lead。下一步先校准用户可复核的语义标注协议，区分模型错误、评分错误和多个合理答案，再决定是否值得设计新的离线候选。详见 E34 与 ADR-014。

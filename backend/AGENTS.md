@@ -183,13 +183,19 @@ first comparison. Any successor may add only a small actor-role distinction
 between complete object, seller operation/proof, buyer ordinary use, and buyer
 recurring social practice/result. It requires new cases and must replace rather
 than stack on E33.
-E34 is frozen before live evaluation at A49. Its eight new cases compare a
-children's-book business container, seller operations around leather shoes,
-wedding invitation versus notebook use, and two regional dumpling-filling
-styles. Do not alter its prompts, hidden labels, role expectations, scorer, or
-call budget after the sealed run begins; do not rerun or selectively combine
-results. Passing its offline threshold still does not authorize production
-registration.
+E34's fixed actor-role bottleneck did not pass. Its frozen result was three of
+four relations, eleven of sixteen role expectations, seven of eight candidate
+recalls, five of eight final roots, and two of four contrasts. The only fully
+automatic passing pair contained scorer and contract false positives: dumpling
+filling impersonated the parent dumpling object through positive substring
+matching, and a final decision borrowed an option id while changing its term
+and kind. Children's reading and custom shoemaking also exposed ambiguous gold
+labels: a buyer action can be a recurring social practice, and a seller action
+can itself be the sold service. ADR-014 rejects E34 and the four roles as a
+mandatory concept bottleneck. Do not rerun, tune, register, or stack E34. Before
+another prompt experiment, A49 requires a user-reviewable annotation protocol
+that permits multiple valid roots and separates model errors, evaluator errors,
+and gold-label ambiguity.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately

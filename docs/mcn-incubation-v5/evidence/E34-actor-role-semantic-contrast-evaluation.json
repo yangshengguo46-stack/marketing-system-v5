@@ -1,0 +1,153 @@
+{
+  "evidence_id": "E34",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate whether a small actor-role distinction improves relation-first semantic root selection on four new held-out pairs.",
+  "production_baseline": {
+    "commit_before_live_run": "6b979bed",
+    "frozen_preregistration_commit": "5df87635",
+    "frozen_candidate_commit": "025f676e",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "role_relation_stage": "compare one changed factor and label inspectable options as complete object, seller operation/proof, buyer ordinary use, or buyer recurring social practice/result",
+    "decision_stage": "one independent source-object and audience-world decision per side, restricted to a root-candidate option unless explicitly corrected",
+    "role_relation_prompt_sha256": "f2fbb28fc19e9b62766a66313635fb5cb24c6a9e1b883de406099a9c1c9669dc",
+    "decision_prompt_sha256": "58c8b89bc8f9f912db36b540732ddd04fbdb5781f16a93830c84058cb43ce9d8"
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "all_relation_judgments": true,
+    "minimum_role_expectations": 14,
+    "role_expectations_total": 16,
+    "minimum_candidate_recall": 7,
+    "minimum_final_convergence": 7,
+    "minimum_final_contrasts": 3,
+    "no_fabricated_completeness": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e34-actor-role-semantic-contrast-heldout-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "pair_count": 4,
+    "case_count": 8,
+    "provider_call_budget": 14,
+    "provider_calls": 12,
+    "role_relation_schema_repairs": 0,
+    "decision_schema_repairs": 0,
+    "contract_failures": 0,
+    "relation_judgments_passed": 3,
+    "role_expectations_passed": 11,
+    "role_expectations_total": 16,
+    "candidate_recall_passed": 7,
+    "final_convergence_passed": 5,
+    "final_contrasts_passed": 2,
+    "usage": {
+      "input_tokens": 16501,
+      "output_tokens": 12308,
+      "total_tokens": 28809
+    },
+    "elapsed_seconds_total": 317.791,
+    "automatic_acceptance_passed": false,
+    "manual_fact_boundary_passed": false,
+    "acceptance_passed": false
+  },
+  "pair_results": [
+    {
+      "pair_id": "remove-business-container",
+      "relation": "same_root",
+      "automatic_status": "failed_business",
+      "left_world": "亲子共读/儿童阅读",
+      "right_world": "亲子共读/儿童阅读",
+      "diagnosis": "Both sides promoted reading to a recurring social practice instead of retaining the children's-book object. This missed the frozen label, but it also exposes label ambiguity: parent-child reading can legitimately contain recurring people, scenes, choices, and relationships. The model additionally treated a bookshop as an independent root and assumed space, community, reading-promotion activity, traffic, and repeat-purchase paths that were not observed."
+    },
+    {
+      "pair_id": "seller-operation-substitution",
+      "relation": "different_root",
+      "automatic_status": "failed_business",
+      "left_world": "手工皮鞋",
+      "right_world": "成品皮鞋",
+      "diagnosis": "Both final decisions retained the leather-shoe object, but the relation stage classified custom service versus ready-made sales as different roots and marked customization conditional rather than support-only. This also exposes gold-label ambiguity: customization can be the sold service rather than merely seller proof. The analysis invented measuring feet, leather selection, making, order-taking, material, style, price-band, and delivery-cycle details."
+    },
+    {
+      "pair_id": "same-material-different-use",
+      "relation": "different_root",
+      "automatic_status": "failed_business",
+      "left_world": "纸质婚礼请柬",
+      "right_world": "纸质记事本",
+      "diagnosis": "The relation and notebook side were correct. The role stage noticed wedding preparation, guest invitation, and ritual communication but kept that practice conditional, and the final call converged on the invitation product. This is the clearest intended marketing failure: the direct social function was recalled but not selected."
+    },
+    {
+      "pair_id": "intermediate-style-substitution",
+      "relation": "same_root",
+      "automatic_status": "passed",
+      "left_world": "川式饺子馅料",
+      "right_world": "家庭饺子饮食偏好与长期餐桌选择",
+      "diagnosis": "The automatic pass is a semantic false positive. The left side stopped at the intermediate filling rather than returning to dumplings. The right decision selected the filling option id but emitted a different family-dining phrase and labeled it object. Positive substring matching counted both because each contained 饺子. Outputs also assumed production, recipes, ingredients, procurement, selection, repeat purchase, factories, regional supply chains, and target markets."
+    }
+  ],
+  "scoring_boundary": {
+    "frozen_score_changed_posthoc": false,
+    "automatic_defects": [
+      "Replacing forbidden substrings with exact rejected terms fixed E33's cross-character false negative, but positive substring matching still treated 饺子馅料 as the intended parent object 饺子.",
+      "The selected-option contract verified only the id and disposition. It did not bind final audience_world and world_kind to the selected option, allowing a family-dining phrase labeled object to borrow a filling option id.",
+      "Two frozen role labels were not sufficiently unambiguous for expert gold data: parent-child reading may be a recurring social practice, and customization may itself be the sold service."
+    ],
+    "manual_review_role": "Separate model errors, evaluator errors, and ambiguous gold labels. It does not repair the frozen score, rerun cases, or promote the candidate."
+  },
+  "manual_fact_boundary_review": {
+    "status": "failed",
+    "findings": [
+      "The children's-book pair assumed physical-space, community, reading-promotion, traffic, and repeat-purchase operations that were not observed.",
+      "The shoe pair expanded a bare customization expression into measuring, leather selection, hand-making, order-taking, materials, style, price band, and delivery cycle.",
+      "The dumpling pair introduced production, recipes, ingredients, procurement, selection, repeat purchase, factories, regional supply chains, and target-market conditions.",
+      "Some unsupported details were placed in unknowns, but others were used affirmatively to prove content completeness and return paths."
+    ]
+  },
+  "comparison_to_e33": {
+    "case_sets_are_directly_comparable": false,
+    "e33_relation_judgments": "4/4",
+    "e34_relation_judgments": "3/4",
+    "e33_candidate_recall_frozen": "6/8",
+    "e34_candidate_recall_frozen": "7/8",
+    "e33_final_convergence_frozen": "6/8",
+    "e34_final_convergence_frozen": "5/8",
+    "e33_final_contrasts": "3/4",
+    "e34_final_contrasts": "2/4",
+    "e33_total_tokens": 20733,
+    "e34_total_tokens": 28809,
+    "inference": "The extra role object increased visible candidate coverage but did not improve final decisions, relation stability, or fact restraint. Because the held-out sets differ and E34 contains ambiguous labels plus scorer false positives, the numeric difference is diagnostic rather than a causal model comparison."
+  },
+  "architecture_learning": {
+    "retained": [
+      "Relation-first comparison remains useful as an offline diagnostic, but E34 does not justify a production stage.",
+      "Actor ownership is worth inspecting, especially when seller operations compete with complete objects or buyer practices.",
+      "Model error, evaluator error, and gold-label ambiguity must be reported separately.",
+      "A final decision that claims selected_option must be semantically bound to that option's term and kind in future evaluators."
+    ],
+    "rejected": [
+      "Registering E34 as a Lead stage, Tool, Skill, subagent, middleware, or Gateway path.",
+      "Treating the four actor roles as an authoritative concept bottleneck or hard classifier.",
+      "Assuming every seller operation is support-only or every buyer recurring action is automatically the root.",
+      "Using unbounded Chinese substring families to prove parent-object recovery.",
+      "Continuing prompt-only experiments before the gold-label protocol distinguishes valid alternative roots from actual failures."
+    ],
+    "next_candidate_boundary": "Pause runtime and prompt promotion. Before another model run, define a small user-reviewed annotation protocol for source object, object hierarchy, demand-constituting practice, seller operation, ordinary use, accepted alternative roots, rejected roots, and the reason each return path is valid. Use the user's corrected fruit, golden-gift, seafood, hot-pot-base, watch, and beauty examples as development evidence, then freeze genuinely new held-out cases. This is evaluation data and attention guidance, not a mandatory runtime workflow or large knowledge base."
+  },
+  "artifact_sha256": {
+    "manifest_json": "ee463c2b0b8f9da1ff82047b0c2cb80eade84c382cd2de32bb69473f7ce95340",
+    "results_json": "e8d899d3ce55ba6698931f670af268d0e6bcdf1c6445775ef41d0790a644082e",
+    "completion_json": "038908f6182355b1cff9c8b7a2fbb35a367979eea8ae846e6098b2d4bccfb96a"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_role_relation_and_decision_payloads_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_e34_runtime_and_fixed_actor_role_bottleneck"
+}

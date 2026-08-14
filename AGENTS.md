@@ -264,12 +264,14 @@ These apply repo-wide; module guides own the module-specific detail.
   among complete object, seller operation/proof, buyer ordinary use, and buyer
   recurring social practice/result. It must use new cases and replace, not
   stack on, E33.
-  E34 is the frozen offline successor in A49. It keeps the relation-first
-  two-layer shape, applies those four roles only to inspectable candidate
-  options, and evaluates eight new minimal-pair cases with positive signal
-  families and normalized exact-term boundaries. Its prompts, labels, scorer,
-  and call budget are sealed before the single live run. Do not register it in
-  production even if the offline threshold passes; that requires a separate
-  reviewed production probe.
+  E34's frozen actor-role successor also failed: relation judgment was three of
+  four, role/disposition checks eleven of sixteen, candidate recall seven of
+  eight, final convergence five of eight, and final contrasts two of four. Its
+  only automatic all-pass pair contained a parent/child substring false
+  positive and an option-binding contract loophole. Children's reading and
+  custom shoemaking also showed that two hidden role labels were ambiguous.
+  ADR-014 rejects E34 and the four roles as a mandatory bottleneck. Do not
+  rerun, tune, register, or stack E34. Calibrate a user-reviewable annotation
+  protocol with valid alternative roots before another prompt experiment.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
