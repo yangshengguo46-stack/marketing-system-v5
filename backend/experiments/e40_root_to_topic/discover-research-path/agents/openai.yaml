@@ -1,0 +1,4 @@
+interface:
+  display_name: "Discover research path"
+  short_description: "E40 isolated named-candidate discovery"
+  default_prompt: "Use $discover-research-path for the supplied frozen content root and map axes."

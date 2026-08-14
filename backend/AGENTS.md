@@ -156,6 +156,14 @@ The retained E16 research utilities are deliberately offline:
   content is discarded after hashing. A passing result may only authorize a
   later `MessagePlan` comparison; it cannot register the candidate Skill or
   create a mandatory reading stage.
+- `scripts/run_root_to_topic_combination_probe.py` is the isolated E40
+  diagnostic preregistered in A60. It starts from the user-reviewed content
+  root in A59, discovers named research candidates without hidden-answer
+  access, searches at most the first four candidates in model order, and runs
+  the unchanged E39 reading method on at most the first three evidence-bearing
+  paths. Search snippets remain typed as discovery evidence rather than source
+  text. This single user-gold probe cannot establish generalization, promote
+  E39, or register a discovery/reading workflow in the runtime.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
