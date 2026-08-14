@@ -255,5 +255,11 @@ These apply repo-wide; module guides own the module-specific detail.
   independent two-call lattice for production. Do not tune or rerun its seven
   cases, expose hidden labels, or stack more prompts/agents onto it. Retain its
   thin-contract and recall/convergence/contrast diagnostics only.
+  E33 is the only current successor experiment. It replaces independent-case
+  reasoning with a relation-first minimal pair: one call identifies what should
+  stay or change, then one independent decision per side may correct it. Its
+  four pairs and eight cases are new and hidden-reviewed. Keep it offline and
+  unregistered; do not import E32, reuse prior cases, or treat a frozen pass as
+  production approval.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

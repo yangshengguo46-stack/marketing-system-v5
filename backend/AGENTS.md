@@ -116,6 +116,13 @@ The retained E16 research utilities are deliberately offline:
   checks candidate recall, final convergence, and four container/material/use/
   intermediate-product contrast relations across seven new cases. It remains
   offline even if its frozen threshold passes.
+- `scripts/run_relational_semantic_contrast_eval.py` is the isolated E33
+  replacement candidate preregistered in A48. One call compares a new minimal
+  pair and states whether the root should stay or change, then two independent
+  calls select the left and right roots with permission to correct that
+  relation. Hidden review separately measures relation judgment, both candidate
+  recalls, both final convergences, and the resulting contrast. It does not
+  import E32, expose prior cases, or register runtime behavior.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -159,6 +166,10 @@ rejects it for production. Do not put its intermediate object into Lead
 context, add examples or theory to its frozen prompts, or rerun/tune its seven
 cases. Retain only the thin-contract shape and recall/convergence/contrast
 diagnostics for a separately preregistered replacement experiment.
+E33 is that separately preregistered replacement. Its four new pairs and eight
+cases are frozen before execution. Do not expose its expected relations or
+acceptance families to model messages, reuse E29-E32 cases, or infer production
+approval from an offline pass.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -176,6 +187,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_two_step_content_map_eval.py \
   tests/test_semantic_concept_bottleneck_eval.py \
   tests/test_thin_semantic_lattice_eval.py \
+  tests/test_relational_semantic_contrast_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```
