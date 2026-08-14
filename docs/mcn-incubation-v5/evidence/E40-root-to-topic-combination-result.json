@@ -1,0 +1,94 @@
+{
+  "evidence_id": "E40-root-to-topic-combination-result",
+  "status": "completed_and_manually_reviewed",
+  "run_id": "e40-cigar-lounge-combination-20260814-01",
+  "completed_at": "2026-08-14",
+  "frozen_inputs": {
+    "preregistration_commit": "ce61bbd8d7ceb98bea19495d6abc2046f4a70335",
+    "implementation_commit": "a45079a7a3f56450ebaa972dc27e406fe691b6bc",
+    "implementation_freeze_commit": "f4454d03e72597c84d30a06a61e12c389578aecc",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "business_expression": "我是开雪茄馆的，该怎么起号？",
+    "reviewed_content_root": "雪茄"
+  },
+  "artifact_hashes": {
+    "manifest_sha256": "091da7a9ec1766afb801417cfa0dda6a13591fa1d0516280d6316f2ae157d26b",
+    "results_sha256": "4a253ee33ba9ad507f3a798240986791ba25af79964b11ca7d1e4d81132afe0e",
+    "completion_sha256": "38cee7b23135a2a643ae9811e0964c93bf73327a5ea35f6d37150e355af882a0"
+  },
+  "execution": {
+    "primary_calls": 4,
+    "provider_calls": 5,
+    "repair_calls": 1,
+    "contract_failures": 0,
+    "searched_candidates": 4,
+    "reading_candidates": 3,
+    "total_tokens": 24394,
+    "elapsed_seconds": 237.013,
+    "provider_reasoning_content_persisted": false
+  },
+  "discovery": {
+    "contract_status": "passed",
+    "candidate_order": [
+      "温斯顿·丘吉尔",
+      "古巴",
+      "美国对古巴贸易禁运",
+      "CIA暗杀卡斯特罗计划",
+      "高希霸",
+      "绅士俱乐部雪茄室"
+    ],
+    "target_person_recalled_as_candidate": false,
+    "incidental_target_alias_in_downstream_search_snippet": true,
+    "incidental_alias_counts_as_candidate_recall": false
+  },
+  "reading": {
+    "contracts_passed": "3/3",
+    "topic_evidence_passed": "3/3",
+    "topic_questions": [
+      "丘吉尔与雪茄之间的公共关联中，品牌偏好与'丘吉尔'格式命名这两条线索如何分别形成、又如何交织？",
+      "古巴在雪茄产业中的核心产区地位是如何由其地理条件、产量分布和品牌使用关系构成的？",
+      "美国对古巴贸易禁运如何在产品流通、商标归属和国际政治三个层面持续影响雪茄的命运？"
+    ],
+    "unsupported_specific_answer": false,
+    "manual_observations": [
+      "The Churchill path produced a concrete, evidence-referenced preference and format-naming question rather than a category heading.",
+      "The embargo reading surfaced Kennedy's pre-embargo cigar purchase, but final convergence chose a broader trade topic and dropped the most vivid event-level entry.",
+      "Search-result snippets were kept distinct from primary-source evidence; source authority remained mixed."
+    ]
+  },
+  "hidden_acceptance": {
+    "target_person_recalled": "failed",
+    "target_specific_topic_generated": "failed",
+    "target_topic_has_evidence": "failed",
+    "no_unsupported_specific_answer": "passed",
+    "zero_contract_failures": "passed",
+    "within_provider_call_limit": "passed",
+    "overall": "failed"
+  },
+  "comparison_to_a59": {
+    "named_candidate_generation": "improved_from_none_to_six",
+    "evidence_backed_topic_briefs": "improved_from_none_to_three",
+    "user_gold_target": "still_missed"
+  },
+  "diagnosis": {
+    "passing_stage": "Evidence-bounded reading can turn a frozen named path into a concrete TopicBrief.",
+    "failing_stage": "Model-first candidate recall and ordering favored the most salient association and omitted the held-out person.",
+    "architectural_bottleneck": "Search occurred only after candidate names were frozen, so retrieval could verify or enrich a recalled path but could not reliably introduce an omitted path.",
+    "measurement_limitations": [
+      "This is one user-gold development case, not a generalization evaluation.",
+      "Only the first four candidates were searched and only the first three evidence-bearing paths were read; those limits were evaluation budgets, not validated product defaults.",
+      "The evidence pack contains bounded search snippets rather than opened and independently verified primary sources."
+    ]
+  },
+  "post_run_verification": {
+    "focused_regression": "71 passed",
+    "ruff": "passed",
+    "format": "passed",
+    "scope": "E40, E39, active content-world explorer, and active business-semantics tests"
+  },
+  "decision": "target_failed_directional_bridge_signal_retained",
+  "runtime_registered": false,
+  "production_registration": false
+}

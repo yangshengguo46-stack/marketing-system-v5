@@ -163,7 +163,11 @@ The retained E16 research utilities are deliberately offline:
   the unchanged E39 reading method on at most the first three evidence-bearing
   paths. Search snippets remain typed as discovery evidence rather than source
   text. This single user-gold probe cannot establish generalization, promote
-  E39, or register a discovery/reading workflow in the runtime.
+  E39, or register a discovery/reading workflow in the runtime. Its only
+  frozen run missed the held-out person while producing evidence-backed topics
+  for more salient candidates; ADR-021 rejects runtime promotion and forbids
+  retuning the cigar case. Any successor must use new held-out cases to compare
+  closed-book candidate recall with retrieval-assisted open-world recall.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
