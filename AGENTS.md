@@ -324,5 +324,14 @@ These apply repo-wide; module guides own the module-specific detail.
   Do not let fluent copy hide reading errors, do not implement presentation
   work before the reading layer passes held-out cases, and do not turn
   FrameNet, AMR, STORM, or Project Debater into mandatory runtime dependencies.
+  A56 preregisters E39 as a reading-comprehension comparison, not a writing or
+  full-incubation benchmark. It compares the unchanged E38 topic method with an
+  example-free literal/relational/interpretive/convergence attention guide on
+  six held-out evidence packs. Both arms share one GLM model, one primary call
+  per case, and the exact same `ReadingTopicRecord` output contract. Hidden
+  action triples, semantic groups, required evidence, and blind-review labels
+  stay out of model messages. Even a complete pass only permits a later
+  `MessagePlan` comparison; it does not register a Skill, Tool, middleware,
+  workflow stage, or subagent.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

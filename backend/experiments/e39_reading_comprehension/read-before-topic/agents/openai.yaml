@@ -1,0 +1,4 @@
+interface:
+  display_name: "先读懂，再立题"
+  short_description: "从冻结路径和证据提取可核验阅读结果，再生成有边界的选题简报"
+  default_prompt: "使用 $read-before-topic 先读懂给定路径和证据，再形成一个有证据边界的 TopicBrief。"

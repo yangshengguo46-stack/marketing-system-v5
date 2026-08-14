@@ -147,6 +147,15 @@ The retained E16 research utilities are deliberately offline:
   actual map node to reference that same id. It omits the dual-world contract,
   content engines, attention entries, presentation, and operations. The four
   user-corrected labels are review-only and never enter model messages.
+- `scripts/run_reading_comprehension_baseline_eval.py` is the isolated E39
+  comparison preregistered in A56. Both arms use the frozen E38 method or the
+  example-free reading-first candidate with the same six held-out paths,
+  evidence packs, `ReadingTopicRecord` contract, GLM model, and one primary
+  call per case. Hidden action triples, semantic groups, required evidence,
+  and the blind-review key never enter model messages. Provider reasoning
+  content is discarded after hashing. A passing result may only authorize a
+  later `MessagePlan` comparison; it cannot register the candidate Skill or
+  create a mandatory reading stage.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -261,6 +270,15 @@ MessagePlan -> BaseDraft`; presentation and platform adaptation come later.
 Fluency, oral style, script format, or completeness cannot compensate for a
 reading error. FrameNet, AMR, HotpotQA, ReadAgent, Project Debater, and STORM
 are research references, not approved packages, schemas, services, or runtimes.
+E39 freezes the first direct comparison of that hypothesis. Its baseline is the
+unchanged E38 method at SHA-256
+`29c5a762d1d35f1d86a15b6b068e5ccf1c5d132c9ae766a174113cfced7fea6d`;
+its candidate is an isolated attention guide for literal, relational,
+interpretive, and topic-convergence reading. The four labels describe
+inspectable attention, not a production workflow or semantic hard gate. Do not
+alter the six cases, hidden acceptance, shared contract, call budgets, or A56
+thresholds after the formal run begins, and do not tune on E39 after its single
+frozen result.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
