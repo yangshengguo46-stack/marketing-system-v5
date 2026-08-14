@@ -279,6 +279,15 @@ inspectable attention, not a production workflow or semantic hard gate. Do not
 alter the six cases, hidden acceptance, shared contract, call budgets, or A56
 thresholds after the formal run begins, and do not tune on E39 after its single
 frozen result.
+That frozen result did not pass A56. The candidate improved the pre-key manual
+blind review from `23/36` to `31/36`, relation discipline from `2/6` to `6/6`,
+and evidence/inference boundaries from `1/6` to `4/6`, while using fewer
+tokens. It nevertheless reached only `13/15` action relations, `13/24`
+semantic groups, `5/6` complete TopicBrief evidence sets, and had two manual
+fact-boundary failures. ADR-020 rejects runtime promotion and does not authorize
+`MessagePlan`. Preserve the directional evidence, but do not rerun, tune,
+register, or stack E39. Any successor requires new held-out cases and must
+target only fact/inference leakage and whole-path evidence retention.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -300,6 +309,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_actor_role_semantic_contrast_eval.py \
   tests/test_marketing_semantic_annotation_protocol.py \
   tests/test_semantic_baseline_comparison_eval.py \
+  tests/test_reading_comprehension_baseline_eval.py \
   tests/test_rooted_content_map_integration_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q

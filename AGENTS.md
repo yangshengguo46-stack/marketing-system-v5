@@ -333,5 +333,12 @@ These apply repo-wide; module guides own the module-specific detail.
   stay out of model messages. Even a complete pass only permits a later
   `MessagePlan` comparison; it does not register a Skill, Tool, middleware,
   workflow stage, or subagent.
+  The unique frozen E39 run did not pass A56. Manual blind review improved from
+  `23/36` to `31/36` and the candidate used fewer tokens, but it reached only
+  `13/15` action relations, `13/24` semantic groups, `5/6` complete evidence
+  sets, and still had two fact-boundary failures. ADR-020 rejects registration
+  and keeps `MessagePlan` paused. Do not rerun or tune these six cases; a
+  successor must use new held-out material and target only interpretation
+  leakage into fact fields plus path/evidence loss during convergence.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.
