@@ -1,0 +1,185 @@
+{
+  "evidence_id": "E32",
+  "recorded_at": "2026-08-14",
+  "purpose": "Evaluate a plain-language thin semantic lattice on seven new held-out contrast cases.",
+  "production_baseline": {
+    "commit_before_live_run": "3652261b",
+    "frozen_candidate_commit": "41a6eb83",
+    "production_code_changed": false,
+    "runtime_registered": false
+  },
+  "candidate": {
+    "stage_one": "nullable source object, direct use, practice/result possibility, business return path, over-abstraction risk, and candidate roots",
+    "stage_two": "independent source-object and audience-world convergence with permission to correct stage one",
+    "candidate_prompt_sha256": "f87cb2194b4fd430d90bc95212d4c7f961a9b67a65fdb0280137f25783448257",
+    "decision_prompt_sha256": "4e817be86f8f10877c0c23f6d12aaacb0f4a9014e9555303b0f2fd13122735fc"
+  },
+  "preregistered_acceptance": {
+    "zero_contract_failures": true,
+    "minimum_candidate_recall": 6,
+    "minimum_final_convergence": 6,
+    "all_four_contrast_pairs": true,
+    "no_fabricated_completeness": true,
+    "production_registration_on_pass": false
+  },
+  "evaluation": {
+    "run_id": "e32-thin-lattice-heldout-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 7,
+    "provider_call_budget": 16,
+    "provider_calls": 14,
+    "candidate_schema_repairs": 0,
+    "decision_schema_repairs": 0,
+    "contract_failures": 0,
+    "candidate_recall_passed": 5,
+    "final_convergence_passed": 3,
+    "contrast_pairs_passed": 1,
+    "contrast_pair_count": 4,
+    "usage": {
+      "input_tokens": 11610,
+      "output_tokens": 8784,
+      "total_tokens": 20394
+    },
+    "elapsed_seconds_total": 250.308,
+    "automatic_acceptance_passed": false,
+    "manual_fact_boundary_passed": false,
+    "acceptance_passed": false
+  },
+  "case_results": [
+    {
+      "case_id": "tea-shop-container",
+      "candidate_recall": "passed",
+      "final_convergence": "passed",
+      "source_object": "茶叶",
+      "audience_world": "茶叶",
+      "world_kind": "object",
+      "diagnosis": "The model compared the tea object with a drinking-practice candidate and retained the complete object root."
+    },
+    {
+      "case_id": "tea-direct-product",
+      "candidate_recall": "passed",
+      "final_convergence": "failed",
+      "source_object": "茶叶",
+      "audience_world": "饮茶实践",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "The first stage contained the qualifying tea-object candidate. The second stage promoted ordinary drinking and tasting activity after the business expression changed only from opening a tea shop to selling tea."
+    },
+    {
+      "case_id": "silver-business-gift",
+      "candidate_recall": "passed",
+      "final_convergence": "passed",
+      "source_object": "银质商务礼品",
+      "audience_world": "商务赠礼实践",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "The model treated the material as replaceable and selected the recurring gifting relationship served by the product."
+    },
+    {
+      "case_id": "wood-business-gift",
+      "candidate_recall": "passed",
+      "final_convergence": "passed",
+      "source_object": "木质商务礼品定制",
+      "audience_world": "商务赠礼实践",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "The material substitution preserved the same gifting-practice root. A stage-one return-path sentence suggested showing customization cases even though existing cases were not supplied."
+    },
+    {
+      "case_id": "silver-jewelry",
+      "candidate_recall": "passed",
+      "final_convergence": "failed",
+      "source_object": "银饰设计",
+      "audience_world": "银饰设计与手作实践",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "The first stage contained a qualifying silver-jewelry object candidate, but convergence promoted design and handcraft process. The input said only that the subject does jewelry design; hand production capability was not established and was later listed as unknown by the same answer."
+    },
+    {
+      "case_id": "japanese-curry-block",
+      "candidate_recall": "failed",
+      "final_convergence": "failed",
+      "source_object": "日式咖喱块",
+      "audience_world": "日式家庭咖喱烹饪",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "Both stages treated an ordinary cooking process as the parent world instead of returning the intermediate product to the complete curry object. The visible answer also used unsupported quality and convenience language."
+    },
+    {
+      "case_id": "thai-curry-sauce",
+      "candidate_recall": "failed",
+      "final_convergence": "failed",
+      "source_object": "泰式咖喱酱",
+      "audience_world": "泰式咖喱烹饪实践",
+      "world_kind": "activity_or_practice",
+      "diagnosis": "The second intermediate-product variant repeated the same cooking-practice abstraction, showing consistency around the wrong root rather than return to the curry object. Convenience and indispensability were asserted without evidence."
+    }
+  ],
+  "contrast_results": [
+    {
+      "contrast_id": "remove-business-container",
+      "status": "failed",
+      "observed": "茶叶/object -> 饮茶实践/activity_or_practice"
+    },
+    {
+      "contrast_id": "same-use-different-material",
+      "status": "passed",
+      "observed": "商务赠礼实践 -> 商务赠礼实践"
+    },
+    {
+      "contrast_id": "same-material-different-use",
+      "status": "failed",
+      "observed": "The worlds changed, but the jewelry side failed its reviewed object-root judgment and introduced an unsupported handcraft capability."
+    },
+    {
+      "contrast_id": "intermediate-style-substitution",
+      "status": "failed",
+      "observed": "Both cases were invariant around cooking practice, but both missed the reviewed curry object root."
+    }
+  ],
+  "manual_fact_boundary_review": {
+    "frozen_score_changed_posthoc": false,
+    "status": "failed",
+    "findings": [
+      "The silver-jewelry result promoted handcraft and production process even though only design was observed and production mode remained unknown.",
+      "The wood-gift stage-one return path suggested existing customization cases without evidence that cases were available.",
+      "The curry answers used unobserved quality, convenience, and indispensability language to make the return path sound complete."
+    ]
+  },
+  "comparison_to_e31": {
+    "case_sets_are_directly_comparable": false,
+    "e31_contract_failures": 2,
+    "e32_contract_failures": 0,
+    "e31_total_tokens": 43017,
+    "e32_total_tokens": 20394,
+    "e31_elapsed_seconds": 476.932,
+    "e32_elapsed_seconds": 250.308,
+    "inference": "The thin lattice substantially reduced contract surface, token use, and elapsed time. It did not remove the convergence prior toward ordinary use, production process, or theory-sounding practice roots."
+  },
+  "architecture_learning": {
+    "retained": [
+      "Candidate recall and final convergence remain a useful diagnostic split.",
+      "The product-to-use-to-gifting-practice leap transferred across two materials without industry examples in the prompts.",
+      "Held-out contrast pairs reveal semantic instability and consistently wrong invariance that isolated output review would miss.",
+      "Nullable plain-language fields are more contract-stable and cheaper than the full E31 theory object."
+    ],
+    "rejected": [
+      "Registering the current independent-case two-call lattice as a Lead stage, Tool, Skill, subagent, middleware, or Gateway path.",
+      "Assuming that a thinner handoff alone fixes final root selection.",
+      "Treating pairwise consistency as correctness when both members can preserve the same wrong abstraction.",
+      "Adding more theory fields, business examples, agents, or hard action-word gates to rescue this frozen run."
+    ],
+    "next_candidate_boundary": "First obtain human review of the new tea, jewelry, and curry contrast labels. If confirmed, a new preregistered experiment may expose one minimal pair and ask for the invariant or changed relation before selecting roots. It must use new held-out cases, stay optional/offline, and replace rather than stack this candidate."
+  },
+  "artifact_sha256": {
+    "manifest_json": "d63a38428e4a08c55c8e25162755859acb016083686e32f1da23ea547137314e",
+    "results_json": "28e66b0b134e04cc9a5cf0a391b3067064d1e201fbe88ce2ffbd4123182913a4",
+    "completion_json": "c55f48816b9584e0ff0feb890bd3bd8bf902d6375db8dc4793c7a2324ce19e59"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "full_parsed_intermediate_lattices_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_independent_thin_lattice_keep_recall_convergence_and_contrast_diagnostics"
+}

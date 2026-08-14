@@ -1,17 +1,20 @@
 ---
 id: A47
-status: traced
+status: reviewed
 preregistered_at: 2026-08-14
+reviewed_at: 2026-08-14
 baseline_commit: 92556f2a
 frozen_preregistration_commit: d4ea6007
 frozen_candidate_commit: 41a6eb83
 candidate_runtime_registered: false
-decision: pending_frozen_evaluation
+decision: reject_independent_thin_lattice_keep_diagnostics
 sources:
   - docs/mcn-incubation-v5/audits/A45-marketing-semantic-causal-theory.md
   - docs/mcn-incubation-v5/audits/A46-semantic-concept-bottleneck-preregistration.md
   - docs/mcn-incubation-v5/evidence/E31-semantic-concept-bottleneck-evaluation.json
   - docs/mcn-incubation-v5/decisions/ADR-011-reject-full-semantic-concept-bottleneck.md
+  - docs/mcn-incubation-v5/evidence/E32-thin-semantic-lattice-evaluation.json
+  - docs/mcn-incubation-v5/decisions/ADR-012-reject-independent-thin-semantic-lattice.md
 ---
 
 # A47 薄语义格留出对比评测预登记
@@ -79,3 +82,17 @@ E31 证明同一模型有时已经想到正确候选，却在最终收敛时被�
 - 不出现为补齐结构而编造的主体能力、素材、案例、数据、史实或业务条件。
 
 任一条失败，候选就停留在离线证据。即使全部通过，本轮也不修改 Lead、现役 Tool、Skill、子 Agent、中间件或 Gateway；通过只允许进入人工业务复核和生产探针设计。
+
+## 冻结运行结果
+
+- 运行 `e32-thin-lattice-heldout-20260814-01` 完成七题和 `14` 个主调用，两阶段均未使用 Schema 修复。总计 `20,394 tokens / 250.308s`。
+- 零合同失败；候选召回 `5/7`，低于 `6/7`；最终收敛 `3/7`，低于 `6/7`；四组对比只通过商务礼品材质替换一组。
+- 茶叶店与卖茶叶只改变经营容器表达，最终却分别选了茶叶和饮茶实践。银饰候选已包含对象根，收敛仍选了设计/手作实践。日式咖喱块与泰式咖喱酱都没有回到咖喱对象，而是一致选错为烹饪实践。
+- 商务礼品的银质/木质变体均通过，证明“物件 -> 直接用途 -> 赠礼关系”这一跃迁可以在无行业示例提示时迁移。
+- 人工事实复核另外发现银饰手作/加工能力、木质礼品定制案例，以及咖喱的优质/便捷/不可或缺等未经证实的完整化细节，独立触发止损。
+
+## 结论
+
+E32 未通过，不进生产。它把 E31 的合同失败从两例降为零，并减少约一半的 Token 与耗时，所以“薄且可空”的工程形状值得保留。但它没有改掉模型对普通使用、烹饪和生产过程的收敛偏好。
+
+冻结分数不作事后修改。下一步先由用户复核茶叶、银饰和咖喱三类新标签是否符合营销口径；若成立，后续只测试一个新的“先判断最小变体中什么应保持/改变，再选根”候选，并替换而非叠加 E32。详见 E32 与 ADR-012。

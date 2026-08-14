@@ -150,11 +150,15 @@ phrases over the reviewed fruit, watch, and beauty roots. ADR-011 rejects the
 full bottleneck for production. Retain only the diagnostic separation between
 candidate recall and final convergence; do not pass the full theory object into
 Lead context or rerun E31's six cases as a tuned benchmark.
-E32 is the only allowed successor experiment: a plain-language thin lattice on
-seven new held-out cases with hidden metamorphic checks. Do not put its
-intermediate object into Lead context, add business examples to its prompts, or
-change its frozen cases/labels after the live run. A passing offline result is
-evidence for a later production probe, not production approval.
+E32's plain-language thin lattice passed all JSON contracts but reached only
+five of seven candidate recalls, three of seven final convergences, and one of
+four held-out contrasts. It preserved the gifting leap across material changes
+but remained unstable under a business-container change and promoted ordinary
+drinking, cooking, design, and handcraft processes over object roots. ADR-012
+rejects it for production. Do not put its intermediate object into Lead
+context, add examples or theory to its frozen prompts, or rerun/tune its seven
+cases. Retain only the thin-contract shape and recall/convergence/contrast
+diagnostics for a separately preregistered replacement experiment.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
