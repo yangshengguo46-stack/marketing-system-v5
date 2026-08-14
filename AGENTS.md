@@ -288,5 +288,11 @@ These apply repo-wide; module guides own the module-specific detail.
   objects are equal candidate directions; the target is the largest effective
   content world followed by actual rooted map nodes. Keep `ca2af9f8` unchanged,
   and do not rerun, tune, stack, or register E35/E36.
+  E37 is a separate frozen one-call development regression. It emits only a
+  source object, competing content subjects, one selected content world,
+  actual map nodes bound to that selected candidate id, and unknowns. Its four
+  user-corrected labels remain hidden from model messages. Do not change its
+  prompt, cases, repair budget, or acceptance after the live run begins, and do
+  not infer production readiness from a development-set pass.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

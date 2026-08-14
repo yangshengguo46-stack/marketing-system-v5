@@ -141,6 +141,12 @@ The retained E16 research utilities are deliberately offline:
   compares roots in plain language, selects object and audience worlds by id,
   and binds the selected term and kind deterministically. Six entirely new
   cases and exact normalized aliases remain hidden until both arms finish.
+- `scripts/run_rooted_content_map_integration_eval.py` is the isolated E37
+  one-call development regression. It generates competing content subjects,
+  binds one selected content world to a known candidate id, and requires every
+  actual map node to reference that same id. It omits the dual-world contract,
+  content engines, attention entries, presentation, and operations. The four
+  user-corrected labels are review-only and never enter model messages.
 
 These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
@@ -221,6 +227,11 @@ the dual-world adoption direction: actions, uses, needs, relations, results,
 culture, and complete objects are equal candidate directions; the target is the
 largest effective content world followed by actual rooted map nodes. Keep
 `ca2af9f8` unchanged. Do not rerun, tune, stack, or register E35/E36.
+E37 is frozen at prompt SHA-256
+`c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608`
+before its single development run. Do not alter its prompt, four cases, shared
+repair budget, or acceptance after execution begins. A development-set pass is
+not production or generalization evidence.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -242,6 +253,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_actor_role_semantic_contrast_eval.py \
   tests/test_marketing_semantic_annotation_protocol.py \
   tests/test_semantic_baseline_comparison_eval.py \
+  tests/test_rooted_content_map_integration_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```

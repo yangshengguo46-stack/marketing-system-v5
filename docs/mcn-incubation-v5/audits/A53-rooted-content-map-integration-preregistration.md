@@ -3,8 +3,9 @@ id: A53
 status: traced
 preregistered_at: 2026-08-14
 baseline_commit: ca2af9f8905698a0ad81a204350afa07fb840bcf
-frozen_test_commit: pending
-frozen_candidate_commit: pending
+frozen_test_commit: bcd79b7f
+frozen_candidate_commit: 7ff281a9
+candidate_prompt_sha256: c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608
 runtime_registered: false
 decision: pending_single_run
 sources:
@@ -61,3 +62,5 @@ E37 不叠加 E35 与 E29。它缩成一次调用内的一个完整判断：生�
 - 四例实际根化内容地图人工复核 `4/4`；轴标签、内容形式或经营动作不能冒充节点。
 - 不编造用户能力、资源、案例、数据和确定史实。
 - 任一项失败即拒绝 E37。即使全部通过，也只证明已知开发回归可以结合，不自动注册生产；还需新的未见案例验证泛化。
+
+冻结测试与预登记提交为 `bcd79b7f`，冻结候选实现提交为 `7ff281a9`，提示 SHA-256 为 `c769e3eed640ccc39da5543b264da2bc0ae046cbe80792ac7e60136ae85fd608`。真实运行前，E37 与相关旧评测回归为 `56 passed`，ruff 检查和格式检查均通过。
