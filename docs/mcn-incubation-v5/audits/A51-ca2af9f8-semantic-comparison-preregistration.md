@@ -9,6 +9,7 @@ frozen_preregistration_commit: 313913a1
 frozen_candidate_commit: 60865135
 runtime_registered: false
 decision: retain_ca2af9f8_full_structure_adopt_dual_world_direction_only
+superseded_by: ADR-016
 sources:
   - docs/mcn-incubation-v5/audits/A42-content-structure-and-commerce-boundary.md
   - docs/mcn-incubation-v5/audits/A50-user-reviewed-semantic-annotation-protocol.md
@@ -85,3 +86,7 @@ sources:
 ## 结论
 
 保留 `ca2af9f8` 作为完整结构基线；采用“对象世界 / 观众世界”双世界注意力作为下一次最小内部改造方向。E35 比较器和候选调用不注册生产，六题不再重跑。详见 E35 与 ADR-015。
+
+## 后续纠正
+
+E36 使用四个用户亲自纠正的开发案例原样回归后，E35 候选语义迁移与内容地图均为 `0/4`。因此本节的“采用双世界注意力方向”已被 ADR-016 撤销；保留 `ca2af9f8` 基线的结论不变。

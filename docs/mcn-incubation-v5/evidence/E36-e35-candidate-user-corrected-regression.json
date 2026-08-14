@@ -1,0 +1,110 @@
+{
+  "evidence_id": "E36",
+  "recorded_at": "2026-08-14",
+  "purpose": "Regress the unchanged E35 semantic candidate against the four user-corrected development cases and separately verify whether it emits a rooted content map.",
+  "candidate": {
+    "prompt_sha256": "0bdc826d1256828f399515dc5a4f9149603947cd7ca22397915f45bf2e886b6f",
+    "production_changed": false,
+    "runtime_registered": false,
+    "user_gold_in_model_messages": false,
+    "content_map_contract_present": false
+  },
+  "evaluation": {
+    "run_id": "e36-e35-candidate-four-user-cases-20260814-01",
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "case_count": 4,
+    "provider_calls": 4,
+    "repair_calls": 0,
+    "contract_failures": 0,
+    "usage": {
+      "input_tokens": 3746,
+      "output_tokens": 5119,
+      "total_tokens": 8865
+    }
+  },
+  "user_reviewed_acceptance": {
+    "fruit-shop": {
+      "object_world": "水果",
+      "audience_world": "水果"
+    },
+    "gold-gift": {
+      "object_world": "礼品",
+      "audience_world": "送礼与人情往来"
+    },
+    "seafood-source": {
+      "object_world": "海鲜",
+      "audience_world": "海鲜"
+    },
+    "chongqing-hotpot-base": {
+      "object_world": "火锅",
+      "audience_world": "火锅"
+    },
+    "content_map_requirement": "Emit actual rooted expansion nodes; capacity-axis labels alone do not qualify."
+  },
+  "case_results": [
+    {
+      "case_id": "fruit-shop",
+      "object_world": "水果零售",
+      "audience_world": "日常水果挑选与消费",
+      "semantic_status": "failed",
+      "content_map_status": "failed",
+      "diagnosis": "The model replaced the fruit object with seller retail and ordinary buyer consumption. Its axes focused on display, pricing, loss control, selection, and eating rather than the complete fruit world."
+    },
+    {
+      "case_id": "gold-gift",
+      "object_world": "黄金礼品加工与定制",
+      "audience_world": "黄金礼赠",
+      "semantic_status": "failed",
+      "content_map_status": "failed",
+      "diagnosis": "The model retained gold material and seller processing in both candidate roots. It approached gifting but did not recover the broader gift object or gifting and human-relations world."
+    },
+    {
+      "case_id": "seafood-source",
+      "object_world": "海鲜源头生产与获取",
+      "audience_world": "海鲜产地实况与市场行情",
+      "semantic_status": "failed",
+      "content_map_status": "failed",
+      "diagnosis": "The model reproduced the rejected source-operation, B/C, supply, price, selection, and trust templates and omitted seafood itself as a candidate root."
+    },
+    {
+      "case_id": "chongqing-hotpot-base",
+      "object_world": "重庆火锅风味还原与延伸",
+      "audience_world": "家庭火锅聚餐实践",
+      "semantic_status": "failed",
+      "content_map_status": "failed",
+      "diagnosis": "The model let regional flavor and one family-use scene narrow the complete hotpot world. Plain hotpot was not recalled as a candidate."
+    }
+  ],
+  "summary": {
+    "semantic_migration_passed": 0,
+    "semantic_migration_total": 4,
+    "rooted_content_map_passed": 0,
+    "rooted_content_map_total": 4,
+    "complete_acceptance_passed": 0,
+    "complete_acceptance_total": 4,
+    "candidate_accepted": false
+  },
+  "root_cause": {
+    "prompt_bias": "Actions, uses, and long-term needs receive repeated positive attention, so the model promotes them over complete object worlds even when the object is the larger valid content root.",
+    "contract_gap": "The candidate contract stores only capacity-axis labels and does not require actual content-map nodes under the selected root.",
+    "evaluation_learning": "System-authored unseen labels in E35 were insufficient to establish alignment with the user's marketing semantics. User-reviewed development regressions remain mandatory alongside unseen generalization cases."
+  },
+  "retained_target": {
+    "semantic_migration": "Generate competing content-subject candidates from object hierarchy, use, action, relation, result, culture, and other relevant directions without granting any direction priority.",
+    "selection": "The Lead chooses the largest effective content world that remains specific enough to return naturally to the business.",
+    "content_map": "Expand actual nodes from the selected root across applicable vertical, horizontal, temporal, spatial, cultural, character, event, conflict, and cross-domain dimensions."
+  },
+  "artifact_sha256": {
+    "results_json": "a3e36ed84c009c1fff67c1dab4013971d8fcbd473bf642d30d5a3ab19f853891"
+  },
+  "privacy": {
+    "raw_visible_answers_committed": false,
+    "reviewed_semantic_summaries_committed": true,
+    "provider_reasoning_committed": false,
+    "provider_reasoning_hash_only": true,
+    "credentials_committed": false
+  },
+  "decision": "reject_e35_need_biased_candidate_and_require_semantic_migration_plus_rooted_content_map"
+}

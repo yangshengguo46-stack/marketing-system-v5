@@ -213,12 +213,14 @@ case with the same GLM model and evidence. Do not alter either prompt, hidden
 aliases, cases, thresholds, or repair budget after the run begins. A candidate
 win cannot replace the baseline's content-engine or attention-entry behavior;
 it only supports a separately reviewed semantic-core promotion decision.
-The frozen run failed the exact-alias threshold. Manual review found systematic
-false negatives and a four-better/two-tradeoff candidate signal, but did not
-repair the score. ADR-015 retains `ca2af9f8` as the full-structure rollback
-baseline and permits only a future minimal internal dual-world attention
-change. Do not rerun E35, add post-run aliases, register its evaluator, or drop
-the baseline's content engines and attention entries.
+The frozen run failed the exact-alias threshold. Its initial manual review found
+false negatives, but E36 then tested the unchanged candidate on the four
+user-corrected fruit, golden-gift, seafood, and hot-pot-base cases. Semantic
+migration and rooted content-map acceptance were both `0/4`. ADR-016 supersedes
+the dual-world adoption direction: actions, uses, needs, relations, results,
+culture, and complete objects are equal candidate directions; the target is the
+largest effective content world followed by actual rooted map nodes. Keep
+`ca2af9f8` unchanged. Do not rerun, tune, stack, or register E35/E36.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
