@@ -247,5 +247,12 @@ These apply repo-wide; module guides own the module-specific detail.
   and theory-shaped over-abstraction during convergence. ADR-011 rejects that
   runtime architecture. Preserve candidate-recall versus final-convergence as
   an evaluation distinction only; do not register E31 or tune on its six cases.
+  E32 is a separately preregistered offline successor using only a nullable
+  plain-language thin lattice and seven new held-out contrast cases. It checks
+  container and material invariance, use sensitivity, and return from an
+  intermediate product to its parent object. It must not read E31's cases,
+  expose hidden labels to the model, or enter Lead context. A frozen passing
+  result permits only later human review and production-probe design; it does
+  not register a runtime stage.
 - **Format before pushing** — run `make format` (backend) / `pnpm check` (frontend). Backend
   CI enforces `ruff format --check`, so formatting must be clean before a push.

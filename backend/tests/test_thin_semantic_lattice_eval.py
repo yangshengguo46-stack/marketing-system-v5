@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import asyncio
 import json
+from argparse import Namespace
+from pathlib import Path
 
 import pytest
 from langchain_core.messages import AIMessage
+
 from scripts.run_thin_semantic_lattice_eval import (
     CANDIDATE_SYSTEM_PROMPT,
     DECISION_SYSTEM_PROMPT,
+    FROZEN_MODEL,
     build_candidate_messages,
     build_decision_messages,
     calculate_primary_call_count,
@@ -18,6 +22,7 @@ from scripts.run_thin_semantic_lattice_eval import (
     parse_world_decision,
     review_contrast_pairs,
     review_thin_lattice_result,
+    run_evaluation,
     run_thin_lattice_case,
 )
 
@@ -304,3 +309,20 @@ def test_call_budget_is_sealed_for_seven_two_call_cases_without_a_model_judge():
         )
         == 16
     )
+
+
+def test_live_runner_rejects_any_model_outside_the_preregistered_single_model(tmp_path: Path):
+    args = Namespace(
+        execute=True,
+        models=["unfrozen-model"],
+        case_ids=[],
+        max_calls=14,
+        max_candidate_repair_calls=1,
+        max_decision_repair_calls=1,
+        seed=80,
+        output_root=tmp_path,
+        run_id="must-not-run",
+    )
+    assert FROZEN_MODEL == "glm-5-2-260617"
+    with pytest.raises(ValueError, match="frozen model"):
+        asyncio.run(run_evaluation(args))

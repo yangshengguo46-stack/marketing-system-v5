@@ -108,8 +108,16 @@ The retained E16 research utilities are deliberately offline:
   Hidden review labels run after both calls. Empty concept groups are valid and
   count as missed recall rather than contract failure, so this evaluator must
   not become a mandatory Lead workflow or required questionnaire.
+- `scripts/run_thin_semantic_lattice_eval.py` is the separately preregistered
+  E32 held-out evaluator. It does not modify or rerun E31. Its first call
+  exposes only nullable plain-language source object, direct use, possible
+  practice/result, business return path, over-abstraction risk, and candidate
+  roots. Its second call may select or correct those roots. Hidden review then
+  checks candidate recall, final convergence, and four container/material/use/
+  intermediate-product contrast relations across seven new cases. It remains
+  offline even if its frozen threshold passes.
 
-All four require explicit `--execute`, enforce a sealed call count, and persist
+These utilities require explicit `--execute`, enforce a sealed call count, and persist
 only visible output plus hashes/usage under the gitignored `.deer-flow/`.
 Provider reasoning is hashed rather than persisted. The runtime tools are
 available only to the default Lead on demand, never as middleware or mandatory
@@ -142,6 +150,11 @@ phrases over the reviewed fruit, watch, and beauty roots. ADR-011 rejects the
 full bottleneck for production. Retain only the diagnostic separation between
 candidate recall and final convergence; do not pass the full theory object into
 Lead context or rerun E31's six cases as a tuned benchmark.
+E32 is the only allowed successor experiment: a plain-language thin lattice on
+seven new held-out cases with hidden metamorphic checks. Do not put its
+intermediate object into Lead context, add business examples to its prompts, or
+change its frozen cases/labels after the live run. A passing offline result is
+evidence for a later production probe, not production approval.
 The offline evaluators remain unregistered. The
 rejected full-adviser, Lead-handoff, and content-world selector experiments
 remain ledger evidence only; do not restore or stack them without a separately
@@ -158,6 +171,7 @@ PYTHONPATH=. uv run pytest \
   tests/test_layered_content_map_eval.py \
   tests/test_two_step_content_map_eval.py \
   tests/test_semantic_concept_bottleneck_eval.py \
+  tests/test_thin_semantic_lattice_eval.py \
   tests/test_business_semantics_tool.py \
   tests/test_content_world_explorer_tool.py -q
 ```
