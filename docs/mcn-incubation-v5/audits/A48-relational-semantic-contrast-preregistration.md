@@ -3,7 +3,8 @@ id: A48
 status: traced
 preregistered_at: 2026-08-14
 baseline_commit: 6e672095
-frozen_candidate_commit: pending
+frozen_preregistration_commit: 290f8054
+frozen_candidate_commit: b612db21
 candidate_runtime_registered: false
 decision: pending_frozen_evaluation
 sources:
@@ -53,6 +54,8 @@ E33 不修改或重跑 E32，而是用全新案例测试一个替代架构：
 - 可见中间态只保存在 gitignored 的 `.deer-flow/`；供应方隐藏思考只保留哈希。
 - 代码、测试、预登记和提示哈希必须先提交，再运行唯一一轮。运行后不改题、不改标签、不改分数、不拼局部最佳。
 
+冻结预登记提交为 `290f8054`，冻结候选实现提交为 `b612db21`。关系提示 SHA-256 为 `2b503a8ab9d81ea02f25648117e6529f9a2107ff0d7bb3e3d22a0d5afd39cc77`，收敛提示 SHA-256 为 `ac137463c3fcb0881ebc15c5a064ea383fac3917ce32f9b3429a2d81be49cfd4`。真实运行前的相关后端回归为 `173 passed`。
+
 ## 通过与止损
 
 E33 只在同时满足以下条件时通过离线门：
@@ -65,4 +68,3 @@ E33 只在同时满足以下条件时通过离线门：
 - 人工复核不存在为补齐关系或返回路径而编造的主体能力、素材、案例、数据、史实或业务条件。
 
 任一条失败，候选就停留在离线证据。即使全部通过，也只允许进入用户业务复核和单次生产探针设计，不自动注册 Lead、Tool、Skill、子 Agent、中间件或 Gateway。
-
