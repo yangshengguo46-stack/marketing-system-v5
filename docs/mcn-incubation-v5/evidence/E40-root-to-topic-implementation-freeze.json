@@ -1,0 +1,47 @@
+{
+  "evidence_id": "E40-root-to-topic-implementation-freeze",
+  "status": "frozen_before_live_run",
+  "frozen_at": "2026-08-14",
+  "preregistration": {
+    "audit": "A60-e40-root-to-topic-combination-preregistration.md",
+    "commit": "ce61bbd8d7ceb98bea19495d6abc2046f4a70335"
+  },
+  "implementation": {
+    "commit": "a45079a7a3f56450ebaa972dc27e406fe691b6bc",
+    "tree": "604e3ba7963b414d28bba3326b3df7f78eaa2f71"
+  },
+  "frozen_hashes": {
+    "discovery_method_sha256": "c5e67124a1c2cf633b95820b0fac3710059b5c6bc2f4e3a8843fbb6d5da9b604",
+    "discovery_agent_metadata_sha256": "e048af9e4e33d423c889face52c8b271ebc95d928326c26207328f71e74e85cd",
+    "runner_sha256": "70d700d0b1b3bf5c2fa63d9e30f4e2087286679685a3085259a6ebb309ed07ae",
+    "test_sha256": "f85fd0c07a8a1450b632b6ebfa72adb93659cd97d2f303c70c5352ca10872321",
+    "reading_method_sha256": "7150ffafc2f4e77b98e853426c1582ba1e0a75b9e238d26438425e9abb2ce9cb",
+    "discovery_system_prompt_sha256": "8e450fed52ef0141e85c1d96b7686c3386aa130bd9ff18d0432e20c487ad30ab",
+    "discovery_output_contract_sha256": "7336cd265e2b246db8a74cd1ac04ca9e2147c6946c5ddab2d6a814fa498a848c",
+    "frozen_input_payload_sha256": "cb1f459eebdc0dbe85c71a2022544472b70b5352d2db1a7feaa6899e8fb6ede6",
+    "hidden_acceptance_sha256": "a6584463e343581b743221000b369a5f792197561cde09617dfbe45023ddba84"
+  },
+  "sealed_run": {
+    "model": "glm-5-2-260617",
+    "thinking_enabled": true,
+    "reasoning_effort": "low",
+    "primary_call_limit": 4,
+    "discovery_repair_call_limit": 1,
+    "reading_repair_call_limit": 1,
+    "maximum_provider_calls": 6,
+    "searched_candidate_limit": 4,
+    "queries_per_candidate_limit": 2,
+    "results_per_query_limit": 5,
+    "reading_candidate_limit": 3,
+    "evidence_items_per_candidate_limit": 8,
+    "evidence_claim_character_limit": 700
+  },
+  "verification": {
+    "command": "PYTHONPATH=. uv run pytest tests/test_root_to_topic_combination_probe.py tests/test_reading_comprehension_baseline_eval.py tests/test_content_world_explorer_tool.py tests/test_business_semantics_tool.py -q",
+    "result": "71 passed",
+    "ruff": "passed",
+    "format": "passed"
+  },
+  "runtime_registered": false,
+  "production_decision": "not_evaluated"
+}
