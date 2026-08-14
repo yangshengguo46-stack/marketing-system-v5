@@ -2,9 +2,10 @@
 id: A58
 status: reviewed
 reviewed_at: 2026-08-14
-decision: unseen_cigar_cafe_failed_before_topic_generation
+decision: ambiguous_cigar_cafe_failed_and_requires_lexical_contrast
 production_code_changed: false
 runtime_registered: false
+interpretation_corrected_by: A59
 sources:
   - Gateway thread eval_cigar_cafe_unseen_20260814_01
   - Gateway run c5c8eb5a-ed18-40e0-8d15-c08aa5173d42
@@ -39,6 +40,8 @@ sources:
 | 具体选题生成 | 失败 | 现役链路停在类别级地图，没有调用选题证据桥，未形成“经典照片里是哪款雪茄”。 |
 
 本题按用户锁定验收为 **完整失败**。它不否定四个已知开发案例的 `4/4` 回归，但否定了据此宣称“陌生业务已稳定达到 80 分”。
+
+> 后续纠正：用户指出“雪茄咖”中的“咖”可能将模型吸引到咖啡馆。A59 使用无歧义的“我是开雪茄馆的”作最小对照，最终可见回答正确选回“雪茄”。因此 A58 不能单独证明通用根选择完全失败；它首先是一个词义歧义与过度补全失败。具体人物与选题生成仍然失败。
 
 ## 病因
 
